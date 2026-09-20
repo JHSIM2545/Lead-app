@@ -68,7 +68,7 @@
     label.form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #3c4043; }
     .req { color: #d93025; margin-left: 2px; }
     .opt { color: #5f6368; font-weight: normal; font-size: 0.75rem; margin-left: 4px; }
-    input[type="text"], input[type="tel"], input[type="password"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
+    input[type="text"], input[type="tel"], input[type="password"], select, textarea {
       width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 8px;
       font-size: 16px; background-color: #fafbfc; transition: border-color 0.2s;
     }
@@ -250,7 +250,7 @@
       pointer-events: auto !important;
     }
     .modal-card {
-      background: #ffffff; width: 100%; max-width: 540px; max-height: 90vh;
+      background: #ffffff; width: 100%; max-width: 580px; max-height: 90vh;
       border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
       box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     }
@@ -276,6 +276,28 @@
     .status-update-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 10px; padding: 14px; margin-top: 14px; }
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
     .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
+
+    /* 안건 수정/삭제 권한 관리자/작성자 전용 패널 */
+    .lead-author-actions {
+      background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
+      padding: 12px 14px; margin-top: 16px; display: none;
+    }
+    .lead-author-actions-title {
+      font-size: 0.86rem; font-weight: 800; color: #c5221f; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .lead-action-btns { display: flex; gap: 8px; }
+    .btn-action-edit {
+      flex: 1; padding: 9px; background: #ffffff; color: #1a73e8; border: 1.5px solid #1a73e8;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+    .btn-action-del {
+      flex: 1; padding: 9px; background: #fce8e6; color: #d93025; border: 1px solid #fad2cf;
+      border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+
+    /* 수정 폼 모달 */
+    #editLeadContainer { display: none; margin-top: 10px; background: #fff; border-radius: 8px; padding: 10px; border: 1px solid #dadce0; }
 
     body.on-login { background: #ffffff; }
     body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
@@ -613,6 +635,64 @@
           <div class="detail-val"><div class="modal-photo-grid" id="mPhotoGrid"></div></div>
         </div>
 
+        <!-- 안건 정보 수정 입력창 (토글) -->
+        <div id="editLeadContainer">
+          <h4 style="margin:0 0 8px 0; color:#1a73e8; font-size:0.9rem;">📝 안건 상세 수정</h4>
+          <div class="form-group">
+            <label class="form-label">고객명/상호</label>
+            <input type="text" id="editCustomerName">
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label class="form-label">대표/담당자</label>
+              <input type="text" id="editContactPerson">
+            </div>
+            <div class="form-group">
+              <label class="form-label">연락처</label>
+              <input type="tel" id="editContactPhone">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">사업장 주소</label>
+            <input type="text" id="editAddress">
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <label class="form-label">업종</label>
+              <input type="text" id="editBusinessType">
+            </div>
+            <div class="form-group">
+              <label class="form-label">현재사용회사</label>
+              <input type="text" id="editCurrentCompany">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">관심상품</label>
+            <input type="text" id="editProduct">
+          </div>
+          <div class="form-group">
+            <label class="form-label">현장설명</label>
+            <textarea id="editFieldDesc" rows="3"></textarea>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button type="button" class="btn-save-status" id="btnConfirmEditLead" style="margin-top:0;">수정 완료 저장</button>
+            <button type="button" id="btnCancelEditLead" style="padding:10px 16px; background:#f1f3f4; border:none; border-radius:8px; font-weight:700; cursor:pointer;">취소</button>
+          </div>
+        </div>
+
+        <!-- 최초 작성자 및 관리자 전용 액션 영역 -->
+        <div class="lead-author-actions" id="authorActionsBox">
+          <div class="lead-author-actions-title">
+            <span>⚙️ 안건 관리 (최초 작성자 및 지사 관리자 전용)</span>
+            <span id="authorTag" style="font-size:0.75rem; color:#5f6368; font-weight:normal;"></span>
+          </div>
+          <div class="lead-action-btns">
+            <button type="button" class="btn-action-edit" id="btnEditLead">✏️ 안건 정보 수정</button>
+            <button type="button" class="btn-action-del" id="btnDeleteLead">🗑️ 안건 완전 삭제</button>
+          </div>
+        </div>
+
+        <!-- 진행상태 업데이트 -->
         <div class="status-update-box">
           <h4>⚡ 영업 진행상태 업데이트</h4>
           <div class="form-group">
@@ -699,9 +779,10 @@
       // ==========================================================
       var currentRole = '';
       var currentUserName = '';
+      var currentAgentPureName = ''; // CS 소개자 순수 이름 (예: '용승우')
       var currentStatusFilter = '전체';
       var currentLeadsData = [];
-      var activeLeadId = '';
+      var activeLeadItem = null;
       var uploadedPhotos = [];
 
       function showScreen(screenId) {
@@ -732,12 +813,12 @@
           } else {
             if (regTitle) regTitle.innerText = '🛡️ ' + currentUserName;
             if (regSub) regSub.innerText = '출동/CS 등록 모드';
-            if (regSwitch) regSwitch.style.display = 'none';
+            if (regSwitch) regSwitch.style.display = 'inline-block'; // CS 요원도 대시보드 열람 가능
           }
           loadRecentHistory();
         } else if (screenId === 'dashboard') {
           var dashSub = document.getElementById('dashUserSub');
-          if (dashSub) dashSub.innerText = (currentRole === 'admin' ? '👑 관리자' : '👤 ' + currentUserName) + ' 로그인 중';
+          if (dashSub) dashSub.innerText = (currentRole === 'admin' ? '👑 관리자' : (currentRole === 'consultant' ? '👤 ' + currentUserName : '🛡️ ' + currentUserName)) + ' 로그인 중';
           loadDashboardLeads();
         }
       }
@@ -1000,7 +1081,7 @@
       function openDetailModal(idx) {
         var item = currentLeadsData[idx];
         if (!item) return;
-        activeLeadId = item.lead_id;
+        activeLeadItem = item;
 
         document.getElementById('mTitle').innerText = item.customer_name || '';
         document.getElementById('mLeadId').innerText = item.lead_id || '';
@@ -1039,6 +1120,27 @@
         var uSel = document.getElementById('uStatus');
         if (uSel) uSel.value = item.status || '접수대기';
 
+        // ==========================================================
+        // ★ [핵심] 최초 작성자 및 관리자만 수정/삭제 버튼 활성화
+        // ==========================================================
+        var actionsBox = document.getElementById('authorActionsBox');
+        var authorTag = document.getElementById('authorTag');
+        var editContainer = document.getElementById('editLeadContainer');
+        if (editContainer) editContainer.style.display = 'none';
+
+        var canModify = false;
+        if (currentRole === 'admin') {
+          canModify = true;
+          if (authorTag) authorTag.innerText = '👑 관리자 권한';
+        } else if (currentRole === 'cs' && currentAgentPureName && item.agent_name && (currentAgentPureName === item.agent_name.trim())) {
+          canModify = true;
+          if (authorTag) authorTag.innerText = '🛡️ 최초 등록 요원 본인 건';
+        }
+
+        if (actionsBox) {
+          actionsBox.style.display = canModify ? 'block' : 'none';
+        }
+
         var modal = document.getElementById('detailModal');
         if (modal) modal.classList.add('open');
       }
@@ -1046,7 +1148,9 @@
       function closeDetailModal() {
         var modal = document.getElementById('detailModal');
         if (modal) modal.classList.remove('open');
-        activeLeadId = '';
+        var editContainer = document.getElementById('editLeadContainer');
+        if (editContainer) editContainer.style.display = 'none';
+        activeLeadItem = null;
       }
 
       async function loadRecentHistory() {
@@ -1086,6 +1190,7 @@
             if (!car) { showLoginError('csLoginErr', '담당 차량을 선택해주세요.'); return; }
 
             currentRole = 'cs';
+            currentAgentPureName = name;
             currentUserName = name + ' (' + car + '호)';
             document.getElementById('agentName').value = name;
             document.getElementById('carNumber').value = car;
@@ -1187,15 +1292,98 @@
           });
         });
 
+        // 상태 저장
         document.getElementById('btnSaveStatus').addEventListener('click', async function() {
-          if (!activeLeadId || !supabase) return;
+          if (!activeLeadItem || !supabase) return;
           var newSt = document.getElementById('uStatus').value;
           this.disabled = true; this.innerText = '저장 중...';
-          await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadId);
+          await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
           this.disabled = false; this.innerText = '상태 저장하기';
           alert('진행상태가 업데이트되었습니다.');
           closeDetailModal();
           loadDashboardLeads();
+        });
+
+        // ==========================================================
+        // ★ [작성자/관리자 전용] 안건 수정 UI 토글 및 Supabase 반영
+        // ==========================================================
+        document.getElementById('btnEditLead').addEventListener('click', function() {
+          if (!activeLeadItem) return;
+          var editBox = document.getElementById('editLeadContainer');
+          if (!editBox) return;
+
+          // 기존 값 채우기
+          document.getElementById('editCustomerName').value = activeLeadItem.customer_name || '';
+          document.getElementById('editContactPerson').value = activeLeadItem.contact_person || '';
+          document.getElementById('editContactPhone').value = activeLeadItem.contact_phone || '';
+          document.getElementById('editAddress').value = activeLeadItem.address || '';
+          document.getElementById('editBusinessType').value = activeLeadItem.business_type || '';
+          document.getElementById('editCurrentCompany').value = activeLeadItem.current_company || '';
+          document.getElementById('editProduct').value = activeLeadItem.product || '';
+          document.getElementById('editFieldDesc').value = activeLeadItem.field_description || '';
+
+          editBox.style.display = 'block';
+          editBox.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('btnCancelEditLead').addEventListener('click', function() {
+          document.getElementById('editLeadContainer').style.display = 'none';
+        });
+
+        document.getElementById('btnConfirmEditLead').addEventListener('click', async function() {
+          if (!activeLeadItem || !supabase) return;
+
+          var cName = document.getElementById('editCustomerName').value.trim();
+          var cPhone = document.getElementById('editContactPhone').value.trim();
+          if (!cName) { alert('고객명을 입력해주세요.'); return; }
+          if (!cPhone) { alert('연락처를 입력해주세요.'); return; }
+
+          this.disabled = true; this.innerText = '수정 저장 중...';
+
+          var updatedData = {
+            customer_name: cName,
+            contact_person: document.getElementById('editContactPerson').value.trim(),
+            contact_phone: formatPhone(cPhone),
+            address: document.getElementById('editAddress').value.trim(),
+            business_type: document.getElementById('editBusinessType').value.trim(),
+            current_company: document.getElementById('editCurrentCompany').value.trim(),
+            product: document.getElementById('editProduct').value.trim(),
+            field_description: document.getElementById('editFieldDesc').value.trim()
+          };
+
+          var res = await supabase.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
+          this.disabled = false; this.innerText = '수정 완료 저장';
+
+          if (!res.error) {
+            alert('✅ 안건 상세 정보가 성공적으로 수정되었습니다.');
+            closeDetailModal();
+            loadDashboardLeads();
+          } else {
+            alert('수정 실패: ' + res.error.message);
+          }
+        });
+
+        // ==========================================================
+        // ★ [작성자/관리자 전용] 안건 완전 삭제
+        // ==========================================================
+        document.getElementById('btnDeleteLead').addEventListener('click', async function() {
+          if (!activeLeadItem || !supabase) return;
+
+          var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객명: ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
+          if (!confirmDel) return;
+
+          this.disabled = true; this.innerText = '삭제 처리 중...';
+
+          var res = await supabase.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
+          this.disabled = false; this.innerText = '🗑️ 안건 완전 삭제';
+
+          if (!res.error) {
+            alert('🗑️ 안건이 삭제되었습니다.');
+            closeDetailModal();
+            loadDashboardLeads();
+          } else {
+            alert('삭제 실패: ' + res.error.message);
+          }
         });
 
         // 사진 파일 선택 및 촬영 이벤트
@@ -1229,13 +1417,11 @@
           var rep = document.getElementById('assignedRep').value || CAR_REP_MAP[car] || '';
 
           try {
-            // 1. 사진 파일 Supabase Storage 전송
             var photoUrls = [];
             if (uploadedPhotos.length > 0) {
               photoUrls = await uploadPhotosToSupabase(leadId, uploadedPhotos);
             }
 
-            // 2. leads 테이블 레코드 생성
             var res = await supabase.from('leads').insert([{
               lead_id: leadId,
               car_number: car,
@@ -1258,7 +1444,6 @@
 
             alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
 
-            // 폼 초기화
             document.getElementById('customerName').value = '';
             document.getElementById('contactPerson').value = '';
             document.getElementById('contactPhone').value = '';
