@@ -231,7 +231,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
     }
     .m-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .m-car-tag { background: #f1f3f4; color: #3c4043; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+    .m-agent-tag { background: #e8f0fe; color: #1a73e8; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
     .m-customer-name { font-size: 1.15rem; font-weight: 800; color: #1a73e8; margin-bottom: 4px; }
     .m-phone-link { display: inline-flex; align-items: center; gap: 4px; color: #202124; text-decoration: none; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
     .m-info-row { font-size: 0.82rem; color: #5f6368; margin-bottom: 4px; }
@@ -285,7 +285,6 @@
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
     .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-    /* 안건 수정/삭제 권한 관리자/작성자 전용 패널 */
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
       padding: 12px 14px; margin-top: 16px; display: none;
@@ -333,7 +332,7 @@
           <button type="button" class="login-tab-item" id="tabBtnAdmin">지사 관리자</button>
         </div>
 
-        <!-- 1. 일반 직원 로그인 폼 (CS/컨설턴트/기술 등 공통) -->
+        <!-- 1. 일반 직원 로그인 폼 -->
         <div id="loginFormMember" style="display:block;">
           <form id="formLoginMember">
             <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 북서울지사 직원 로그인 (전화번호+비밀번호)</div>
@@ -355,7 +354,7 @@
           </form>
         </div>
 
-        <!-- 2. 신규 회원가입 폼 -->
+        <!-- 2. 신규 회원가입 폼 (차량 선택 완전 제거) -->
         <div id="loginFormSignup" style="display:none;">
           <form id="formSignup">
             <div style="background:#e6f4ea; color:#137333; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
@@ -378,18 +377,6 @@
                 <option value="CS관리자">CS관리자</option>
                 <option value="컨설턴트">컨설턴트</option>
                 <option value="기술사원">기술사원</option>
-              </select>
-            </div>
-
-            <div class="form-group" id="regCarGroup" style="display:none;">
-              <label class="form-label">담당차량(호기) <span class="opt">(CS근무자 필수)</span></label>
-              <select id="regCar">
-                <option value="">차량 선택</option>
-                <option value="26">26호</option>
-                <option value="27">27호</option>
-                <option value="28">28호</option>
-                <option value="127">127호</option>
-                <option value="160">160호</option>
               </select>
             </div>
 
@@ -429,7 +416,7 @@
       </div>
     </div>
 
-    <!-- [화면 2] 현장 등록 화면 -->
+    <!-- [화면 2] 현장 등록 화면 (차량 선택 제거) -->
     <div id="viewRegister">
       <div class="inner-header-bar">
         <div class="user-badge-group">
@@ -457,36 +444,24 @@
         <form id="leadForm">
           <div class="row">
             <div class="form-group">
-              <label class="form-label">담당차량(호기)<span class="req">*</span></label>
-              <select id="carNumber" required>
-                <option value="">선택</option>
-                <option value="26">26호</option>
-                <option value="27">27호</option>
-                <option value="28">28호</option>
-                <option value="127">127호</option>
-                <option value="160">160호</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">소개자<span class="req">*</span></label>
+              <label class="form-label">소개자 이름 <span class="req">*</span></label>
               <input type="text" id="agentName" placeholder="소개자 이름" required>
             </div>
+            <div class="form-group">
+              <label class="form-label">담당 영업컨설턴트 <span class="req">*</span></label>
+              <select id="assignedRep" class="rep-select" required>
+                <option value="">컨설턴트 선택</option>
+                <option value="정문재">정문재</option>
+                <option value="이수열">이수열</option>
+                <option value="최영국">최영국</option>
+                <option value="임영민">임영민</option>
+                <option value="박광춘">박광춘</option>
+              </select>
+            </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label">담당 컨설턴트 <span class="opt">(차량 선택 시 자동지정 / 수동 변경 가능)</span></label>
-            <select id="assignedRep" class="rep-select" required>
-              <option value="">컨설턴트 선택</option>
-              <option value="정문재">정문재</option>
-              <option value="이수열">이수열</option>
-              <option value="최영국">최영국</option>
-              <option value="임영민">임영민</option>
-              <option value="박광춘">박광춘</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" style="margin-bottom:6px;">고객명 / 상호<span class="req">*</span></label>
+            <label class="form-label" style="margin-bottom:6px;">고객명 / 상호 <span class="req">*</span></label>
             <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
           </div>
 
@@ -496,7 +471,7 @@
               <input type="text" id="contactPerson" placeholder="대표님">
             </div>
             <div class="form-group">
-              <label class="form-label">연락처<span class="req">*</span></label>
+              <label class="form-label">연락처 <span class="req">*</span></label>
               <input type="tel" id="contactPhone" placeholder="010-0000-0000" required>
             </div>
           </div>
@@ -513,7 +488,7 @@
 
           <div class="row">
             <div class="form-group">
-              <label class="form-label">현재 사용중인 회사<span class="req">*</span></label>
+              <label class="form-label">현재 사용중인 회사 <span class="req">*</span></label>
               <select id="currentCompany" required>
                 <option value="미사용">미사용</option>
                 <option value="SK 쉴더스">SK 쉴더스</option>
@@ -528,7 +503,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">관심/추천 상품 (다중 선택 가능)<span class="req">*</span></label>
+            <label class="form-label">관심/추천 상품 (다중 선택 가능) <span class="req">*</span></label>
             <div class="prod-grid" id="productGrid">
               <label class="prod-item"><input type="checkbox" name="prod" value="알람"> 알람</label>
               <label class="prod-item"><input type="checkbox" name="prod" value="영상렌탈"> 영상렌탈</label>
@@ -543,7 +518,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">현장 설명<span class="req">*</span></label>
+            <label class="form-label">현장 설명 <span class="req">*</span></label>
             <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." required></textarea>
           </div>
 
@@ -573,11 +548,11 @@
 
       <div class="history-card">
         <div class="history-header">
-          <span class="history-title">📌 내 소개 최근 접수 현황</span>
-          <span id="carLabel" style="font-size: 0.78rem; color: #5f6368;">소개자 이름 입력 시 조회</span>
+          <span class="history-title">📌 내 최근 소개 접수 현황</span>
+          <span id="agentRecentLabel" style="font-size: 0.78rem; color: #5f6368;">실시간 연동</span>
         </div>
         <div id="historyList">
-          <p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">담당 차량을 선택하면 최근 접수 내역이 표시됩니다.</p>
+          <p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">최근 접수 내역이 표시됩니다.</p>
         </div>
       </div>
     </div>
@@ -614,7 +589,7 @@
           <button type="button" class="filter-chip" data-status="취소/보류">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소 검색">
+          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소, 소개자 검색">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -624,7 +599,7 @@
           <thead>
             <tr>
               <th>접수일시</th>
-              <th>차량/소개자</th>
+              <th>소개자</th>
               <th>담당컨설턴트</th>
               <th>고객명/상호</th>
               <th>연락처</th>
@@ -666,7 +641,7 @@
         <div class="detail-grid">
           <div class="detail-label">접수번호</div><div class="detail-val" id="mLeadId"></div>
           <div class="detail-label">접수일시</div><div class="detail-val" id="mDate" style="font-weight:700; color:#1a73e8;"></div>
-          <div class="detail-label">소개출동차량</div><div class="detail-val" id="mCarAgent"></div>
+          <div class="detail-label">소개자</div><div class="detail-val" id="mAgentName"></div>
           <div class="detail-label">담당컨설턴트</div><div class="detail-val" id="mAssignedRep" style="font-weight:700; color:#1a73e8;"></div>
           <div class="detail-label">고객명/상호</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
           <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
@@ -771,7 +746,6 @@
       var supabase = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
       var ADMIN_PASSWORD = "sy0928@@";
-      var CAR_REP_MAP = { '26': '정문재', '27': '이수열', '28': '최영국', '127': '임영민', '160': '박광춘' };
 
       // ==========================================================
       // [2] 탭 전환
@@ -839,10 +813,9 @@
       // ==========================================================
       // [4] 전역 및 세션 상태
       // ==========================================================
-      var currentRole = ''; // 'admin' | 'CS근무자' | 'CS관리자' | '컨설턴트' | '기술사원'
+      var currentRole = '';
       var currentUserName = '';
       var currentAgentPureName = '';
-      var currentUserCar = '';
       var currentStatusFilter = '전체';
       var currentLeadsData = [];
       var activeLeadItem = null;
@@ -1025,7 +998,7 @@
       }
 
       // ==========================================================
-      // [6] DB 조회 및 모달 처리
+      // [6] DB 조회 및 대시보드 테이블 렌더링 (차량 컬럼 제거)
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -1033,7 +1006,6 @@
 
         try {
           var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
-          // 컨설턴트는 본인 배정건만 필터 (관리자 및 기타 직무는 전체 조회)
           if (currentRole === '컨설턴트') {
             query = query.eq('assigned_rep', currentUserName);
           }
@@ -1069,7 +1041,7 @@
               else if (currentStatusFilter !== '상담진행' && currentStatusFilter !== '견적제출' && currentStatusFilter !== '취소/보류' && st !== currentStatusFilter) return false;
             }
             if (kw) {
-              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.car_number].join(' ').toLowerCase();
+              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(' ').toLowerCase();
               if (txt.indexOf(kw) === -1) return false;
             }
             return true;
@@ -1101,11 +1073,11 @@
 
           pcHtml += '<tr>'
             + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
-            + '<td><strong>' + r.car_number + '호</strong><br><span style="font-size:0.75rem; color:#5f6368;">' + r.agent_name + '</span></td>'
+            + '<td><strong>' + (r.agent_name || '-') + '</strong></td>'
             + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
             + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
             + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
-            + '<td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (r.address || '-') + '</td>'
+            + '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (r.address || '-') + '</td>'
             + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
             + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
             + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
@@ -1114,7 +1086,7 @@
             + '</tr>';
 
           mHtml += '<div class="mobile-lead-card">'
-            + '<div class="m-card-header"><span class="m-car-tag">' + r.car_number + '호 · ' + r.agent_name + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
+            + '<div class="m-card-header"><span class="m-agent-tag">소개자: ' + (r.agent_name || '-') + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
             + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
             + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
             + '<div class="m-info-row">📍 ' + (r.address || '주소 없음') + '</div>'
@@ -1144,7 +1116,7 @@
         document.getElementById('mTitle').innerText = item.customer_name || '';
         document.getElementById('mLeadId').innerText = item.lead_id || '';
         document.getElementById('mDate').innerText = formatKoreanDate(item.created_at);
-        document.getElementById('mCarAgent').innerText = item.car_number + '호차 (' + item.agent_name + ')';
+        document.getElementById('mAgentName').innerText = item.agent_name || '-';
         document.getElementById('mAssignedRep').innerText = item.assigned_rep || '-';
         document.getElementById('mCustomerName').innerText = item.customer_name || '';
         document.getElementById('mContactPerson').innerText = item.contact_person || '-';
@@ -1234,20 +1206,8 @@
         if (tabMember) tabMember.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
         if (tabAdm) tabAdm.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('admin'); });
 
-        // 회원가입 화면 토글 버튼
         document.getElementById('btnGoSignup').addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('signup'); });
         document.getElementById('btnBackToLogin').addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
-
-        // 회원가입 시 직무가 CS근무자일 때만 차량 선택 표시
-        document.getElementById('regJob').addEventListener('change', function() {
-          var carBox = document.getElementById('regCarGroup');
-          if (this.value === 'CS근무자') {
-            carBox.style.display = 'block';
-          } else {
-            carBox.style.display = 'none';
-            document.getElementById('regCar').value = '';
-          }
-        });
 
         // 1. 신규 회원가입 폼 제출
         var fSignup = document.getElementById('formSignup');
@@ -1259,7 +1219,6 @@
             var phone = document.getElementById('regPhone').value.replace(/[^0-9]/g, '');
             var name = document.getElementById('regName').value.trim();
             var job = document.getElementById('regJob').value;
-            var car = document.getElementById('regCar').value;
             var pwd = document.getElementById('regPwd').value;
             var pwdConfirm = document.getElementById('regPwdConfirm').value;
             var btn = document.getElementById('btnDoSignup');
@@ -1267,9 +1226,7 @@
             if (!phone || phone.length < 10) { showLoginError('signupErr', '올바른 휴대전화번호를 입력해주세요.'); return; }
             if (!name) { showLoginError('signupErr', '이름을 입력해주세요.'); return; }
             if (!job) { showLoginError('signupErr', '직무를 선택해주세요.'); return; }
-            if (job === 'CS근무자' && !car) { showLoginError('signupErr', 'CS근무자는 담당 차량(호기)을 선택해주세요.'); return; }
 
-            // 비밀번호 검증 (영문+숫자+특수문자 8~10자)
             var pwdErr = validatePassword(pwd);
             if (pwdErr) { showLoginError('signupErr', pwdErr); return; }
 
@@ -1281,7 +1238,6 @@
             btn.disabled = true; btn.innerText = '가입 처리 중...';
 
             try {
-              // 중복 가입 체크
               var chk = await supabase.from('app_users').select('phone').eq('phone', phone);
               if (chk.data && chk.data.length > 0) {
                 btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
@@ -1289,12 +1245,10 @@
                 return;
               }
 
-              // 신규 회원 등록
               var ins = await supabase.from('app_users').insert([{
                 phone: phone,
                 name: name,
                 job: job,
-                car_number: car || '',
                 password: pwd
               }]);
 
@@ -1302,19 +1256,12 @@
 
               alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.');
 
-              // 자동 로그인 처리
               currentRole = job;
               currentUserName = name;
               currentAgentPureName = name;
-              currentUserCar = car;
 
               document.getElementById('agentName').value = name;
-              if (car) {
-                document.getElementById('carNumber').value = car;
-                if (CAR_REP_MAP[car]) document.getElementById('assignedRep').value = CAR_REP_MAP[car];
-              }
 
-              // 직무에 따라 화면 분기
               if (job === 'CS근무자') {
                 showScreen('register');
               } else {
@@ -1342,7 +1289,6 @@
 
             btn.disabled = true; btn.innerText = '인증 확인 중...';
 
-            // 관리자 비밀번호 마스터키 우회 접속 지원
             if (pwd === ADMIN_PASSWORD) {
               currentRole = 'admin';
               currentUserName = '지사장(관리자)';
@@ -1366,17 +1312,11 @@
                 return;
               }
 
-              // 로그인 성공
               currentRole = user.job || '일반';
               currentUserName = user.name;
               currentAgentPureName = user.name;
-              currentUserCar = user.car_number || '';
 
               document.getElementById('agentName').value = user.name;
-              if (user.car_number) {
-                document.getElementById('carNumber').value = user.car_number;
-                if (CAR_REP_MAP[user.car_number]) document.getElementById('assignedRep').value = CAR_REP_MAP[user.car_number];
-              }
 
               if (user.job === 'CS근무자') {
                 showScreen('register');
@@ -1429,11 +1369,6 @@
         document.getElementById('btnSearchKeyword').addEventListener('click', loadDashboardLeads);
         document.getElementById('searchKeyword').addEventListener('keyup', function(e) {
           if (e.key === 'Enter') loadDashboardLeads();
-        });
-
-        document.getElementById('carNumber').addEventListener('change', function() {
-          var c = this.value;
-          if (CAR_REP_MAP[c]) document.getElementById('assignedRep').value = CAR_REP_MAP[c];
         });
 
         document.getElementById('currentCompany').addEventListener('change', function() {
@@ -1556,6 +1491,9 @@
           var checked = Array.from(document.querySelectorAll('input[name="prod"]:checked')).map(function(c) { return c.value; });
           if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
 
+          var rep = document.getElementById('assignedRep').value;
+          if (!rep) { alert('담당 영업컨설턴트를 선택해주세요.'); return; }
+
           var btn = document.getElementById('submitBtn');
           btn.disabled = true;
           btn.innerText = uploadedPhotos.length > 0 ? '사진 업로드 및 저장 중...' : '접수 등록 중...';
@@ -1568,9 +1506,7 @@
             ('0' + now.getMinutes()).slice(-2) +
             ('0' + now.getSeconds()).slice(-2);
 
-          var car = document.getElementById('carNumber').value;
           var agent = document.getElementById('agentName').value;
-          var rep = document.getElementById('assignedRep').value || CAR_REP_MAP[car] || '';
 
           try {
             var photoUrls = [];
@@ -1580,7 +1516,7 @@
 
             var res = await supabase.from('leads').insert([{
               lead_id: leadId,
-              car_number: car,
+              car_number: '',
               agent_name: agent,
               customer_name: document.getElementById('customerName').value,
               contact_person: document.getElementById('contactPerson').value,
