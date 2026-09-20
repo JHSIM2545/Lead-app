@@ -172,6 +172,7 @@
     .history-title { font-size: 0.9rem; font-weight: 700; color: #3c4043; }
     .history-item { border-bottom: 1px solid #f1f3f4; padding: 8px 0; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center; }
 
+    /* 대시보드 화면 */
     #viewDashboard { display: none; position: relative; z-index: 20; }
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px; }
     .stat-card {
@@ -247,7 +248,7 @@
       .search-box { max-width: 100%; }
     }
 
-    /* 상세 모달 & 비밀번호 변경 모달 공통 */
+    /* 모달 오버레이 */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 99999;
@@ -422,11 +423,11 @@
       <div class="inner-header-bar">
         <div class="user-badge-group">
           <span class="user-badge-title" id="regUserTitle">🛡️ 북서울지사</span>
-          <span class="user-badge-subtitle" id="regUserSub">현장등록 모드</span>
+          <span class="user-badge-subtitle" id="regUserSub">고객소개 등록</span>
         </div>
         <div class="inner-header-btns">
           <button type="button" class="btn-inner btn-pwd" id="regPwdBtn">🔑 비밀번호 변경</button>
-          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn">📊 대시보드</button>
+          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn">📋 내 안건 목록</button>
           <button type="button" class="btn-inner btn-logout" id="regLogoutBtn">로그아웃</button>
         </div>
       </div>
@@ -550,31 +551,31 @@
 
       <div class="history-card">
         <div class="history-header">
-          <span class="history-title">📌 내 최근 소개 접수 현황</span>
+          <span class="history-title">📌 최근 등록된 접수 현황</span>
           <span id="agentRecentLabel" style="font-size: 0.78rem; color: #5f6368;">실시간 연동</span>
         </div>
         <div id="historyList">
-          <p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">최근 접수 내역이 표시됩니다.</p>
+          <p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">접수 내역을 불러오는 중...</p>
         </div>
       </div>
     </div>
 
-    <!-- [화면 3] 대시보드 화면 -->
+    <!-- [화면 3] 소개영업 안건 목록 / 대시보드 화면 -->
     <div id="viewDashboard">
       <div class="inner-header-bar">
         <div class="user-badge-group">
-          <span class="user-badge-title">📊 소개영업 대시보드</span>
+          <span class="user-badge-title" id="dashViewTitle">📊 소개영업 안건 목록</span>
           <span class="user-badge-subtitle" id="dashUserSub">접속 사용자</span>
         </div>
         <div class="inner-header-btns">
           <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>
-          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn">➕ 현장등록</button>
+          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>
           <button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>
         </div>
       </div>
 
       <div class="stat-grid">
-        <div class="stat-card total" id="cardStatTotal"><div class="stat-label">총 소개건수</div><div class="stat-value" id="cntTotal">0</div></div>
+        <div class="stat-card total" id="cardStatTotal"><div class="stat-label">조회 안건</div><div class="stat-value" id="cntTotal">0</div></div>
         <div class="stat-card wait" id="cardStatWait"><div class="stat-label">접수대기</div><div class="stat-value" id="cntWait">0</div></div>
         <div class="stat-card ing" id="cardStatIng"><div class="stat-label">상담진행</div><div class="stat-value" id="cntIng">0</div></div>
         <div class="stat-card ing" id="cardStatQuote" style="border-left-color: #9c27b0;"><div class="stat-label">견적제출</div><div class="stat-value" id="cntQuote">0</div></div>
@@ -592,7 +593,7 @@
           <button type="button" class="filter-chip" data-status="취소/보류">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소, 소개자 검색">
+          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소 검색">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -706,7 +707,7 @@
         <!-- 최초 작성자 및 관리자 전용 액션 영역 -->
         <div class="lead-author-actions" id="authorActionsBox">
           <div class="lead-author-actions-title">
-            <span>⚙️ 안건 관리 (최초 작성자 및 지사 관리자 전용)</span>
+            <span>⚙️ 안건 정보 관리</span>
             <span id="authorTag" style="font-size:0.75rem; color:#5f6368; font-weight:normal;"></span>
           </div>
           <div class="lead-action-btns">
@@ -715,11 +716,11 @@
           </div>
         </div>
 
-        <!-- 진행상태 업데이트 -->
-        <div class="status-update-box">
-          <h4>⚡ 영업 진행상태 업데이트</h4>
+        <!-- 영업 진행상태 업데이트 (컨설턴트 및 관리자 권한) -->
+        <div class="status-update-box" id="statusUpdateBox">
+          <h4>⚡ 영업 진행상태 업데이트 <span id="statusPermissionTag" style="font-size:0.75rem; color:#5f6368; font-weight:normal;"></span></h4>
           <div class="form-group">
-            <label class="form-label">다음 진행상태 선택</label>
+            <label class="form-label">진행상태 선택</label>
             <select id="uStatus">
               <option value="접수대기">1. 접수대기</option>
               <option value="접수확인">2. 접수확인</option>
@@ -738,7 +739,7 @@
     </div>
   </div>
 
-  <!-- [추가] 통합 비밀번호 변경 모달 -->
+  <!-- 통합 비밀번호 변경 모달 -->
   <div class="modal-overlay" id="pwdChangeModal">
     <div class="modal-card" style="max-width: 440px;">
       <div class="modal-header">
@@ -773,7 +774,7 @@
   <script>
     (function() {
       // ==========================================================
-      // [1] Supabase 클라이언트 설정
+      // [1] Supabase 설정
       // ==========================================================
       var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
       var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
@@ -828,7 +829,7 @@
       }
 
       // ==========================================================
-      // [3] SHA-256 암호화 및 비밀번호 유효성 검사
+      // [3] SHA-256 및 비밀번호 유효성 검사
       // ==========================================================
       async function sha256(str) {
         var buf = new TextEncoder().encode(str);
@@ -851,12 +852,11 @@
       }
 
       // ==========================================================
-      // [4] 전역 및 세션 상태
+      // [4] 전역 상태 및 직무별 화면 라우팅
       // ==========================================================
-      var currentRole = '';
+      var currentRole = ''; // 'admin' | '컨설턴트' | 'CS근무자' | 'CS관리자' | '기술사원'
       var currentUserName = '';
-      var currentAgentPureName = '';
-      var currentUserPhone = ''; // 비밀번호 변경 시 사용
+      var currentUserPhone = '';
       var currentStatusFilter = '전체';
       var currentLeadsData = [];
       var activeLeadItem = null;
@@ -865,6 +865,7 @@
       function showScreen(screenId) {
         closeDetailModal();
         closePwdModal();
+
         document.body.classList.toggle('on-login', screenId === 'login');
 
         var vLogin = document.getElementById('viewLogin');
@@ -875,13 +876,14 @@
         if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
         if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
 
-        // 관리자는 개별 비밀번호 변경 버튼 숨김
+        // 비밀번호 변경 버튼
         var regPwdBtn = document.getElementById('regPwdBtn');
         var dashPwdBtn = document.getElementById('dashPwdBtn');
-        var showPwdBtn = (currentRole !== 'admin');
+        var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
         if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
         if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
 
+        // 화면 상단 제목 및 전환 버튼 제어
         if (screenId === 'register') {
           var regTitle = document.getElementById('regUserTitle');
           var regSub = document.getElementById('regUserSub');
@@ -890,17 +892,31 @@
           if (currentRole === 'admin') {
             if (regTitle) regTitle.innerText = '👑 관리자(지사장)';
             if (regSub) regSub.innerText = '현장등록 모드';
+            if (regSwitch) regSwitch.innerText = '📊 전체 대시보드';
           } else {
             if (regTitle) regTitle.innerText = '👤 ' + currentUserName + ' (' + currentRole + ')';
-            if (regSub) regSub.innerText = '현장등록 모드';
+            if (regSub) regSub.innerText = '신규 가망고객 소개등록';
+            if (regSwitch) regSwitch.innerText = (currentRole === '컨설턴트') ? '💼 배당 안건 목록' : '📋 내 소개 안건 목록';
           }
-          if (regSwitch) regSwitch.style.display = 'inline-block';
           loadRecentHistory();
+
         } else if (screenId === 'dashboard') {
+          var dashTitle = document.getElementById('dashViewTitle');
           var dashSub = document.getElementById('dashUserSub');
-          if (dashSub) {
-            dashSub.innerText = (currentRole === 'admin' ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')') + ' 로그인 중';
+          var dashSwitch = document.getElementById('dashSwitchBtn');
+
+          if (currentRole === 'admin') {
+            if (dashTitle) dashTitle.innerText = '📊 소개영업 전체 대시보드';
+            if (dashSub) dashSub.innerText = '👑 지사 관리자 (전체 안건 열람/관리)';
+          } else if (currentRole === '컨설턴트') {
+            if (dashTitle) dashTitle.innerText = '💼 내 배당 안건 관리 대시보드';
+            if (dashSub) dashSub.innerText = '👤 ' + currentUserName + ' 컨설턴트 (나에게 배당된 안건)';
+          } else {
+            if (dashTitle) dashTitle.innerText = '📋 내가 소개한 가망고객 목록';
+            if (dashSub) dashSub.innerText = '🛡️ ' + currentUserName + ' (' + currentRole + ') - 내가 등록한 안건';
           }
+          if (dashSwitch) dashSwitch.innerText = '➕ 새 안건 등록';
+
           loadDashboardLeads();
         }
       }
@@ -1047,7 +1063,7 @@
       }
 
       // ==========================================================
-      // [6] DB 조회 및 모달 처리
+      // [6] DB 조회 및 권한별 필터링
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -1055,9 +1071,18 @@
 
         try {
           var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+
+          // ★ [핵심 권한 분기]
+          // 1. 컨설턴트: 본인에게 배당된 안건만 조회
           if (currentRole === '컨설턴트') {
             query = query.eq('assigned_rep', currentUserName);
+          } 
+          // 2. CS근무자 / CS관리자 / 기술사원: 본인이 등록한 안건만 조회
+          else if (currentRole !== 'admin') {
+            query = query.eq('agent_name', currentUserName);
           }
+          // 3. 지사 관리자(admin): 전체 조회 유지
+
           var res = await query;
           if (res.error) throw res.error;
 
@@ -1107,9 +1132,11 @@
         var pcBody = document.getElementById('pcTableBody');
         var mList = document.getElementById('mobileCardList');
 
+        var emptyMsg = (currentRole === '컨설턴트') ? '나에게 배당된 안건이 없습니다.' : (currentRole === 'admin' ? '조회된 소개 내역이 없습니다.' : '내가 소개한 안건이 아직 없습니다.');
+
         if (!list || list.length === 0) {
-          if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">조회된 소개 내역이 없습니다.</td></tr>';
-          if (mList) mList.innerHTML = '<p style="text-align:center; padding:35px; color:#9aa0a6;">조회된 소개 내역이 없습니다.</p>';
+          if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</td></tr>';
+          if (mList) mList.innerHTML = '<p style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</p>';
           return;
         }
 
@@ -1199,22 +1226,34 @@
         var uSel = document.getElementById('uStatus');
         if (uSel) uSel.value = item.status || '접수대기';
 
+        // 1. 안건 정보 수정/삭제 권한 (지사 관리자 또는 최초 작성자 본인)
         var actionsBox = document.getElementById('authorActionsBox');
         var authorTag = document.getElementById('authorTag');
         var editContainer = document.getElementById('editLeadContainer');
         if (editContainer) editContainer.style.display = 'none';
 
-        var canModify = false;
-        if (currentRole === 'admin') {
-          canModify = true;
-          if (authorTag) authorTag.innerText = '👑 관리자 권한';
-        } else if (currentAgentPureName && item.agent_name && (currentAgentPureName === item.agent_name.trim())) {
-          canModify = true;
-          if (authorTag) authorTag.innerText = '🛡️ 최초 등록자 본인 건';
-        }
-
+        var canModify = (currentRole === 'admin') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
         if (actionsBox) {
           actionsBox.style.display = canModify ? 'block' : 'none';
+          if (authorTag) authorTag.innerText = (currentRole === 'admin') ? '👑 지사 관리자' : '🛡️ 본인 등록 안건';
+        }
+
+        // 2. ★ 상태 변경 권한 (컨설턴트 및 지사 관리자만 가능)
+        var statusBox = document.getElementById('statusUpdateBox');
+        var statusPermTag = document.getElementById('statusPermissionTag');
+        var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
+
+        if (statusBox) {
+          var btnSave = document.getElementById('btnSaveStatus');
+          if (canChangeStatus) {
+            uSel.disabled = false;
+            if (btnSave) btnSave.style.display = 'block';
+            if (statusPermTag) statusPermTag.innerText = (currentRole === 'admin') ? '(관리자 수정 가능)' : '(배당 컨설턴트 처리 가능)';
+          } else {
+            uSel.disabled = true;
+            if (btnSave) btnSave.style.display = 'none';
+            if (statusPermTag) statusPermTag.innerText = '(컨설턴트/관리자 전용)';
+          }
         }
 
         var modal = document.getElementById('detailModal');
@@ -1245,15 +1284,19 @@
       }
 
       async function loadRecentHistory() {
-        var agent = document.getElementById('agentName') ? document.getElementById('agentName').value.trim() : '';
         var listDiv = document.getElementById('historyList');
-        if (!agent || !supabase) return;
+        if (!supabase) return;
 
-        var res = await supabase.from('leads').select('*').eq('agent_name', agent).order('created_at', { ascending: false }).limit(10);
+        var query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
+        if (currentRole !== 'admin' && currentUserName) {
+          query = query.eq('agent_name', currentUserName);
+        }
+
+        var res = await query;
         if (!res.error && res.data && listDiv) {
           var html = '';
           res.data.forEach(function(r) {
-            html += '<div class="history-item"><div><strong>' + r.customer_name + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + formatKoreanDate(r.created_at) + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
+            html += '<div class="history-item"><div><strong>' + r.customer_name + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + formatKoreanDate(r.created_at) + ' · 담당: ' + (r.assigned_rep || '-') + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
           });
           listDiv.innerHTML = html || '<p style="font-size:0.8rem; color:#9aa0a6; text-align:center;">최근 접수 내역이 없습니다.</p>';
         }
@@ -1324,16 +1367,12 @@
 
               currentRole = job;
               currentUserName = name;
-              currentAgentPureName = name;
               currentUserPhone = phone;
 
               document.getElementById('agentName').value = name;
 
-              if (job === 'CS근무자') {
-                showScreen('register');
-              } else {
-                showScreen('dashboard');
-              }
+              // 직무별 최초 진입 화면 분기
+              showScreen('dashboard');
 
             } catch (err) {
               showLoginError('signupErr', '가입 오류: ' + (err.message || err));
@@ -1385,16 +1424,12 @@
 
               currentRole = user.job || '일반';
               currentUserName = user.name;
-              currentAgentPureName = user.name;
               currentUserPhone = user.phone;
 
               document.getElementById('agentName').value = user.name;
 
-              if (user.job === 'CS근무자') {
-                showScreen('register');
-              } else {
-                showScreen('dashboard');
-              }
+              // 로그인 시 즉시 본인 직무에 맞는 목록 대시보드로 진입
+              showScreen('dashboard');
 
             } catch (err) {
               btn.disabled = false; btn.innerText = '로그인 접속';
@@ -1422,9 +1457,7 @@
           });
         }
 
-        // ==========================================================
-        // ★ [핵심] 중앙 DB 비밀번호 변경 실행 로직
-        // ==========================================================
+        // 비밀번호 변경 모달 이벤트
         document.getElementById('regPwdBtn').addEventListener('click', openPwdModal);
         document.getElementById('dashPwdBtn').addEventListener('click', openPwdModal);
         document.getElementById('btnClosePwdModal').addEventListener('click', closePwdModal);
@@ -1454,7 +1487,6 @@
           btn.disabled = true; btn.innerText = '비밀번호 변경 처리 중...';
 
           try {
-            // 1. 현재 사용자 조회
             var res = await supabase.from('app_users').select('*').eq('phone', currentUserPhone).single();
             if (res.error || !res.data) {
               btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
@@ -1472,7 +1504,6 @@
               return;
             }
 
-            // 2. 중앙 DB(Supabase) 실시간 갱신 (영업일보 포털에도 즉각 반영)
             var newHashed = await sha256(newPwd);
             var upRes = await supabase.from('app_users').update({
               password: newPwd,
@@ -1494,7 +1525,7 @@
           }
         });
 
-        // 화면 전환 및 로그아웃
+        // 화면 전환 버튼
         document.getElementById('regSwitchBtn').addEventListener('click', function() { showScreen('dashboard'); });
         document.getElementById('dashSwitchBtn').addEventListener('click', function() { showScreen('register'); });
         document.getElementById('regLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
@@ -1533,16 +1564,22 @@
           });
         });
 
-        // 상태 저장
+        // 상태 저장 (컨설턴트 및 관리자만 가능)
         document.getElementById('btnSaveStatus').addEventListener('click', async function() {
           if (!activeLeadItem || !supabase) return;
           var newSt = document.getElementById('uStatus').value;
           this.disabled = true; this.innerText = '저장 중...';
-          await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
+
+          var res = await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
           this.disabled = false; this.innerText = '상태 저장하기';
-          alert('진행상태가 업데이트되었습니다.');
-          closeDetailModal();
-          loadDashboardLeads();
+
+          if (!res.error) {
+            alert('✅ 진행상태가 업데이트되었습니다: ' + newSt);
+            closeDetailModal();
+            loadDashboardLeads();
+          } else {
+            alert('상태 변경 실패: ' + res.error.message);
+          }
         });
 
         // 안건 정보 수정
@@ -1651,7 +1688,7 @@
             ('0' + now.getMinutes()).slice(-2) +
             ('0' + now.getSeconds()).slice(-2);
 
-          var agent = document.getElementById('agentName').value;
+          var agent = document.getElementById('agentName').value || currentUserName;
 
           try {
             var photoUrls = [];
@@ -1681,6 +1718,7 @@
 
             alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
 
+            // 폼 초기화
             document.getElementById('customerName').value = '';
             document.getElementById('contactPerson').value = '';
             document.getElementById('contactPhone').value = '';
@@ -1694,7 +1732,9 @@
 
             uploadedPhotos = [];
             renderPreview();
-            loadRecentHistory();
+
+            // 등록 후 본인 안건 목록 화면으로 이동
+            showScreen('dashboard');
 
           } catch (err) {
             alert('등록 실패: ' + (err.message || err));
