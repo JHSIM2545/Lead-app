@@ -37,12 +37,12 @@
     .btn-inner.btn-pwd { background: #fef7e0; color: #b06000; border-color: #fce8b2; }
     .btn-inner.btn-logout { background: #f8f9fa; color: #5f6368; border-color: #dadce0; }
 
-    /* 로그인 뷰 영역 */
-    #viewLogin { max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 50; }
+    /* 로그인 뷰 영역: 클릭 방해 차단 완벽 보장 */
+    #viewLogin { max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 5000; }
     .login-card {
       background: #ffffff; border-radius: 18px; padding: 26px 22px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
-      position: relative; z-index: 51;
+      position: relative; z-index: 5001; pointer-events: auto !important;
     }
     .login-header {
       text-align: center; margin-bottom: 22px; border-bottom: 2px solid #e8f0fe; padding-bottom: 16px;
@@ -53,12 +53,12 @@
     /* 로그인 탭 바 */
     .login-tab-bar {
       display: flex; background: #eef2f6; border-radius: 12px; padding: 5px; margin-bottom: 20px;
-      position: relative; z-index: 60; gap: 4px; border: 1px solid #dadce0;
+      position: relative; z-index: 5002; gap: 4px; border: 1px solid #dadce0;
     }
     .login-tab-item {
       flex: 1; padding: 12px 4px; border: none; background: transparent; font-size: 0.9rem;
       font-weight: 700; color: #5f6368; cursor: pointer !important; border-radius: 8px; text-align: center;
-      transition: all 0.15s ease; user-select: none;
+      transition: all 0.15s ease; user-select: none; pointer-events: auto !important;
     }
     .login-tab-item.active {
       background: #1a73e8 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(26,115,232,0.35);
@@ -78,8 +78,9 @@
 
     .btn-login-action {
       width: 100%; padding: 14px; background: #1a73e8; color: #ffffff; border: none;
-      border-radius: 9px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      border-radius: 9px; font-size: 1.05rem; font-weight: 700; cursor: pointer !important;
       box-shadow: 0 2px 6px rgba(26,115,232,0.3); margin-top: 10px; user-select: none;
+      pointer-events: auto !important;
     }
     .btn-login-action:active { background: #1557b0; }
     .btn-login-action:disabled { background: #9aa0a6; cursor: not-allowed; }
@@ -247,16 +248,19 @@
       .search-box { max-width: 100%; }
     }
 
-    /* 모달 오버레이 */
+    /* ★ [핵심 해결] 모달이 닫혀 있을 때 화면 클릭을 100% 보장하는 CSS */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 99999;
-      display: none; align-items: center; justify-content: center; padding: 16px;
-      pointer-events: none;
+      display: none !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+      align-items: center; justify-content: center; padding: 16px;
     }
     .modal-overlay.open {
       display: flex !important;
       pointer-events: auto !important;
+      visibility: visible !important;
     }
     .modal-card {
       background: #ffffff; width: 100%; max-width: 600px; max-height: 90vh;
@@ -286,7 +290,7 @@
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
     .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-    /* [소개 게시판 디자인] */
+    /* 소개 게시판 디자인 */
     .board-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 16px; }
     .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1.5px solid #edf2f7; padding-bottom: 8px; }
     .board-header h4 { margin: 0; font-size: 0.96rem; color: #202124; display: flex; align-items: center; gap: 6px; }
@@ -312,7 +316,6 @@
     .btn-attach-file { padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .board-submit-btn { padding: 8px 18px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
-    /* 안건수정 / 안건삭제 액션 박스 */
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
       padding: 12px 14px; margin-top: 16px; display: none;
@@ -351,14 +354,15 @@
           <p id="loginGuideText">휴대전화번호와 비밀번호로 로그인해 주세요</p>
         </div>
 
+        <!-- 인라인 onclick을 부여하여 스크립트 실행 지연 시에도 탭 즉각 반응 보장 -->
         <div class="login-tab-bar" id="loginTabBar">
-          <button type="button" class="login-tab-item active" id="tabBtnMember">직원 로그인</button>
-          <button type="button" class="login-tab-item" id="tabBtnAdmin">지사 관리자</button>
+          <button type="button" class="login-tab-item active" id="tabBtnMember" onclick="window.applyLoginTab('member')">직원 로그인</button>
+          <button type="button" class="login-tab-item" id="tabBtnAdmin" onclick="window.applyLoginTab('admin')">지사 관리자</button>
         </div>
 
         <!-- 1. 일반 직원 로그인 폼 -->
         <div id="loginFormMember" style="display:block;">
-          <form id="formLoginMember">
+          <form id="formLoginMember" onsubmit="event.preventDefault(); window.handleMemberLogin();">
             <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 북서울지사 직원 로그인 (전화번호+비밀번호)</div>
             <div class="form-group">
               <label class="form-label">아이디 (휴대전화번호) <span class="req">*</span></label>
@@ -373,14 +377,14 @@
 
             <div class="signup-toggle-box">
               아직 계정이 없으신가요? 
-              <button type="button" class="signup-toggle-btn" id="btnGoSignup">신규 회원가입</button>
+              <button type="button" class="signup-toggle-btn" id="btnGoSignup" onclick="window.applyLoginTab('signup')">신규 회원가입</button>
             </div>
           </form>
         </div>
 
         <!-- 2. 신규 회원가입 폼 -->
         <div id="loginFormSignup" style="display:none;">
-          <form id="formSignup">
+          <form id="formSignup" onsubmit="event.preventDefault(); window.handleSignup();">
             <div style="background:#e6f4ea; color:#137333; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
             
             <div class="form-group">
@@ -419,14 +423,14 @@
 
             <div class="signup-toggle-box">
               이미 계정이 있으신가요? 
-              <button type="button" class="signup-toggle-btn" id="btnBackToLogin">로그인 화면으로</button>
+              <button type="button" class="signup-toggle-btn" id="btnBackToLogin" onclick="window.applyLoginTab('member')">로그인 화면으로</button>
             </div>
           </form>
         </div>
 
         <!-- 3. 지사 관리자 전용 폼 -->
         <div id="loginFormAdmin" style="display:none;">
-          <form id="formLoginAdmin">
+          <form id="formLoginAdmin" onsubmit="event.preventDefault(); window.handleAdminLogin();">
             <div style="background:#fce8e6; color:#c5221f; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #fad2cf;">👑 지사 관리자 (전용 비밀번호)</div>
             <div class="form-group">
               <label class="form-label">관리자 비밀번호 <span class="req">*</span></label>
@@ -447,9 +451,9 @@
           <span class="user-badge-title" id="regUserTitle">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns">
-          <button type="button" class="btn-inner btn-pwd" id="regPwdBtn">🔑 비밀번호 변경</button>
-          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn">📋 안건 목록</button>
-          <button type="button" class="btn-inner btn-logout" id="regLogoutBtn">로그아웃</button>
+          <button type="button" class="btn-inner btn-pwd" id="regPwdBtn" onclick="window.openPwdModal()">🔑 비밀번호 변경</button>
+          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn" onclick="window.showScreen('dashboard')">📋 안건 목록</button>
+          <button type="button" class="btn-inner btn-logout" id="regLogoutBtn" onclick="window.handleLogout()">로그아웃</button>
         </div>
       </div>
 
@@ -465,7 +469,7 @@
       </div>
 
       <div class="form-card">
-        <form id="leadForm">
+        <form id="leadForm" onsubmit="event.preventDefault(); window.handleLeadSubmit();">
           <div class="row">
             <div class="form-group">
               <label class="form-label">소개자 이름 <span class="req">*</span></label>
@@ -513,7 +517,7 @@
           <div class="row">
             <div class="form-group">
               <label class="form-label">현재 사용중인 회사 <span class="req">*</span></label>
-              <select id="currentCompany" required>
+              <select id="currentCompany" required onchange="window.handleCompanyChange()">
                 <option value="미사용">미사용</option>
                 <option value="SK 쉴더스">SK 쉴더스</option>
                 <option value="KT 텔레캅">KT 텔레캅</option>
@@ -549,12 +553,12 @@
           <!-- 현장 사진 등록 -->
           <div class="form-group">
             <label class="form-label">현장 사진 등록 <span class="opt">(최대 4장)</span></label>
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
-            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;">
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="window.handleFileSelect(event)">
+            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;" onchange="window.handleFileSelect(event)">
 
             <div class="photo-btn-group">
-              <button type="button" class="photo-btn" id="btnShootCamera">📷 직접 촬영</button>
-              <button type="button" class="photo-btn" id="btnSelectGallery">🖼️ 갤러리 선택</button>
+              <button type="button" class="photo-btn" id="btnShootCamera" onclick="document.getElementById('cameraInput').click()">📷 직접 촬영</button>
+              <button type="button" class="photo-btn" id="btnSelectGallery" onclick="document.getElementById('galleryInput').click()">🖼️ 갤러리 선택</button>
             </div>
             
             <div class="photo-status">
@@ -588,9 +592,9 @@
           <span class="user-badge-title" id="dashUserTitle">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns">
-          <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>
-          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>
-          <button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>
+          <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn" onclick="window.openPwdModal()">🔑 비밀번호 변경</button>
+          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;" onclick="window.showScreen('register')">➕ 새 안건 등록</button>
+          <button type="button" class="btn-inner btn-logout" id="dashLogoutBtn" onclick="window.handleLogout()">로그아웃</button>
         </div>
       </div>
 
@@ -614,7 +618,7 @@
         </div>
         <div class="search-box">
           <input type="text" id="searchKeyword" placeholder="고객(상호), 연락처, 주소 검색">
-          <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
+          <button type="button" class="btn-detail" id="btnSearchKeyword" onclick="window.loadDashboardLeads()">검색</button>
         </div>
       </div>
 
@@ -657,7 +661,7 @@
         </div>
         <div class="modal-header-right">
           <span class="badge" id="mHeaderStatusBadge">접수대기</span>
-          <button type="button" class="btn-close" id="btnCloseDetailModal">×</button>
+          <button type="button" class="btn-close" id="btnCloseDetailModal" onclick="window.closeDetailModal()">×</button>
         </div>
       </div>
 
@@ -767,16 +771,15 @@
           <div class="board-input-box">
             <textarea id="boardContentInput" placeholder="의견 및 피드백 내용을 자유롭게 입력해주세요..."></textarea>
             
-            <!-- 파일 첨부 상태 표시 -->
-            <input type="file" id="boardFileInput" style="display:none;">
+            <input type="file" id="boardFileInput" style="display:none;" onchange="window.handleBoardFileSelect(event)">
             <div id="boardFileStatus" style="display:none; font-size:0.76rem; color:#1a73e8; font-weight:600; display:flex; align-items:center; gap:6px;">
               <span id="boardFileNameText"></span>
-              <button type="button" id="btnRemoveBoardFile" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">×</button>
+              <button type="button" id="btnRemoveBoardFile" onclick="window.clearBoardFile()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">×</button>
             </div>
 
             <div class="board-input-footer">
-              <button type="button" class="btn-attach-file" id="btnAttachBoardFile">📎 사진/파일 첨부</button>
-              <button type="button" class="board-submit-btn" id="btnSubmitBoardPost">의견 등록</button>
+              <button type="button" class="btn-attach-file" id="btnAttachBoardFile" onclick="document.getElementById('boardFileInput').click()">📎 사진/파일 첨부</button>
+              <button type="button" class="board-submit-btn" id="btnSubmitBoardPost" onclick="window.submitBoardPost()">의견 등록</button>
             </div>
           </div>
         </div>
@@ -792,7 +795,7 @@
         <div class="modal-header-left">
           <h3>🔑 비밀번호 변경</h3>
         </div>
-        <button type="button" class="btn-close" id="btnClosePwdModal">×</button>
+        <button type="button" class="btn-close" id="btnClosePwdModal" onclick="window.closePwdModal()">×</button>
       </div>
       <div class="modal-body">
         <p style="font-size:0.84rem; color:#5f6368; margin-bottom:14px;">
@@ -816,817 +819,1021 @@
     </div>
   </div>
 
-  <!-- 자바스크립트 완전 제어부 -->
+  <!-- 자바스크립트 전역 제어부 -->
   <script>
-    (function() {
-      // ==========================================================
-      // [1] Supabase 설정
-      // ==========================================================
-      var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
-      var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
-      var supabase = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    // ==========================================================
+    // [1] Supabase 설정
+    // ==========================================================
+    var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
+    var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
+    var supabase = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-      var ADMIN_PASSWORD = "sy0928@@";
+    var ADMIN_PASSWORD = "sy0928@@";
 
-      // ==========================================================
-      // [2] 탭 전환
-      // ==========================================================
-      function applyLoginTab(tab) {
-        var btnMember = document.getElementById('tabBtnMember');
-        var btnAdm = document.getElementById('tabBtnAdmin');
+    var currentRole = '';
+    var currentUserName = '';
+    var currentUserPhone = '';
+    var currentStatusFilter = '전체';
+    var currentLeadsData = [];
+    var activeLeadItem = null;
+    var uploadedPhotos = [];
+    var selectedBoardFile = null;
 
-        var formMember = document.getElementById('loginFormMember');
-        var formSignup = document.getElementById('loginFormSignup');
-        var formAdm = document.getElementById('loginFormAdmin');
+    // ==========================================================
+    // [2] 탭 전환 (window 객체에 바인딩하여 무조건 작동 보장)
+    // ==========================================================
+    window.applyLoginTab = function(tab) {
+      hideLoginErrors();
+      var btnMember = document.getElementById('tabBtnMember');
+      var btnAdm = document.getElementById('tabBtnAdmin');
 
-        var tabBar = document.getElementById('loginTabBar');
+      var formMember = document.getElementById('loginFormMember');
+      var formSignup = document.getElementById('loginFormSignup');
+      var formAdm = document.getElementById('loginFormAdmin');
+      var tabBar = document.getElementById('loginTabBar');
 
-        if (tab === 'signup') {
-          if (tabBar) tabBar.style.display = 'none';
-          if (formMember) formMember.style.display = 'none';
-          if (formSignup) formSignup.style.display = 'block';
-          if (formAdm) formAdm.style.display = 'none';
-        } else {
-          if (tabBar) tabBar.style.display = 'flex';
-          if (btnMember) btnMember.className = 'login-tab-item' + (tab === 'member' ? ' active' : '');
-          if (btnAdm) btnAdm.className = 'login-tab-item' + (tab === 'admin' ? ' active' : '');
+      if (tab === 'signup') {
+        if (tabBar) tabBar.style.display = 'none';
+        if (formMember) formMember.style.display = 'none';
+        if (formSignup) formSignup.style.display = 'block';
+        if (formAdm) formAdm.style.display = 'none';
+      } else {
+        if (tabBar) tabBar.style.display = 'flex';
+        if (btnMember) btnMember.className = 'login-tab-item' + (tab === 'member' ? ' active' : '');
+        if (btnAdm) btnAdm.className = 'login-tab-item' + (tab === 'admin' ? ' active' : '');
 
-          if (formMember) formMember.style.display = (tab === 'member' ? 'block' : 'none');
-          if (formSignup) formSignup.style.display = 'none';
-          if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
-        }
-
-        hideLoginErrors();
+        if (formMember) formMember.style.display = (tab === 'member' ? 'block' : 'none');
+        if (formSignup) formSignup.style.display = 'none';
+        if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
       }
+    };
 
-      function hideLoginErrors() {
-        ['memberLoginErr', 'signupErr', 'adminLoginErr', 'pwdChangeErr'].forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.style.display = 'none';
-        });
-      }
-
-      function showLoginError(id, msg) {
+    function hideLoginErrors() {
+      ['memberLoginErr', 'signupErr', 'adminLoginErr', 'pwdChangeErr'].forEach(function(id) {
         var el = document.getElementById(id);
-        if (el) {
-          el.innerText = msg;
-          el.style.display = 'block';
-        }
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    function showLoginError(id, msg) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
       }
+    }
 
-      // ==========================================================
-      // [3] SHA-256 및 비밀번호 유효성 검사
-      // ==========================================================
-      async function sha256(str) {
-        var buf = new TextEncoder().encode(str);
-        var hashBuf = await crypto.subtle.digest('SHA-256', buf);
-        return Array.from(new Uint8Array(hashBuf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    // ==========================================================
+    // [3] 암호화 및 유효성 검사
+    // ==========================================================
+    async function sha256(str) {
+      var buf = new TextEncoder().encode(str);
+      var hashBuf = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(hashBuf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    }
+
+    function validatePassword(pwd) {
+      if (!pwd || pwd.length < 8 || pwd.length > 10) {
+        return '비밀번호는 8자 이상 10자 이하로 입력해주세요.';
       }
+      var hasLetter = /[a-zA-Z]/.test(pwd);
+      var hasNumber = /[0-9]/.test(pwd);
+      var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
 
-      function validatePassword(pwd) {
-        if (!pwd || pwd.length < 8 || pwd.length > 10) {
-          return '비밀번호는 8자 이상 10자 이하로 입력해주세요.';
-        }
-        var hasLetter = /[a-zA-Z]/.test(pwd);
-        var hasNumber = /[0-9]/.test(pwd);
-        var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
-
-        if (!hasLetter || !hasNumber || !hasSpecial) {
-          return '비밀번호는 영문자, 숫자, 특수문자를 모두 포함해야 합니다.';
-        }
-        return '';
+      if (!hasLetter || !hasNumber || !hasSpecial) {
+        return '비밀번호는 영문자, 숫자, 특수문자를 모두 포함해야 합니다.';
       }
+      return '';
+    }
 
-      // ==========================================================
-      // [4] 전역 상태 및 화면 전환
-      // ==========================================================
-      var currentRole = ''; // 'admin' | '컨설턴트' | 'CS근무자' | 'CS관리자' | '기술사원'
-      var currentUserName = '';
-      var currentUserPhone = '';
-      var currentStatusFilter = '전체';
-      var currentLeadsData = [];
-      var activeLeadItem = null;
-      var uploadedPhotos = [];
-      var selectedBoardFile = null;
+    // ==========================================================
+    // [4] 화면 전환 (상단 사용자 이름만 표기)
+    // ==========================================================
+    window.showScreen = function(screenId) {
+      window.closeDetailModal();
+      window.closePwdModal();
 
-      function showScreen(screenId) {
-        closeDetailModal();
-        closePwdModal();
+      document.body.classList.toggle('on-login', screenId === 'login');
 
-        document.body.classList.toggle('on-login', screenId === 'login');
+      var vLogin = document.getElementById('viewLogin');
+      var vReg = document.getElementById('viewRegister');
+      var vDash = document.getElementById('viewDashboard');
 
-        var vLogin = document.getElementById('viewLogin');
-        var vReg = document.getElementById('viewRegister');
-        var vDash = document.getElementById('viewDashboard');
+      if (vLogin) vLogin.style.display = (screenId === 'login' ? 'block' : 'none');
+      if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
+      if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
 
-        if (vLogin) vLogin.style.display = (screenId === 'login' ? 'block' : 'none');
-        if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
-        if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
+      var regPwdBtn = document.getElementById('regPwdBtn');
+      var dashPwdBtn = document.getElementById('dashPwdBtn');
+      var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
+      if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
+      if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
 
-        var regPwdBtn = document.getElementById('regPwdBtn');
-        var dashPwdBtn = document.getElementById('dashPwdBtn');
-        var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
-        if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
-        if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
+      var displayName = (currentRole === 'admin') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
+      var regUserTitle = document.getElementById('regUserTitle');
+      var dashUserTitle = document.getElementById('dashUserTitle');
+      if (regUserTitle) regUserTitle.innerText = displayName;
+      if (dashUserTitle) dashUserTitle.innerText = displayName;
 
-        var displayName = (currentRole === 'admin') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
-        var regUserTitle = document.getElementById('regUserTitle');
-        var dashUserTitle = document.getElementById('dashUserTitle');
-        if (regUserTitle) regUserTitle.innerText = displayName;
-        if (dashUserTitle) dashUserTitle.innerText = displayName;
-
-        if (screenId === 'register') {
-          var regSwitch = document.getElementById('regSwitchBtn');
-          if (regSwitch) regSwitch.innerText = '📋 안건 목록';
-          loadRecentHistory();
-        } else if (screenId === 'dashboard') {
-          var dashSwitch = document.getElementById('dashSwitchBtn');
-          if (dashSwitch) dashSwitch.innerText = '➕ 새 안건 등록';
-          loadDashboardLeads();
-        }
+      if (screenId === 'register') {
+        var regSwitch = document.getElementById('regSwitchBtn');
+        if (regSwitch) regSwitch.innerText = '📋 안건 목록';
+        loadRecentHistory();
+      } else if (screenId === 'dashboard') {
+        var dashSwitch = document.getElementById('dashSwitchBtn');
+        if (dashSwitch) dashSwitch.innerText = '➕ 새 안건 등록';
+        window.loadDashboardLeads();
       }
-
-      function formatPhone(phone) {
-        var s = String(phone || '').replace(/[^0-9]/g, '');
-        if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-        if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-        return s;
-      }
-
-      function formatKoreanDate(dateInput) {
-        if (!dateInput) return '';
-        var d = new Date(dateInput);
-        if (isNaN(d.getTime())) return String(dateInput);
-        var days = ['일', '월', '화', '수', '목', '금', '토'];
-        return String(d.getFullYear()).slice(-2) + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' (' + days[d.getDay()] + ') ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
-      }
-
-      function getBadgeClass(status) {
-        if (status === '계약완료') return 'badge-done';
-        if (status === '계약실패') return 'badge-fail';
-        if (status === '계약보류' || status === '취소/보류') return 'badge-cancel';
-        if (status === '견적제출' || status === '견적상담') return 'badge-quote';
-        if (status === '접수확인' || status === '고객면담' || status === '추가면담') return 'badge-ing';
-        return 'badge-wait';
-      }
-
-      // ==========================================================
-      // [5] 사진 압축 및 Supabase Storage 업로드
-      // ==========================================================
-      function compressImage(file, maxDim, quality, callback) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          var img = new Image();
-          img.onload = function() {
-            var w = img.width, h = img.height;
-            if (w > h) {
-              if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
-            } else {
-              if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
-            }
-            var canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            var base64 = canvas.toDataURL('image/jpeg', quality);
-            var kb = Math.round(base64.length * 0.75 / 1024);
-            callback(base64, kb);
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-
-      function handleFileSelect(e) {
-        var files = Array.from(e.target.files);
-        if (!files.length) return;
-        if (uploadedPhotos.length + files.length > 4) {
-          alert('사진은 최대 4장까지만 등록 가능합니다.');
-        }
-        var remaining = 4 - uploadedPhotos.length;
-        var targets = files.slice(0, remaining);
-        var btn = document.getElementById('submitBtn');
-        if (btn) { btn.disabled = true; btn.innerText = '사진 압축 변환 중...'; }
-
-        var count = 0;
-        targets.forEach(function(file) {
-          compressImage(file, 900, 0.65, function(base64, kb) {
-            uploadedPhotos.push({ data: base64, name: file.name, kb: kb });
-            count++;
-            if (count === targets.length) {
-              if (btn) btn.disabled = false;
-              renderPreview();
-            }
-          });
-        });
-        e.target.value = '';
-      }
-
-      function renderPreview() {
-        var grid = document.getElementById('previewGrid');
-        var countText = document.getElementById('photoCountText');
-        var btn = document.getElementById('submitBtn');
-
-        if (countText) countText.innerText = uploadedPhotos.length + ' / 4장';
-
-        if (uploadedPhotos.length === 0) {
-          if (grid) grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
-          if (btn) btn.innerText = '⚡ 실시간 접수 등록';
-          return;
-        }
-
-        if (btn) btn.innerText = '⚡ 실시간 접수 등록 (사진 ' + uploadedPhotos.length + '장)';
-        if (grid) {
-          grid.innerHTML = '';
-          uploadedPhotos.forEach(function(p, idx) {
-            var slot = document.createElement('div');
-            slot.className = 'photo-slot';
-            slot.innerHTML = '<img src="' + p.data + '">'
-              + '<span class="photo-size-tag">' + p.kb + 'KB</span>'
-              + '<button type="button" class="photo-del-btn" data-del="' + idx + '">×</button>';
-            grid.appendChild(slot);
-          });
-          grid.querySelectorAll('.photo-del-btn').forEach(function(b) {
-            b.addEventListener('click', function() {
-              var delIdx = parseInt(this.getAttribute('data-del'), 10);
-              uploadedPhotos.splice(delIdx, 1);
-              renderPreview();
-            });
-          });
-        }
-      }
-
-      async function uploadPhotosToSupabase(leadId, photos) {
-        var urls = [];
-        if (!photos || photos.length === 0 || !supabase) return urls;
-
-        for (var i = 0; i < photos.length; i++) {
-          try {
-            var p = photos[i];
-            var res = await fetch(p.data);
-            var blob = await res.blob();
-            var filePath = leadId + '/photo_' + (i + 1) + '_' + Date.now() + '.jpg';
-
-            var upRes = await supabase.storage
-              .from('lead-photos')
-              .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
-
-            if (upRes.error) {
-              console.error('스토리지 저장 실패:', upRes.error);
-              continue;
-            }
-
-            var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
-            if (pub && pub.data && pub.data.publicUrl) {
-              urls.push(pub.data.publicUrl);
-            }
-          } catch (err) {
-            console.error('사진 변환 업로드 오류:', err);
-          }
-        }
-        return urls;
-      }
-
-      // ==========================================================
-      // [6] DB 조회 및 목록 표시
-      // ==========================================================
-      async function loadDashboardLeads() {
-        if (!supabase) return;
-        var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value.trim().toLowerCase() : '';
-
-        try {
-          var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
-
-          if (currentRole === '컨설턴트') {
-            query = query.eq('assigned_rep', currentUserName);
-          } else if (currentRole !== 'admin') {
-            query = query.eq('agent_name', currentUserName);
-          }
-
-          var res = await query;
-          if (res.error) throw res.error;
-
-          var list = res.data || [];
-          var counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
-
-          list.forEach(function(r) {
-            var st = r.status || '접수대기';
-            counts.total++;
-            if (st === '접수대기') counts.wait++;
-            else if (st === '견적제출' || st === '견적상담') counts.quote++;
-            else if (st === '계약완료') counts.done++;
-            else if (st === '계약실패' || st === '계약보류' || st === '취소/보류') counts.cancel++;
-            else counts.ing++;
-          });
-
-          document.getElementById('cntTotal').innerText = counts.total;
-          document.getElementById('cntWait').innerText = counts.wait;
-          document.getElementById('cntIng').innerText = counts.ing;
-          document.getElementById('cntQuote').innerText = counts.quote;
-          document.getElementById('cntDone').innerText = counts.done;
-          document.getElementById('cntCancel').innerText = counts.cancel;
-
-          var filtered = list.filter(function(r) {
-            var st = r.status || '접수대기';
-            if (currentStatusFilter !== '전체') {
-              if (currentStatusFilter === '상담진행' && !(st === '접수확인' || st === '고객면담' || st === '추가면담' || st === '상담진행')) return false;
-              else if (currentStatusFilter === '견적제출' && !(st === '견적제출' || st === '견적상담')) return false;
-              else if (currentStatusFilter === '취소/보류' && !(st === '계약실패' || st === '계약보류' || st === '취소/보류')) return false;
-              else if (currentStatusFilter !== '상담진행' && currentStatusFilter !== '견적제출' && currentStatusFilter !== '취소/보류' && st !== currentStatusFilter) return false;
-            }
-            if (kw) {
-              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(' ').toLowerCase();
-              if (txt.indexOf(kw) === -1) return false;
-            }
-            return true;
-          });
-
-          renderLeadTables(filtered);
-        } catch (e) {
-          console.error("데이터 로드 실패:", e);
-        }
-      }
-
-      function renderLeadTables(list) {
-        currentLeadsData = list;
-        var pcBody = document.getElementById('pcTableBody');
-        var mList = document.getElementById('mobileCardList');
-
-        var emptyMsg = (currentRole === '컨설턴트') ? '나에게 배당된 안건이 없습니다.' : (currentRole === 'admin' ? '조회된 소개 내역이 없습니다.' : '내가 소개한 안건이 아직 없습니다.');
-
-        if (!list || list.length === 0) {
-          if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</td></tr>';
-          if (mList) mList.innerHTML = '<p style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</p>';
-          return;
-        }
-
-        var pcHtml = '';
-        var mHtml = '';
-
-        list.forEach(function(r, idx) {
-          var pCount = (r.photo_urls && r.photo_urls.length) ? r.photo_urls.length : 0;
-          var phoneFmt = formatPhone(r.contact_phone);
-
-          pcHtml += '<tr>'
-            + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
-            + '<td><strong>' + (r.agent_name || '-') + '</strong></td>'
-            + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
-            + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
-            + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
-            + '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (r.address || '-') + '</td>'
-            + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
-            + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
-            + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
-            + '<td><span class="badge " + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
-            + '<td><button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button></td>'
-            + '</tr>';
-
-          mHtml += '<div class="mobile-lead-card">'
-            + '<div class="m-card-header"><span class="m-agent-tag">소개자: ' + (r.agent_name || '-') + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
-            + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
-            + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
-            + '<div class="m-info-row">📍 ' + (r.address || '주소 없음') + '</div>'
-            + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
-            + '<div class="m-footer-actions">'
-            + '<span style="font-size:0.75rem; color:#5f6368;">담당: <strong>' + (r.assigned_rep || '-') + '</strong></span>'
-            + '<button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button>'
-            + '</div></div>';
-        });
-
-        if (pcBody) pcBody.innerHTML = pcHtml;
-        if (mList) mList.innerHTML = mHtml;
-
-        document.querySelectorAll('.btn-detail, .customer-cell, .m-customer-name').forEach(function(el) {
-          el.addEventListener('click', function() {
-            var i = this.getAttribute('data-idx');
-            if (i !== null) openDetailModal(parseInt(i, 10));
-          });
-        });
-      }
-
-      // ==========================================================
-      // [7] 안건별 전용 소개 게시판 로직 (첫 소절 타이틀 & 파일 첨부)
-      // ==========================================================
-      async function loadLeadBoardPosts(leadId) {
-        var listContainer = document.getElementById('boardPostList');
-        var badge = document.getElementById('boardCountBadge');
-        if (!listContainer || !supabase || !leadId) return;
-
-        try {
-          var res = await supabase.from('lead_board')
-            .select('*')
-            .eq('lead_id', leadId)
-            .order('created_at', { ascending: true });
-
-          if (res.error) throw res.error;
-
-          var posts = res.data || [];
-          if (badge) badge.innerText = '(' + posts.length + ')';
-
-          if (posts.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;">등록된 의견이 없습니다. 첫 의견을 남겨보세요!</p>';
-            return;
-          }
-
-          var html = '';
-          posts.forEach(function(p) {
-            var canDelete = (currentRole === 'admin') || (p.author === currentUserName);
-            var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" onclick="deleteBoardPost(\'' + p.post_id + '\')">삭제</button>' : '';
-
-            // 첫 소절(첫 문장 또는 30자)을 굵은 타이틀로 생성
-            var rawText = (p.content || '').trim();
-            var firstLine = rawText.split('\n')[0].trim();
-            var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
-            if (!titleSnippet) titleSnippet = '안건 의견';
-
-            // 첨부파일 파싱
-            var attachHtml = '';
-            var fileUrlMatch = rawText.match(/https:\/\/[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.pdf|\.xlsx|\.docx)/i);
-            if (fileUrlMatch) {
-              var fUrl = fileUrlMatch[0];
-              var isImg = /\.(jpg|jpeg|png|gif)$/i.test(fUrl);
-              if (isImg) {
-                attachHtml = '<div class="board-attachment"><img src="' + fUrl + '" class="board-attachment-img" onclick="window.open(\'' + fUrl + '\', \'_blank\')"></div>';
-              } else {
-                attachHtml = '<div class="board-attachment"><a href="' + fUrl + '" target="_blank">📎 첨부파일 다운로드 ↗</a></div>';
-              }
-            }
-
-            html += '<div class="board-card">'
-              + '<div class="board-card-top">'
-              + '<span class="board-title-snippet">📌 ' + titleSnippet + '</span>'
-              + delBtnHtml
-              + '</div>'
-              + '<div class="board-card-meta">'
-              + '<span><strong>' + (p.author || '직원') + '</strong></span>'
-              + '<span class="board-role-tag">' + (p.author_role || '일반') + '</span>'
-              + '<span>· ' + formatKoreanDate(p.created_at) + '</span>'
-              + '</div>'
-              + '<div class="board-content">' + rawText + '</div>'
-              + attachHtml
-              + '</div>';
-          });
-
-          listContainer.innerHTML = html;
-          listContainer.scrollTop = listContainer.scrollHeight;
-
-        } catch (e) {
-          console.error("게시판 로드 실패:", e);
-          listContainer.innerHTML = '<p style="text-align:center; padding:15px; font-size:0.8rem; color:#ef4444;">의견을 불러오지 못했습니다.</p>';
-        }
-      }
-
-      window.deleteBoardPost = async function(postId) {
-        if (!confirm('이 의견을 삭제하시겠습니까?')) return;
-        if (!supabase || !activeLeadItem) return;
-
-        var res = await supabase.from('lead_board').delete().eq('post_id', postId);
-        if (!res.error) {
-          loadLeadBoardPosts(activeLeadItem.lead_id);
-        } else {
-          alert('삭제 실패: ' + res.error.message);
-        }
-      };
-
-      async function submitBoardPost() {
-        var input = document.getElementById('boardContentInput');
-        if (!input || !activeLeadItem || !supabase) return;
-
-        var content = input.value.trim();
-        if (!content && !selectedBoardFile) { alert('의견 내용 또는 첨부파일을 선택해주세요.'); return; }
-
-        var btn = document.getElementById('btnSubmitBoardPost');
-        if (btn) { btn.disabled = true; btn.innerText = '등록 중...'; }
-
-        try {
-          var fileUrl = '';
-          if (selectedBoardFile) {
-            var ext = selectedBoardFile.name.split('.').pop();
-            var filePath = 'board_files/' + activeLeadItem.lead_id + '_' + Date.now() + '.' + ext;
-            var upRes = await supabase.storage.from('lead-photos').upload(filePath, selectedBoardFile);
-            if (!upRes.error) {
-              var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
-              if (pub && pub.data && pub.data.publicUrl) {
-                fileUrl = pub.data.publicUrl;
-              }
-            }
-          }
-
-          var finalContent = content;
-          if (fileUrl) {
-            finalContent = (finalContent ? finalContent + '\n\n' : '') + fileUrl;
-          }
-
-          var firstLine = finalContent.split('\n')[0].trim();
-          var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
-
-          var postId = 'B-' + Date.now();
-          var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
-
-          var res = await supabase.from('lead_board').insert([{
-            post_id: postId,
-            lead_id: activeLeadItem.lead_id,
-            title: titleSnippet,
-            content: finalContent,
-            author: currentUserName,
-            author_role: authorRole
-          }]);
-
-          if (res.error) throw res.error;
-
-          input.value = '';
-          clearBoardFile();
-          loadLeadBoardPosts(activeLeadItem.lead_id);
-        } catch (err) {
-          alert('등록 실패: ' + (err.message || err));
-        } finally {
-          if (btn) { btn.disabled = false; btn.innerText = '의견 등록'; }
-        }
-      }
-
-      function clearBoardFile() {
-        selectedBoardFile = null;
-        var fileInp = document.getElementById('boardFileInput');
-        if (fileInp) fileInp.value = '';
-        var statusBox = document.getElementById('boardFileStatus');
-        if (statusBox) statusBox.style.display = 'none';
-      }
-
-      // ==========================================================
-      // [8] 상세 모달 오픈 및 닫기
-      // ==========================================================
-      function openDetailModal(idx) {
-        var item = currentLeadsData[idx];
-        if (!item) return;
-        activeLeadItem = item;
-
-        document.getElementById('mTitle').innerText = item.customer_name || '';
-        document.getElementById('mLeadId').innerText = item.lead_id || '';
-        document.getElementById('mDate').innerText = formatKoreanDate(item.created_at);
-        document.getElementById('mAgentName').innerText = item.agent_name || '-';
-        document.getElementById('mAssignedRep').innerText = item.assigned_rep || '-';
-        document.getElementById('mCustomerName').innerText = item.customer_name || '';
-        document.getElementById('mContactPerson').innerText = item.contact_person || '-';
-        document.getElementById('mAddress').innerText = item.address || '-';
-        document.getElementById('mBusinessType').innerText = item.business_type || '-';
-        document.getElementById('mCurrentCompany').innerText = item.current_company || '미사용';
-        document.getElementById('mProduct').innerText = item.product || '';
-        document.getElementById('mFieldDesc').innerText = item.field_description || '없음';
-
-        var phoneFmt = formatPhone(item.contact_phone);
-        document.getElementById('mContactPhone').innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700;">' + phoneFmt + ' 📞</a>';
-
-        var b = document.getElementById('mHeaderStatusBadge');
-        b.innerText = item.status || '접수대기';
-        b.className = 'badge ' + getBadgeClass(item.status);
-
-        var pGrid = document.getElementById('mPhotoGrid');
-        pGrid.innerHTML = '';
-        if (item.photo_urls && item.photo_urls.length > 0) {
-          item.photo_urls.forEach(function(url, pIdx) {
-            var d = document.createElement('div');
-            d.className = 'modal-photo-card';
-            d.innerHTML = '<img src="' + url + '" onclick="window.open(\'' + url + '\', \'_blank\')">'
-              + '<div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (pIdx + 1) + ' 원본보기 ↗</a></div>';
-            pGrid.appendChild(d);
-          });
-        } else {
-          pGrid.innerHTML = '<p style="color:#9aa0a6; font-size:0.8rem; grid-column:span 2; padding:10px 0;">등록된 사진이 없습니다.</p>';
-        }
-
-        var uSel = document.getElementById('uStatus');
-        if (uSel) uSel.value = item.status || '접수대기';
-
-        // 1. 안건수정 / 안건삭제 버튼 노출 (지사 관리자 또는 최초 작성자 본인)
-        var actionsBox = document.getElementById('authorActionsBox');
-        var editContainer = document.getElementById('editLeadContainer');
-        if (editContainer) editContainer.style.display = 'none';
-
-        var canModify = (currentRole === 'admin') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
-        if (actionsBox) {
-          actionsBox.style.display = canModify ? 'block' : 'none';
-        }
-
-        // 2. 상태 변경 권한 (컨설턴트 및 지사 관리자만 가능)
-        var statusBox = document.getElementById('statusUpdateBox');
-        var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
-
-        if (statusBox) {
-          var btnSave = document.getElementById('btnSaveStatus');
-          if (canChangeStatus) {
-            uSel.disabled = false;
-            if (btnSave) btnSave.style.display = 'block';
+    };
+
+    window.handleLogout = function() {
+      currentRole = '';
+      currentUserName = '';
+      currentUserPhone = '';
+      window.showScreen('login');
+      window.applyLoginTab('member');
+    };
+
+    function formatPhone(phone) {
+      var s = String(phone || '').replace(/[^0-9]/g, '');
+      if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+      if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+      return s;
+    }
+
+    function formatKoreanDate(dateInput) {
+      if (!dateInput) return '';
+      var d = new Date(dateInput);
+      if (isNaN(d.getTime())) return String(dateInput);
+      var days = ['일', '월', '화', '수', '목', '금', '토'];
+      return String(d.getFullYear()).slice(-2) + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' (' + days[d.getDay()] + ') ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    }
+
+    function getBadgeClass(status) {
+      if (status === '계약완료') return 'badge-done';
+      if (status === '계약실패') return 'badge-fail';
+      if (status === '계약보류' || status === '취소/보류') return 'badge-cancel';
+      if (status === '견적제출' || status === '견적상담') return 'badge-quote';
+      if (status === '접수확인' || status === '고객면담' || status === '추가면담') return 'badge-ing';
+      return 'badge-wait';
+    }
+
+    // ==========================================================
+    // [5] 사진 압축 및 Supabase Storage 업로드
+    // ==========================================================
+    function compressImage(file, maxDim, quality, callback) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var w = img.width, h = img.height;
+          if (w > h) {
+            if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
           } else {
-            uSel.disabled = true;
-            if (btnSave) btnSave.style.display = 'none';
+            if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
           }
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          var base64 = canvas.toDataURL('image/jpeg', quality);
+          var kb = Math.round(base64.length * 0.75 / 1024);
+          callback(base64, kb);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    window.handleFileSelect = function(e) {
+      var files = Array.from(e.target.files);
+      if (!files.length) return;
+      if (uploadedPhotos.length + files.length > 4) {
+        alert('사진은 최대 4장까지만 등록 가능합니다.');
+      }
+      var remaining = 4 - uploadedPhotos.length;
+      var targets = files.slice(0, remaining);
+      var btn = document.getElementById('submitBtn');
+      if (btn) { btn.disabled = true; btn.innerText = '사진 압축 변환 중...'; }
+
+      var count = 0;
+      targets.forEach(function(file) {
+        compressImage(file, 900, 0.65, function(base64, kb) {
+          uploadedPhotos.push({ data: base64, name: file.name, kb: kb });
+          count++;
+          if (count === targets.length) {
+            if (btn) btn.disabled = false;
+            renderPreview();
+          }
+        });
+      });
+      e.target.value = '';
+    };
+
+    function renderPreview() {
+      var grid = document.getElementById('previewGrid');
+      var countText = document.getElementById('photoCountText');
+      var btn = document.getElementById('submitBtn');
+
+      if (countText) countText.innerText = uploadedPhotos.length + ' / 4장';
+
+      if (uploadedPhotos.length === 0) {
+        if (grid) grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
+        if (btn) btn.innerText = '⚡ 실시간 접수 등록';
+        return;
+      }
+
+      if (btn) btn.innerText = '⚡ 실시간 접수 등록 (사진 ' + uploadedPhotos.length + '장)';
+      if (grid) {
+        grid.innerHTML = '';
+        uploadedPhotos.forEach(function(p, idx) {
+          var slot = document.createElement('div');
+          slot.className = 'photo-slot';
+          slot.innerHTML = '<img src="' + p.data + '">'
+            + '<span class="photo-size-tag">' + p.kb + 'KB</span>'
+            + '<button type="button" class="photo-del-btn" onclick="window.removePhoto(' + idx + ')">×</button>';
+          grid.appendChild(slot);
+        });
+      }
+    }
+
+    window.removePhoto = function(idx) {
+      uploadedPhotos.splice(idx, 1);
+      renderPreview();
+    };
+
+    async function uploadPhotosToSupabase(leadId, photos) {
+      var urls = [];
+      if (!photos || photos.length === 0 || !supabase) return urls;
+
+      for (var i = 0; i < photos.length; i++) {
+        try {
+          var p = photos[i];
+          var res = await fetch(p.data);
+          var blob = await res.blob();
+          var filePath = leadId + '/photo_' + (i + 1) + '_' + Date.now() + '.jpg';
+
+          var upRes = await supabase.storage
+            .from('lead-photos')
+            .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
+
+          if (upRes.error) {
+            console.error('스토리지 저장 실패:', upRes.error);
+            continue;
+          }
+
+          var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+          if (pub && pub.data && pub.data.publicUrl) {
+            urls.push(pub.data.publicUrl);
+          }
+        } catch (err) {
+          console.error('사진 변환 업로드 오류:', err);
         }
-
-        // 3. 해당 안건 소개 게시판 불러오기
-        clearBoardFile();
-        loadLeadBoardPosts(item.lead_id);
-        var bInput = document.getElementById('boardContentInput');
-        if (bInput) bInput.value = '';
-
-        var modal = document.getElementById('detailModal');
-        if (modal) modal.classList.add('open');
       }
+      return urls;
+    }
 
-      function closeDetailModal() {
-        var modal = document.getElementById('detailModal');
-        if (modal) modal.classList.remove('open');
-        var editContainer = document.getElementById('editLeadContainer');
-        if (editContainer) editContainer.style.display = 'none';
-        clearBoardFile();
-        activeLeadItem = null;
-      }
+    // ==========================================================
+    // [6] DB 조회 및 목록 표시
+    // ==========================================================
+    window.loadDashboardLeads = async function() {
+      if (!supabase) return;
+      var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value.trim().toLowerCase() : '';
 
-      function openPwdModal() {
-        hideLoginErrors();
-        document.getElementById('curPwdInput').value = '';
-        document.getElementById('newPwdInput').value = '';
-        document.getElementById('newPwdConfirmInput').value = '';
-        var m = document.getElementById('pwdChangeModal');
-        if (m) m.classList.add('open');
-      }
+      try {
+        var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
 
-      function closePwdModal() {
-        var m = document.getElementById('pwdChangeModal');
-        if (m) m.classList.remove('open');
-        hideLoginErrors();
-      }
-
-      async function loadRecentHistory() {
-        var listDiv = document.getElementById('historyList');
-        if (!supabase) return;
-
-        var query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
-        if (currentRole !== 'admin' && currentUserName) {
+        if (currentRole === '컨설턴트') {
+          query = query.eq('assigned_rep', currentUserName);
+        } else if (currentRole !== 'admin') {
           query = query.eq('agent_name', currentUserName);
         }
 
         var res = await query;
-        if (!res.error && res.data && listDiv) {
-          var html = '';
-          res.data.forEach(function(r) {
-            html += '<div class="history-item"><div><strong>' + r.customer_name + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + formatKoreanDate(r.created_at) + ' · 담당: ' + (r.assigned_rep || '-') + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
-          });
-          listDiv.innerHTML = html || '<p style="font-size:0.8rem; color:#9aa0a6; text-align:center;">최근 접수 내역이 없습니다.</p>';
+        if (res.error) throw res.error;
+
+        var list = res.data || [];
+        var counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
+
+        list.forEach(function(r) {
+          var st = r.status || '접수대기';
+          counts.total++;
+          if (st === '접수대기') counts.wait++;
+          else if (st === '견적제출' || st === '견적상담') counts.quote++;
+          else if (st === '계약완료') counts.done++;
+          else if (st === '계약실패' || st === '계약보류' || st === '취소/보류') counts.cancel++;
+          else counts.ing++;
+        });
+
+        document.getElementById('cntTotal').innerText = counts.total;
+        document.getElementById('cntWait').innerText = counts.wait;
+        document.getElementById('cntIng').innerText = counts.ing;
+        document.getElementById('cntQuote').innerText = counts.quote;
+        document.getElementById('cntDone').innerText = counts.done;
+        document.getElementById('cntCancel').innerText = counts.cancel;
+
+        var filtered = list.filter(function(r) {
+          var st = r.status || '접수대기';
+          if (currentStatusFilter !== '전체') {
+            if (currentStatusFilter === '상담진행' && !(st === '접수확인' || st === '고객면담' || st === '추가면담' || st === '상담진행')) return false;
+            else if (currentStatusFilter === '견적제출' && !(st === '견적제출' || st === '견적상담')) return false;
+            else if (currentStatusFilter === '취소/보류' && !(st === '계약실패' || st === '계약보류' || st === '취소/보류')) return false;
+            else if (currentStatusFilter !== '상담진행' && currentStatusFilter !== '견적제출' && currentStatusFilter !== '취소/보류' && st !== currentStatusFilter) return false;
+          }
+          if (kw) {
+            var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(' ').toLowerCase();
+            if (txt.indexOf(kw) === -1) return false;
+          }
+          return true;
+        });
+
+        renderLeadTables(filtered);
+      } catch (e) {
+        console.error("데이터 로드 실패:", e);
+      }
+    };
+
+    function renderLeadTables(list) {
+      currentLeadsData = list;
+      var pcBody = document.getElementById('pcTableBody');
+      var mList = document.getElementById('mobileCardList');
+
+      var emptyMsg = (currentRole === '컨설턴트') ? '나에게 배당된 안건이 없습니다.' : (currentRole === 'admin' ? '조회된 소개 내역이 없습니다.' : '내가 소개한 안건이 아직 없습니다.');
+
+      if (!list || list.length === 0) {
+        if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</td></tr>';
+        if (mList) mList.innerHTML = '<p style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</p>';
+        return;
+      }
+
+      var pcHtml = '';
+      var mHtml = '';
+
+      list.forEach(function(r, idx) {
+        var pCount = (r.photo_urls && r.photo_urls.length) ? r.photo_urls.length : 0;
+        var phoneFmt = formatPhone(r.contact_phone);
+
+        pcHtml += '<tr>'
+          + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
+          + '<td><strong>' + (r.agent_name || '-') + '</strong></td>'
+          + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
+          + '<td class="customer-cell" onclick="window.openDetailModal(' + idx + ')">' + r.customer_name + '</td>'
+          + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
+          + '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (r.address || '-') + '</td>'
+          + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
+          + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
+          + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
+          + '<td><button type="button" class="btn-detail" onclick="window.openDetailModal(' + idx + ')">상세보기</button></td>'
+          + '</tr>';
+
+        mHtml += '<div class="mobile-lead-card">'
+          + '<div class="m-card-header"><span class="m-agent-tag">소개자: ' + (r.agent_name || '-') + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
+          + '<div class="m-customer-name" onclick="window.openDetailModal(' + idx + ')" style="cursor:pointer;">' + r.customer_name + '</div>'
+          + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
+          + '<div class="m-info-row">📍 ' + (r.address || '주소 없음') + '</div>'
+          + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
+          + '<div class="m-footer-actions">'
+          + '<span style="font-size:0.75rem; color:#5f6368;">담당: <strong>' + (r.assigned_rep || '-') + '</strong></span>'
+          + '<button type="button" class="btn-detail" onclick="window.openDetailModal(' + idx + ')">상세보기</button>'
+          + '</div></div>';
+      });
+
+      if (pcBody) pcBody.innerHTML = pcHtml;
+      if (mList) mList.innerHTML = mHtml;
+    }
+
+    // ==========================================================
+    // [7] 안건별 전용 소개 게시판 로직
+    // ==========================================================
+    async function loadLeadBoardPosts(leadId) {
+      var listContainer = document.getElementById('boardPostList');
+      var badge = document.getElementById('boardCountBadge');
+      if (!listContainer || !supabase || !leadId) return;
+
+      try {
+        var res = await supabase.from('lead_board')
+          .select('*')
+          .eq('lead_id', leadId)
+          .order('created_at', { ascending: true });
+
+        if (res.error) throw res.error;
+
+        var posts = res.data || [];
+        if (badge) badge.innerText = '(' + posts.length + ')';
+
+        if (posts.length === 0) {
+          listContainer.innerHTML = '<p style="text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;">등록된 의견이 없습니다. 첫 의견을 남겨보세요!</p>';
+          return;
+        }
+
+        var html = '';
+        posts.forEach(function(p) {
+          var canDelete = (currentRole === 'admin') || (p.author === currentUserName);
+          var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" onclick="window.deleteBoardPost(\'' + p.post_id + '\')">삭제</button>' : '';
+
+          var rawText = (p.content || '').trim();
+          var firstLine = rawText.split('\n')[0].trim();
+          var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+          if (!titleSnippet) titleSnippet = '안건 의견';
+
+          var attachHtml = '';
+          var fileUrlMatch = rawText.match(/https:\/\/[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.pdf|\.xlsx|\.docx)/i);
+          if (fileUrlMatch) {
+            var fUrl = fileUrlMatch[0];
+            var isImg = /\.(jpg|jpeg|png|gif)$/i.test(fUrl);
+            if (isImg) {
+              attachHtml = '<div class="board-attachment"><img src="' + fUrl + '" class="board-attachment-img" onclick="window.open(\'' + fUrl + '\', \'_blank\')"></div>';
+            } else {
+              attachHtml = '<div class="board-attachment"><a href="' + fUrl + '" target="_blank">📎 첨부파일 다운로드 ↗</a></div>';
+            }
+          }
+
+          html += '<div class="board-card">'
+            + '<div class="board-card-top">'
+            + '<span class="board-title-snippet">📌 ' + titleSnippet + '</span>'
+            + delBtnHtml
+            + '</div>'
+            + '<div class="board-card-meta">'
+            + '<span><strong>' + (p.author || '직원') + '</strong></span>'
+            + '<span class="board-role-tag">' + (p.author_role || '일반') + '</span>'
+            + '<span>· ' + formatKoreanDate(p.created_at) + '</span>'
+            + '</div>'
+            + '<div class="board-content">' + rawText + '</div>'
+            + attachHtml
+            + '</div>';
+        });
+
+        listContainer.innerHTML = html;
+        listContainer.scrollTop = listContainer.scrollHeight;
+
+      } catch (e) {
+        console.error("게시판 로드 실패:", e);
+        listContainer.innerHTML = '<p style="text-align:center; padding:15px; font-size:0.8rem; color:#ef4444;">의견을 불러오지 못했습니다.</p>';
+      }
+    }
+
+    window.deleteBoardPost = async function(postId) {
+      if (!confirm('이 의견을 삭제하시겠습니까?')) return;
+      if (!supabase || !activeLeadItem) return;
+
+      var res = await supabase.from('lead_board').delete().eq('post_id', postId);
+      if (!res.error) {
+        loadLeadBoardPosts(activeLeadItem.lead_id);
+      } else {
+        alert('삭제 실패: ' + res.error.message);
+      }
+    };
+
+    window.submitBoardPost = async function() {
+      var input = document.getElementById('boardContentInput');
+      if (!input || !activeLeadItem || !supabase) return;
+
+      var content = input.value.trim();
+      if (!content && !selectedBoardFile) { alert('의견 내용 또는 첨부파일을 선택해주세요.'); return; }
+
+      var btn = document.getElementById('btnSubmitBoardPost');
+      if (btn) { btn.disabled = true; btn.innerText = '등록 중...'; }
+
+      try {
+        var fileUrl = '';
+        if (selectedBoardFile) {
+          var ext = selectedBoardFile.name.split('.').pop();
+          var filePath = 'board_files/' + activeLeadItem.lead_id + '_' + Date.now() + '.' + ext;
+          var upRes = await supabase.storage.from('lead-photos').upload(filePath, selectedBoardFile);
+          if (!upRes.error) {
+            var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+            if (pub && pub.data && pub.data.publicUrl) {
+              fileUrl = pub.data.publicUrl;
+            }
+          }
+        }
+
+        var finalContent = content;
+        if (fileUrl) {
+          finalContent = (finalContent ? finalContent + '\n\n' : '') + fileUrl;
+        }
+
+        var firstLine = finalContent.split('\n')[0].trim();
+        var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+
+        var postId = 'B-' + Date.now();
+        var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
+
+        var res = await supabase.from('lead_board').insert([{
+          post_id: postId,
+          lead_id: activeLeadItem.lead_id,
+          title: titleSnippet,
+          content: finalContent,
+          author: currentUserName,
+          author_role: authorRole
+        }]);
+
+        if (res.error) throw res.error;
+
+        input.value = '';
+        window.clearBoardFile();
+        loadLeadBoardPosts(activeLeadItem.lead_id);
+      } catch (err) {
+        alert('등록 실패: ' + (err.message || err));
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerText = '의견 등록'; }
+      }
+    };
+
+    window.handleBoardFileSelect = function(e) {
+      var f = e.target.files[0];
+      if (f) {
+        selectedBoardFile = f;
+        var statusBox = document.getElementById('boardFileStatus');
+        var nameText = document.getElementById('boardFileNameText');
+        if (statusBox && nameText) {
+          nameText.innerText = '선택된 파일: ' + f.name;
+          statusBox.style.display = 'flex';
+        }
+      }
+    };
+
+    window.clearBoardFile = function() {
+      selectedBoardFile = null;
+      var fileInp = document.getElementById('boardFileInput');
+      if (fileInp) fileInp.value = '';
+      var statusBox = document.getElementById('boardFileStatus');
+      if (statusBox) statusBox.style.display = 'none';
+    };
+
+    // ==========================================================
+    // [8] 상세 모달 열기/닫기
+    // ==========================================================
+    window.openDetailModal = function(idx) {
+      var item = currentLeadsData[idx];
+      if (!item) return;
+      activeLeadItem = item;
+
+      document.getElementById('mTitle').innerText = item.customer_name || '';
+      document.getElementById('mLeadId').innerText = item.lead_id || '';
+      document.getElementById('mDate').innerText = formatKoreanDate(item.created_at);
+      document.getElementById('mAgentName').innerText = item.agent_name || '-';
+      document.getElementById('mAssignedRep').innerText = item.assigned_rep || '-';
+      document.getElementById('mCustomerName').innerText = item.customer_name || '';
+      document.getElementById('mContactPerson').innerText = item.contact_person || '-';
+      document.getElementById('mAddress').innerText = item.address || '-';
+      document.getElementById('mBusinessType').innerText = item.business_type || '-';
+      document.getElementById('mCurrentCompany').innerText = item.current_company || '미사용';
+      document.getElementById('mProduct').innerText = item.product || '';
+      document.getElementById('mFieldDesc').innerText = item.field_description || '없음';
+
+      var phoneFmt = formatPhone(item.contact_phone);
+      document.getElementById('mContactPhone').innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700;">' + phoneFmt + ' 📞</a>';
+
+      var b = document.getElementById('mHeaderStatusBadge');
+      b.innerText = item.status || '접수대기';
+      b.className = 'badge ' + getBadgeClass(item.status);
+
+      var pGrid = document.getElementById('mPhotoGrid');
+      pGrid.innerHTML = '';
+      if (item.photo_urls && item.photo_urls.length > 0) {
+        item.photo_urls.forEach(function(url, pIdx) {
+          var d = document.createElement('div');
+          d.className = 'modal-photo-card';
+          d.innerHTML = '<img src="' + url + '" onclick="window.open(\'' + url + '\', \'_blank\')">'
+            + '<div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (pIdx + 1) + ' 원본보기 ↗</a></div>';
+          pGrid.appendChild(d);
+        });
+      } else {
+        pGrid.innerHTML = '<p style="color:#9aa0a6; font-size:0.8rem; grid-column:span 2; padding:10px 0;">등록된 사진이 없습니다.</p>';
+      }
+
+      var uSel = document.getElementById('uStatus');
+      if (uSel) uSel.value = item.status || '접수대기';
+
+      // 안건수정 / 안건삭제 버튼 노출 제어
+      var actionsBox = document.getElementById('authorActionsBox');
+      var editContainer = document.getElementById('editLeadContainer');
+      if (editContainer) editContainer.style.display = 'none';
+
+      var canModify = (currentRole === 'admin') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
+      if (actionsBox) {
+        actionsBox.style.display = canModify ? 'block' : 'none';
+      }
+
+      // 상태 변경 권한
+      var statusBox = document.getElementById('statusUpdateBox');
+      var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
+
+      if (statusBox) {
+        var btnSave = document.getElementById('btnSaveStatus');
+        if (canChangeStatus) {
+          uSel.disabled = false;
+          if (btnSave) btnSave.style.display = 'block';
+        } else {
+          uSel.disabled = true;
+          if (btnSave) btnSave.style.display = 'none';
         }
       }
 
-      // ==========================================================
-      // [9] 이벤트 리스너 바인딩
-      // ==========================================================
-      document.addEventListener('DOMContentLoaded', function() {
-        var tabMember = document.getElementById('tabBtnMember');
-        var tabAdm = document.getElementById('tabBtnAdmin');
+      window.clearBoardFile();
+      loadLeadBoardPosts(item.lead_id);
+      var bInput = document.getElementById('boardContentInput');
+      if (bInput) bInput.value = '';
 
-        if (tabMember) tabMember.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
-        if (tabAdm) tabAdm.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('admin'); });
+      var modal = document.getElementById('detailModal');
+      if (modal) modal.classList.add('open');
+    };
 
-        document.getElementById('btnGoSignup').addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('signup'); });
-        document.getElementById('btnBackToLogin').addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
+    window.closeDetailModal = function() {
+      var modal = document.getElementById('detailModal');
+      if (modal) modal.classList.remove('open');
+      var editContainer = document.getElementById('editLeadContainer');
+      if (editContainer) editContainer.style.display = 'none';
+      window.clearBoardFile();
+      activeLeadItem = null;
+    };
 
-        // 1. 신규 회원가입 폼 제출
-        var fSignup = document.getElementById('formSignup');
-        if (fSignup) {
-          fSignup.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            if (!supabase) { alert('데이터베이스에 연결할 수 없습니다.'); return; }
+    window.openPwdModal = function() {
+      hideLoginErrors();
+      document.getElementById('curPwdInput').value = '';
+      document.getElementById('newPwdInput').value = '';
+      document.getElementById('newPwdConfirmInput').value = '';
+      var m = document.getElementById('pwdChangeModal');
+      if (m) m.classList.add('open');
+    };
 
-            var phone = document.getElementById('regPhone').value.replace(/[^0-9]/g, '');
-            var name = document.getElementById('regName').value.trim();
-            var job = document.getElementById('regJob').value;
-            var pwd = document.getElementById('regPwd').value;
-            var pwdConfirm = document.getElementById('regPwdConfirm').value;
-            var btn = document.getElementById('btnDoSignup');
+    window.closePwdModal = function() {
+      var m = document.getElementById('pwdChangeModal');
+      if (m) m.classList.remove('open');
+      hideLoginErrors();
+    };
 
-            if (!phone || phone.length < 10) { showLoginError('signupErr', '올바른 휴대전화번호를 입력해주세요.'); return; }
-            if (!name) { showLoginError('signupErr', '이름을 입력해주세요.'); return; }
-            if (!job) { showLoginError('signupErr', '직무를 선택해주세요.'); return; }
+    window.handleCompanyChange = function() {
+      var comp = document.getElementById('currentCompany').value;
+      var f = document.getElementById('currentFee');
+      if (comp !== '미사용') {
+        f.disabled = false; f.style.backgroundColor = '#fff';
+      } else {
+        f.disabled = true; f.value = ''; f.style.backgroundColor = '#f1f3f4';
+      }
+    };
 
-            var pwdErr = validatePassword(pwd);
-            if (pwdErr) { showLoginError('signupErr', pwdErr); return; }
+    async function loadRecentHistory() {
+      var listDiv = document.getElementById('historyList');
+      if (!supabase) return;
 
-            if (pwd !== pwdConfirm) {
-              showLoginError('signupErr', '비밀번호 확인이 일치하지 않습니다.');
-              return;
-            }
+      var query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
+      if (currentRole !== 'admin' && currentUserName) {
+        query = query.eq('agent_name', currentUserName);
+      }
 
-            btn.disabled = true; btn.innerText = '가입 처리 중...';
+      var res = await query;
+      if (!res.error && res.data && listDiv) {
+        var html = '';
+        res.data.forEach(function(r) {
+          html += '<div class="history-item"><div><strong>' + r.customer_name + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + formatKoreanDate(r.created_at) + ' · 담당: ' + (r.assigned_rep || '-') + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
+        });
+        listDiv.innerHTML = html || '<p style="font-size:0.8rem; color:#9aa0a6; text-align:center;">최근 접수 내역이 없습니다.</p>';
+      }
+    }
 
-            try {
-              var chk = await supabase.from('app_users').select('phone').eq('phone', phone);
-              if (chk.data && chk.data.length > 0) {
-                btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
-                showLoginError('signupErr', '이미 가입된 휴대전화번호입니다. 로그인해 주세요.');
-                return;
-              }
+    // ==========================================================
+    // [9] 로그인, 가입 및 저장 핸들러
+    // ==========================================================
+    window.handleMemberLogin = async function() {
+      var phone = document.getElementById('memberLoginPhone').value.replace(/[^0-9]/g, '');
+      var pwd = document.getElementById('memberLoginPwd').value.trim();
+      var btn = document.getElementById('btnMemberLogin');
 
-              var hashedPwd = await sha256(pwd);
+      if (!phone || !pwd) { showLoginError('memberLoginErr', '전화번호와 비밀번호를 모두 입력해주세요.'); return; }
 
-              var ins = await supabase.from('app_users').insert([{
-                phone: phone,
-                name: name,
-                job: job,
-                password: pwd,
-                hash: hashedPwd
-              }]);
+      btn.disabled = true; btn.innerText = '인증 확인 중...';
 
-              if (ins.error) throw ins.error;
+      try {
+        var q = await supabase.from('app_users').select('*').eq('phone', phone);
+        btn.disabled = false; btn.innerText = '로그인 접속';
 
-              alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.');
-
-              currentRole = job.trim();
-              currentUserName = name.trim();
-              currentUserPhone = phone;
-
-              document.getElementById('agentName').value = name;
-              showScreen('dashboard');
-
-            } catch (err) {
-              showLoginError('signupErr', '가입 오류: ' + (err.message || err));
-            } finally {
-              btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
-            }
-          });
+        if (q.error || !q.data || q.data.length === 0) {
+          showLoginError('memberLoginErr', '가입되지 않은 전화번호입니다. 아래 [신규 회원가입]을 진행해주세요.');
+          return;
         }
 
-        // 2. 통합 직원 로그인 폼 제출
-        var fMember = document.getElementById('formLoginMember');
-        if (fMember) {
-          fMember.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            var phone = document.getElementById('memberLoginPhone').value.replace(/[^0-9]/g, '');
-            var pwd = document.getElementById('memberLoginPwd').value.trim();
-            var btn = document.getElementById('btnMemberLogin');
+        var user = q.data[0];
+        var hashedInput = await sha256(pwd);
+        var isMatch = (user.password === pwd) || (user.hash && user.hash === hashedInput);
 
-            if (!phone || !pwd) { showLoginError('memberLoginErr', '전화번호와 비밀번호를 모두 입력해주세요.'); return; }
-
-            btn.disabled = true; btn.innerText = '인증 확인 중...';
-
-            try {
-              var q = await supabase.from('app_users').select('*').eq('phone', phone);
-              btn.disabled = false; btn.innerText = '로그인 접속';
-
-              if (q.error || !q.data || q.data.length === 0) {
-                showLoginError('memberLoginErr', '가입되지 않은 전화번호입니다. 아래 [신규 회원가입]을 진행해주세요.');
-                return;
-              }
-
-              var user = q.data[0];
-              var hashedInput = await sha256(pwd);
-              var isMatch = (user.password === pwd) || (user.hash && user.hash === hashedInput);
-
-              if (!isMatch) {
-                showLoginError('memberLoginErr', '비밀번호가 일치하지 않습니다.');
-                return;
-              }
-
-              currentRole = user.job ? user.job.trim() : 'CS근무자';
-              if (currentRole === 'admin' || currentRole === '지사장') {
-                currentRole = 'CS관리자';
-              }
-
-              currentUserName = user.name ? user.name.trim() : '직원';
-              currentUserPhone = user.phone;
-
-              document.getElementById('agentName').value = currentUserName;
-              showScreen('dashboard');
-
-            } catch (err) {
-              btn.disabled = false; btn.innerText = '로그인 접속';
-              showLoginError('memberLoginErr', '통신 오류: ' + (err.message || err));
-            }
-          });
+        if (!isMatch) {
+          showLoginError('memberLoginErr', '비밀번호가 일치하지 않습니다.');
+          return;
         }
 
-        // 3. 지사 관리자 전용 로그인 폼 제출
-        var fAdm = document.getElementById('formLoginAdmin');
-        if (fAdm) {
-          fAdm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var pwd = document.getElementById('adminLoginPwd').value;
-            if (!pwd) { showLoginError('adminLoginErr', '비밀번호를 입력해주세요.'); return; }
-
-            if (pwd === ADMIN_PASSWORD) {
-              currentRole = 'admin';
-              currentUserName = '지사장(관리자)';
-              currentUserPhone = '';
-              showScreen('dashboard');
-            } else {
-              showLoginError('adminLoginErr', '관리자 비밀번호가 일치하지 않습니다.');
-            }
-          });
+        currentRole = user.job ? user.job.trim() : 'CS근무자';
+        if (currentRole === 'admin' || currentRole === '지사장') {
+          currentRole = 'CS관리자';
         }
 
-        // 비밀번호 변경 모달 이벤트
-        document.getElementById('regPwdBtn').addEventListener('click', openPwdModal);
-        document.getElementById('dashPwdBtn').addEventListener('click', openPwdModal);
-        document.getElementById('btnClosePwdModal').addEventListener('click', closePwdModal);
+        currentUserName = user.name ? user.name.trim() : '직원';
+        currentUserPhone = user.phone;
 
-        document.getElementById('btnSubmitChangePwd').addEventListener('click', async function() {
+        document.getElementById('agentName').value = currentUserName;
+        window.showScreen('dashboard');
+
+      } catch (err) {
+        btn.disabled = false; btn.innerText = '로그인 접속';
+        showLoginError('memberLoginErr', '통신 오류: ' + (err.message || err));
+      }
+    };
+
+    window.handleAdminLogin = function() {
+      var pwd = document.getElementById('adminLoginPwd').value;
+      if (!pwd) { showLoginError('adminLoginErr', '비밀번호를 입력해주세요.'); return; }
+
+      if (pwd === ADMIN_PASSWORD) {
+        currentRole = 'admin';
+        currentUserName = '지사장(관리자)';
+        currentUserPhone = '';
+        window.showScreen('dashboard');
+      } else {
+        showLoginError('adminLoginErr', '관리자 비밀번호가 일치하지 않습니다.');
+      }
+    };
+
+    window.handleSignup = async function() {
+      if (!supabase) { alert('데이터베이스에 연결할 수 없습니다.'); return; }
+
+      var phone = document.getElementById('regPhone').value.replace(/[^0-9]/g, '');
+      var name = document.getElementById('regName').value.trim();
+      var job = document.getElementById('regJob').value;
+      var pwd = document.getElementById('regPwd').value;
+      var pwdConfirm = document.getElementById('regPwdConfirm').value;
+      var btn = document.getElementById('btnDoSignup');
+
+      if (!phone || phone.length < 10) { showLoginError('signupErr', '올바른 휴대전화번호를 입력해주세요.'); return; }
+      if (!name) { showLoginError('signupErr', '이름을 입력해주세요.'); return; }
+      if (!job) { showLoginError('signupErr', '직무를 선택해주세요.'); return; }
+
+      var pwdErr = validatePassword(pwd);
+      if (pwdErr) { showLoginError('signupErr', pwdErr); return; }
+
+      if (pwd !== pwdConfirm) {
+        showLoginError('signupErr', '비밀번호 확인이 일치하지 않습니다.');
+        return;
+      }
+
+      btn.disabled = true; btn.innerText = '가입 처리 중...';
+
+      try {
+        var chk = await supabase.from('app_users').select('phone').eq('phone', phone);
+        if (chk.data && chk.data.length > 0) {
+          btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
+          showLoginError('signupErr', '이미 가입된 휴대전화번호입니다. 로그인해 주세요.');
+          return;
+        }
+
+        var hashedPwd = await sha256(pwd);
+
+        var ins = await supabase.from('app_users').insert([{
+          phone: phone,
+          name: name,
+          job: job,
+          password: pwd,
+          hash: hashedPwd
+        }]);
+
+        if (ins.error) throw ins.error;
+
+        alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.');
+
+        currentRole = job.trim();
+        currentUserName = name.trim();
+        currentUserPhone = phone;
+
+        document.getElementById('agentName').value = name;
+        window.showScreen('dashboard');
+
+      } catch (err) {
+        showLoginError('signupErr', '가입 오류: ' + (err.message || err));
+      } finally {
+        btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
+      }
+    };
+
+    window.handleLeadSubmit = async function() {
+      if (!supabase) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
+
+      var checked = Array.from(document.querySelectorAll('input[name="prod"]:checked')).map(function(c) { return c.value; });
+      if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
+
+      var rep = document.getElementById('assignedRep').value;
+      if (!rep) { alert('담당 컨설턴트를 선택해주세요.'); return; }
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.innerText = uploadedPhotos.length > 0 ? '사진 업로드 및 저장 중...' : '접수 등록 중...';
+
+      var now = new Date();
+      var leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
+        ('0' + (now.getMonth() + 1)).slice(-2) +
+        ('0' + now.getDate()).slice(-2) +
+        ('0' + now.getHours()).slice(-2) +
+        ('0' + now.getMinutes()).slice(-2) +
+        ('0' + now.getSeconds()).slice(-2);
+
+      var agent = document.getElementById('agentName').value || currentUserName;
+
+      try {
+        var photoUrls = [];
+        if (uploadedPhotos.length > 0) {
+          photoUrls = await uploadPhotosToSupabase(leadId, uploadedPhotos);
+        }
+
+        var res = await supabase.from('leads').insert([{
+          lead_id: leadId,
+          car_number: '',
+          agent_name: agent,
+          customer_name: document.getElementById('customerName').value,
+          contact_person: document.getElementById('contactPerson').value,
+          contact_phone: formatPhone(document.getElementById('contactPhone').value),
+          address: document.getElementById('address').value,
+          business_type: document.getElementById('businessType').value,
+          current_company: document.getElementById('currentCompany').value,
+          current_fee: document.getElementById('currentFee').value,
+          product: checked.join(', '),
+          field_description: document.getElementById('fieldDescription').value,
+          photo_urls: photoUrls,
+          assigned_rep: rep,
+          status: '접수대기'
+        }]);
+
+        if (res.error) throw res.error;
+
+        alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
+
+        document.getElementById('customerName').value = '';
+        document.getElementById('contactPerson').value = '';
+        document.getElementById('contactPhone').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('businessType').value = '';
+        document.getElementById('fieldDescription').value = '';
+        document.querySelectorAll('input[name="prod"]').forEach(function(cb) {
+          cb.checked = false;
+          if (cb.closest('.prod-item')) cb.closest('.prod-item').classList.remove('checked');
+        });
+
+        uploadedPhotos = [];
+        renderPreview();
+        window.showScreen('dashboard');
+
+      } catch (err) {
+        alert('등록 실패: ' + (err.message || err));
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '⚡ 실시간 접수 등록';
+      }
+    };
+
+    // ==========================================================
+    // [10] 부가 이벤트 리스너 바인딩
+    // ==========================================================
+    document.addEventListener('DOMContentLoaded', function() {
+      // 필터 칩 이벤트
+      document.querySelectorAll('.filter-chip').forEach(function(chip) {
+        chip.addEventListener('click', function() {
+          document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+          this.classList.add('active');
+          currentStatusFilter = this.getAttribute('data-status');
+          window.loadDashboardLeads();
+        });
+      });
+
+      // 검색창 엔터키
+      var kwInput = document.getElementById('searchKeyword');
+      if (kwInput) {
+        kwInput.addEventListener('keyup', function(e) {
+          if (e.key === 'Enter') window.loadDashboardLeads();
+        });
+      }
+
+      // 체크박스 클릭 디자인 토글
+      document.querySelectorAll('.prod-item').forEach(function(item) {
+        item.addEventListener('click', function(e) {
+          var cb = this.querySelector('input[type="checkbox"]');
+          if (e.target !== cb) cb.checked = !cb.checked;
+          this.classList.toggle('checked', cb.checked);
+        });
+      });
+
+      // 상태 저장
+      var btnSave = document.getElementById('btnSaveStatus');
+      if (btnSave) {
+        btnSave.addEventListener('click', async function() {
+          if (!activeLeadItem || !supabase) return;
+          var newSt = document.getElementById('uStatus').value;
+          this.disabled = true; this.innerText = '저장 중...';
+
+          var res = await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
+          this.disabled = false; this.innerText = '상태 저장하기';
+
+          if (!res.error) {
+            alert('✅ 진행상태가 업데이트되었습니다: ' + newSt);
+            window.closeDetailModal();
+            window.loadDashboardLeads();
+          } else {
+            alert('상태 변경 실패: ' + res.error.message);
+          }
+        });
+      }
+
+      // 안건 수정 토글 및 저장
+      var btnEdit = document.getElementById('btnEditLead');
+      if (btnEdit) {
+        btnEdit.addEventListener('click', function() {
+          if (!activeLeadItem) return;
+          var editBox = document.getElementById('editLeadContainer');
+          if (!editBox) return;
+
+          document.getElementById('editCustomerName').value = activeLeadItem.customer_name || '';
+          document.getElementById('editContactPerson').value = activeLeadItem.contact_person || '';
+          document.getElementById('editContactPhone').value = activeLeadItem.contact_phone || '';
+          document.getElementById('editAddress').value = activeLeadItem.address || '';
+          document.getElementById('editBusinessType').value = activeLeadItem.business_type || '';
+          document.getElementById('editCurrentCompany').value = activeLeadItem.current_company || '';
+          document.getElementById('editProduct').value = activeLeadItem.product || '';
+          document.getElementById('editFieldDesc').value = activeLeadItem.field_description || '';
+
+          editBox.style.display = 'block';
+          editBox.scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+
+      var btnCancelEdit = document.getElementById('btnCancelEditLead');
+      if (btnCancelEdit) {
+        btnCancelEdit.addEventListener('click', function() {
+          document.getElementById('editLeadContainer').style.display = 'none';
+        });
+      }
+
+      var btnConfirmEdit = document.getElementById('btnConfirmEditLead');
+      if (btnConfirmEdit) {
+        btnConfirmEdit.addEventListener('click', async function() {
+          if (!activeLeadItem || !supabase) return;
+
+          var cName = document.getElementById('editCustomerName').value.trim();
+          var cPhone = document.getElementById('editContactPhone').value.trim();
+          if (!cName) { alert('고객(상호)을 입력해주세요.'); return; }
+          if (!cPhone) { alert('연락처를 입력해주세요.'); return; }
+
+          this.disabled = true; this.innerText = '수정 저장 중...';
+
+          var updatedData = {
+            customer_name: cName,
+            contact_person: document.getElementById('editContactPerson').value.trim(),
+            contact_phone: formatPhone(cPhone),
+            address: document.getElementById('editAddress').value.trim(),
+            business_type: document.getElementById('editBusinessType').value.trim(),
+            current_company: document.getElementById('editCurrentCompany').value.trim(),
+            product: document.getElementById('editProduct').value.trim(),
+            field_description: document.getElementById('editFieldDesc').value.trim()
+          };
+
+          var res = await supabase.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
+          this.disabled = false; this.innerText = '수정 완료 저장';
+
+          if (!res.error) {
+            alert('✅ 안건 상세 정보가 성공적으로 수정되었습니다.');
+            window.closeDetailModal();
+            window.loadDashboardLeads();
+          } else {
+            alert('수정 실패: ' + res.error.message);
+          }
+        });
+      }
+
+      // 안건 삭제
+      var btnDel = document.getElementById('btnDeleteLead');
+      if (btnDel) {
+        btnDel.addEventListener('click', async function() {
+          if (!activeLeadItem || !supabase) return;
+
+          var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
+          if (!confirmDel) return;
+
+          this.disabled = true; this.innerText = '삭제 처리 중...';
+
+          var res = await supabase.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
+          this.disabled = false; this.innerText = '안건삭제';
+
+          if (!res.error) {
+            alert('🗑️ 안건이 삭제되었습니다.');
+            window.closeDetailModal();
+            window.loadDashboardLeads();
+          } else {
+            alert('삭제 실패: ' + res.error.message);
+          }
+        });
+      }
+
+      // 비밀번호 변경 제출
+      var btnChangePwd = document.getElementById('btnSubmitChangePwd');
+      if (btnChangePwd) {
+        btnChangePwd.addEventListener('click', async function() {
           if (!currentUserPhone) {
             alert('로그인 세션 정보가 없습니다. 다시 로그인해 주세요.');
             return;
@@ -1679,7 +1886,7 @@
 
             if (!upRes.error) {
               alert('🎉 비밀번호가 안전하게 변경되었습니다!\n영업일보 포털과 소개영업 포털 모두에 즉시 적용되었습니다.');
-              closePwdModal();
+              window.closePwdModal();
             } else {
               showLoginError('pwdChangeErr', '변경 실패: ' + upRes.error.message);
             }
@@ -1688,246 +1895,8 @@
             showLoginError('pwdChangeErr', '통신 오류: ' + (err.message || err));
           }
         });
-
-        // 게시판 파일 첨부 이벤트
-        document.getElementById('btnAttachBoardFile').addEventListener('click', function() {
-          document.getElementById('boardFileInput').click();
-        });
-
-        document.getElementById('boardFileInput').addEventListener('change', function(e) {
-          var f = e.target.files[0];
-          if (f) {
-            selectedBoardFile = f;
-            var statusBox = document.getElementById('boardFileStatus');
-            var nameText = document.getElementById('boardFileNameText');
-            if (statusBox && nameText) {
-              nameText.innerText = '선택된 파일: ' + f.name;
-              statusBox.style.display = 'flex';
-            }
-          }
-        });
-
-        document.getElementById('btnRemoveBoardFile').addEventListener('click', clearBoardFile);
-        document.getElementById('btnSubmitBoardPost').addEventListener('click', submitBoardPost);
-
-        // 화면 전환 버튼
-        document.getElementById('regSwitchBtn').addEventListener('click', function() { showScreen('dashboard'); });
-        document.getElementById('dashSwitchBtn').addEventListener('click', function() { showScreen('register'); });
-        document.getElementById('regLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
-        document.getElementById('dashLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
-        document.getElementById('btnCloseDetailModal').addEventListener('click', closeDetailModal);
-
-        // 필터 및 검색
-        document.querySelectorAll('.filter-chip').forEach(function(chip) {
-          chip.addEventListener('click', function() {
-            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
-            this.classList.add('active');
-            currentStatusFilter = this.getAttribute('data-status');
-            loadDashboardLeads();
-          });
-        });
-
-        document.getElementById('btnSearchKeyword').addEventListener('click', loadDashboardLeads);
-        document.getElementById('searchKeyword').addEventListener('keyup', function(e) {
-          if (e.key === 'Enter') loadDashboardLeads();
-        });
-
-        document.getElementById('currentCompany').addEventListener('change', function() {
-          var f = document.getElementById('currentFee');
-          if (this.value !== '미사용') {
-            f.disabled = false; f.style.backgroundColor = '#fff';
-          } else {
-            f.disabled = true; f.value = ''; f.style.backgroundColor = '#f1f3f4';
-          }
-        });
-
-        document.querySelectorAll('.prod-item').forEach(function(item) {
-          item.addEventListener('click', function(e) {
-            var cb = this.querySelector('input[type="checkbox"]');
-            if (e.target !== cb) cb.checked = !cb.checked;
-            this.classList.toggle('checked', cb.checked);
-          });
-        });
-
-        // 상태 저장 (컨설턴트 및 관리자만 가능)
-        document.getElementById('btnSaveStatus').addEventListener('click', async function() {
-          if (!activeLeadItem || !supabase) return;
-          var newSt = document.getElementById('uStatus').value;
-          this.disabled = true; this.innerText = '저장 중...';
-
-          var res = await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
-          this.disabled = false; this.innerText = '상태 저장하기';
-
-          if (!res.error) {
-            alert('✅ 진행상태가 업데이트되었습니다: ' + newSt);
-            closeDetailModal();
-            loadDashboardLeads();
-          } else {
-            alert('상태 변경 실패: ' + res.error.message);
-          }
-        });
-
-        // 안건 정보 수정
-        document.getElementById('btnEditLead').addEventListener('click', function() {
-          if (!activeLeadItem) return;
-          var editBox = document.getElementById('editLeadContainer');
-          if (!editBox) return;
-
-          document.getElementById('editCustomerName').value = activeLeadItem.customer_name || '';
-          document.getElementById('editContactPerson').value = activeLeadItem.contact_person || '';
-          document.getElementById('editContactPhone').value = activeLeadItem.contact_phone || '';
-          document.getElementById('editAddress').value = activeLeadItem.address || '';
-          document.getElementById('editBusinessType').value = activeLeadItem.business_type || '';
-          document.getElementById('editCurrentCompany').value = activeLeadItem.current_company || '';
-          document.getElementById('editProduct').value = activeLeadItem.product || '';
-          document.getElementById('editFieldDesc').value = activeLeadItem.field_description || '';
-
-          editBox.style.display = 'block';
-          editBox.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        document.getElementById('btnCancelEditLead').addEventListener('click', function() {
-          document.getElementById('editLeadContainer').style.display = 'none';
-        });
-
-        document.getElementById('btnConfirmEditLead').addEventListener('click', async function() {
-          if (!activeLeadItem || !supabase) return;
-
-          var cName = document.getElementById('editCustomerName').value.trim();
-          var cPhone = document.getElementById('editContactPhone').value.trim();
-          if (!cName) { alert('고객(상호)을 입력해주세요.'); return; }
-          if (!cPhone) { alert('연락처를 입력해주세요.'); return; }
-
-          this.disabled = true; this.innerText = '수정 저장 중...';
-
-          var updatedData = {
-            customer_name: cName,
-            contact_person: document.getElementById('editContactPerson').value.trim(),
-            contact_phone: formatPhone(cPhone),
-            address: document.getElementById('editAddress').value.trim(),
-            business_type: document.getElementById('editBusinessType').value.trim(),
-            current_company: document.getElementById('editCurrentCompany').value.trim(),
-            product: document.getElementById('editProduct').value.trim(),
-            field_description: document.getElementById('editFieldDesc').value.trim()
-          };
-
-          var res = await supabase.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
-          this.disabled = false; this.innerText = '수정 완료 저장';
-
-          if (!res.error) {
-            alert('✅ 안건 상세 정보가 성공적으로 수정되었습니다.');
-            closeDetailModal();
-            loadDashboardLeads();
-          } else {
-            alert('수정 실패: ' + res.error.message);
-          }
-        });
-
-        // 안건 완전 삭제
-        document.getElementById('btnDeleteLead').addEventListener('click', async function() {
-          if (!activeLeadItem || !supabase) return;
-
-          var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
-          if (!confirmDel) return;
-
-          this.disabled = true; this.innerText = '삭제 처리 중...';
-
-          var res = await supabase.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
-          this.disabled = false; this.innerText = '안건삭제';
-
-          if (!res.error) {
-            alert('🗑️ 안건이 삭제되었습니다.');
-            closeDetailModal();
-            loadDashboardLeads();
-          } else {
-            alert('삭제 실패: ' + res.error.message);
-          }
-        });
-
-        // 사진 파일 이벤트
-        document.getElementById('btnShootCamera').addEventListener('click', function() { document.getElementById('cameraInput').click(); });
-        document.getElementById('btnSelectGallery').addEventListener('click', function() { document.getElementById('galleryInput').click(); });
-        document.getElementById('cameraInput').addEventListener('change', handleFileSelect);
-        document.getElementById('galleryInput').addEventListener('change', handleFileSelect);
-
-        // 신규 접수 등록
-        document.getElementById('leadForm').addEventListener('submit', async function(e) {
-          e.preventDefault();
-          if (!supabase) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
-
-          var checked = Array.from(document.querySelectorAll('input[name="prod"]:checked')).map(function(c) { return c.value; });
-          if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
-
-          var rep = document.getElementById('assignedRep').value;
-          if (!rep) { alert('담당 컨설턴트를 선택해주세요.'); return; }
-
-          var btn = document.getElementById('submitBtn');
-          btn.disabled = true;
-          btn.innerText = uploadedPhotos.length > 0 ? '사진 업로드 및 저장 중...' : '접수 등록 중...';
-
-          var now = new Date();
-          var leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
-            ('0' + (now.getMonth() + 1)).slice(-2) +
-            ('0' + now.getDate()).slice(-2) +
-            ('0' + now.getHours()).slice(-2) +
-            ('0' + now.getMinutes()).slice(-2) +
-            ('0' + now.getSeconds()).slice(-2);
-
-          var agent = document.getElementById('agentName').value || currentUserName;
-
-          try {
-            var photoUrls = [];
-            if (uploadedPhotos.length > 0) {
-              photoUrls = await uploadPhotosToSupabase(leadId, uploadedPhotos);
-            }
-
-            var res = await supabase.from('leads').insert([{
-              lead_id: leadId,
-              car_number: '',
-              agent_name: agent,
-              customer_name: document.getElementById('customerName').value,
-              contact_person: document.getElementById('contactPerson').value,
-              contact_phone: formatPhone(document.getElementById('contactPhone').value),
-              address: document.getElementById('address').value,
-              business_type: document.getElementById('businessType').value,
-              current_company: document.getElementById('currentCompany').value,
-              current_fee: document.getElementById('currentFee').value,
-              product: checked.join(', '),
-              field_description: document.getElementById('fieldDescription').value,
-              photo_urls: photoUrls,
-              assigned_rep: rep,
-              status: '접수대기'
-            }]);
-
-            if (res.error) throw res.error;
-
-            alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
-
-            document.getElementById('customerName').value = '';
-            document.getElementById('contactPerson').value = '';
-            document.getElementById('contactPhone').value = '';
-            document.getElementById('address').value = '';
-            document.getElementById('businessType').value = '';
-            document.getElementById('fieldDescription').value = '';
-            document.querySelectorAll('input[name="prod"]').forEach(function(cb) {
-              cb.checked = false;
-              if (cb.closest('.prod-item')) cb.closest('.prod-item').classList.remove('checked');
-            });
-
-            uploadedPhotos = [];
-            renderPreview();
-
-            showScreen('dashboard');
-
-          } catch (err) {
-            alert('등록 실패: ' + (err.message || err));
-          } finally {
-            btn.disabled = false;
-            btn.innerText = '⚡ 실시간 접수 등록';
-          }
-        });
-      });
-    })();
+      }
+    });
   </script>
 </body>
 </html>
