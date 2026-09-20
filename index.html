@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <base target="_top">
   <meta charset="utf-8">
   <title>북서울 소개영업 포털</title>
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,43 +11,14 @@
   <meta name="apple-mobile-web-app-title" content="북서울 소개영업">
   <meta name="theme-color" content="#1a73e8">
 
-  <!-- Supabase 라이브러리 -->
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- [핵심] 로그인 탭 전환 로직을 HEAD 최상단에 전진 배치하여 먹통 원천 방지 -->
-  <script>
-    function setLoginTab(tab) {
-      if (!tab) tab = 'cs';
-      var btnCS = document.getElementById('tabBtnCS');
-      var btnCon = document.getElementById('tabBtnConsultant');
-      var btnAdm = document.getElementById('tabBtnAdmin');
-
-      if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
-      if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
-      if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
-
-      var formCS = document.getElementById('loginFormCS');
-      var formCon = document.getElementById('loginFormConsultant');
-      var formAdm = document.getElementById('loginFormAdmin');
-
-      if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
-      if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
-      if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
-
-      var e1 = document.getElementById('csLoginErr');
-      var e2 = document.getElementById('conLoginErr');
-      var e3 = document.getElementById('adminLoginErr');
-      if (e1) e1.style.display = 'none';
-      if (e2) e2.style.display = 'none';
-      if (e3) e3.style.display = 'none';
-    }
-  </script>
 
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
-    body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; -webkit-tap-highlight-color: transparent; }
+    body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; }
 
-    .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 14px; position: relative; z-index: 1; }
+    .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 14px; position: relative; z-index: 10; }
     @media (max-width: 900px) { .main-container { width: 100%; } }
 
     .inner-header-bar {
@@ -63,18 +33,16 @@
     .btn-inner {
       padding: 8px 13px; border-radius: 8px; font-size: 0.82rem; font-weight: 700;
       cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; white-space: nowrap;
-      touch-action: manipulation;
     }
     .btn-inner.btn-switch { background: #e8f0fe; color: #1a73e8; border-color: #aecbfa; }
-    .btn-inner.btn-switch:hover { background: #d2e3fc; }
     .btn-inner.btn-logout { background: #f8f9fa; color: #5f6368; border-color: #dadce0; }
-    .btn-inner.btn-logout:hover { background: #fce8e6; color: #d93025; border-color: #fad2cf; }
 
-    #viewLogin { max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 100; }
+    /* 로그인 뷰 영역 */
+    #viewLogin { max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 50; }
     .login-card {
       background: #ffffff; border-radius: 18px; padding: 26px 22px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
-      position: relative; z-index: 101;
+      position: relative; z-index: 51;
     }
     .login-header {
       text-align: center; margin-bottom: 22px; border-bottom: 2px solid #e8f0fe; padding-bottom: 16px;
@@ -82,18 +50,18 @@
     .login-header h2 { margin: 0; font-size: 1.5rem; color: #1a73e8; font-weight: 800; }
     .login-header p { margin: 6px 0 0 0; font-size: 0.85rem; color: #5f6368; }
 
+    /* 로그인 탭 바 */
     .login-tab-bar {
       display: flex; background: #eef2f6; border-radius: 12px; padding: 5px; margin-bottom: 20px;
-      position: relative; z-index: 102; gap: 4px; border: 1px solid #dadce0;
+      position: relative; z-index: 60; gap: 4px; border: 1px solid #dadce0;
     }
     .login-tab-item {
-      flex: 1; padding: 11px 4px; border: none; background: transparent; font-size: 0.84rem;
-      font-weight: 700; color: #5f6368; cursor: pointer; border-radius: 8px; text-align: center;
-      transition: all 0.15s ease; user-select: none; -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      flex: 1; padding: 12px 4px; border: none; background: transparent; font-size: 0.88rem;
+      font-weight: 700; color: #5f6368; cursor: pointer !important; border-radius: 8px; text-align: center;
+      transition: all 0.15s ease; user-select: none; pointer-events: auto !important;
     }
     .login-tab-item.active {
-      background: #1a73e8; color: #ffffff !important; box-shadow: 0 2px 8px rgba(26,115,232,0.35);
+      background: #1a73e8 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(26,115,232,0.35);
     }
 
     .form-group { margin-bottom: 14px; }
@@ -102,7 +70,7 @@
     .opt { color: #5f6368; font-weight: normal; font-size: 0.75rem; margin-left: 4px; }
     input[type="text"], input[type="tel"], input[type="password"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
       width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 8px;
-      font-size: 0.95rem; background-color: #fafbfc; transition: border-color 0.2s;
+      font-size: 16px; background-color: #fafbfc; transition: border-color 0.2s;
     }
     input:focus, select:focus, textarea:focus { border-color: #1a73e8; background-color: #fff; outline: none; }
     .row { display: flex; gap: 10px; }
@@ -112,7 +80,6 @@
       width: 100%; padding: 14px; background: #1a73e8; color: #ffffff; border: none;
       border-radius: 9px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
       box-shadow: 0 2px 6px rgba(26,115,232,0.3); margin-top: 10px; user-select: none;
-      transition: background 0.15s; touch-action: manipulation;
     }
     .btn-login-action:active { background: #1557b0; }
     .btn-login-action:disabled { background: #9aa0a6; cursor: not-allowed; }
@@ -123,7 +90,7 @@
       border: 1px solid #fad2cf;
     }
 
-    #viewRegister { display: none; max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
+    #viewRegister { display: none; max-width: 500px; margin: 0 auto; position: relative; z-index: 20; }
     .intro-card {
       background: #ffffff; border-radius: 16px; overflow: hidden;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 14px; border: 1px solid #e2e8f0;
@@ -142,7 +109,7 @@
       display: inline-block; background: #1a73e8; color: #ffffff; font-size: 0.78rem;
       font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-bottom: 4px; border: 1px solid rgba(255,255,255,0.4);
     }
-    .intro-title { margin: 0; font-size: 1.4rem; font-weight: 800; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .intro-title { margin: 0; font-size: 1.4rem; font-weight: 800; color: #ffffff; }
     .intro-subtitle { margin: 4px 0 0 0; font-size: 0.82rem; color: #e8f0fe; font-weight: 500; }
 
     .form-card {
@@ -165,9 +132,7 @@
       flex: 1; padding: 12px 6px; border: 1.5px dashed #1a73e8; border-radius: 8px;
       background: #f8fbff; color: #1a73e8; font-size: 0.9rem; font-weight: 700;
       cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;
-      touch-action: manipulation;
     }
-    .photo-btn:active { background: #e8f0fe; }
     .photo-status { display: flex; justify-content: space-between; font-size: 0.82rem; margin: 6px 0; color: #5f6368; }
     .photo-preview-grid {
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; min-height: 80px;
@@ -189,7 +154,7 @@
     button.submit-btn {
       width: 100%; padding: 15px; background: #1a73e8; color: #fff; border: none;
       border-radius: 10px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
-      box-shadow: 0 2px 6px rgba(26,115,232,0.3); margin-top: 10px; touch-action: manipulation;
+      box-shadow: 0 2px 6px rgba(26,115,232,0.3); margin-top: 10px;
     }
     button.submit-btn:disabled { background: #9aa0a6; cursor: not-allowed; }
 
@@ -198,10 +163,8 @@
     .history-title { font-size: 0.9rem; font-weight: 700; color: #3c4043; }
     .history-item { border-bottom: 1px solid #f1f3f4; padding: 8px 0; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center; }
 
-    #viewDashboard { display: none; }
-    .stat-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px;
-    }
+    #viewDashboard { display: none; position: relative; z-index: 20; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px; }
     .stat-card {
       background: #fff; padding: 14px 16px; border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-left: 4px solid #dadce0;
@@ -225,12 +188,10 @@
     .filter-chip {
       padding: 6px 12px; border-radius: 16px; font-size: 0.8rem; font-weight: 600;
       border: 1px solid #dadce0; background: #fff; color: #5f6368; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease;
+      display: inline-flex; align-items: center; gap: 4px;
     }
     .filter-chip.active { background: #e8f0fe; color: #1a73e8; border-color: #1a73e8; font-weight: 700; }
-    .chip-count {
-      background: rgba(0,0,0,0.08); padding: 1px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 700;
-    }
+    .chip-count { background: rgba(0,0,0,0.08); padding: 1px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; }
     .filter-chip.active .chip-count { background: #1a73e8; color: #fff; }
 
     .search-box { display: flex; gap: 6px; flex: 1; max-width: 320px; min-width: 200px; }
@@ -251,14 +212,10 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
     }
     table.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-    table.data-table th {
-      background: #f8f9fa; padding: 12px 14px; font-weight: 700; color: #3c4043;
-      border-bottom: 2px solid #e8eaed; white-space: nowrap;
-    }
+    table.data-table th { background: #f8f9fa; padding: 12px 14px; font-weight: 700; color: #3c4043; border-bottom: 2px solid #e8eaed; white-space: nowrap; }
     table.data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; }
     table.data-table tr:hover { background-color: #f8fbff; }
     .customer-cell { font-weight: 700; color: #1a73e8; cursor: pointer; white-space: nowrap; }
-    .customer-cell:hover { text-decoration: underline; }
 
     .mobile-card-list { display: none; }
     .mobile-lead-card {
@@ -268,19 +225,10 @@
     .m-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .m-car-tag { background: #f1f3f4; color: #3c4043; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
     .m-customer-name { font-size: 1.15rem; font-weight: 800; color: #1a73e8; margin-bottom: 4px; }
-    .m-phone-link {
-      display: inline-flex; align-items: center; gap: 4px; color: #202124; text-decoration: none;
-      font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;
-    }
+    .m-phone-link { display: inline-flex; align-items: center; gap: 4px; color: #202124; text-decoration: none; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
     .m-info-row { font-size: 0.82rem; color: #5f6368; margin-bottom: 4px; }
-    .m-footer-actions {
-      display: flex; justify-content: space-between; align-items: center; margin-top: 12px;
-      padding-top: 10px; border-top: 1px solid #f1f3f4;
-    }
-    .btn-detail {
-      padding: 6px 12px; background: #e8f0fe; color: #1a73e8; border: none;
-      border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-    }
+    .m-footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f3f4; }
+    .btn-detail { padding: 6px 12px; background: #e8f0fe; color: #1a73e8; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
 
     @media (max-width: 768px) {
       .pc-table-wrapper { display: none; }
@@ -288,18 +236,23 @@
       .stat-grid { grid-template-columns: repeat(3, 1fr); }
       .toolbar-card { flex-direction: column; align-items: stretch; }
       .search-box { max-width: 100%; }
-      .user-badge-title { font-size: 0.95rem; }
     }
 
+    /* 상세 모달: 닫혀 있을 때 화면 클릭을 절대 방해하지 않도록 pointer-events: none 부여 */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.55); z-index: 10000;
+      background: rgba(0,0,0,0.55); z-index: 99999;
       display: none; align-items: center; justify-content: center; padding: 16px;
+      pointer-events: none;
+    }
+    .modal-overlay.open {
+      display: flex !important;
+      pointer-events: auto !important;
     }
     .modal-card {
       background: #ffffff; width: 100%; max-width: 540px; max-height: 90vh;
       border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25); position: relative; z-index: 10001;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     }
     .modal-header {
       position: sticky; top: 0; background: #ffffff; z-index: 100;
@@ -307,79 +260,37 @@
       padding: 16px 20px; border-bottom: 1.5px solid #e8eaed; flex-shrink: 0;
     }
     .modal-header-left { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
-    .modal-header-left h3 {
-      margin: 0; font-size: 1.25rem; font-weight: 800; color: #1a73e8;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .modal-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .btn-close {
-      background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #5f6368; line-height: 1;
-      padding: 0 6px;
-    }
-    .modal-body { padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+    .modal-header-left h3 { margin: 0; font-size: 1.25rem; font-weight: 800; color: #1a73e8; }
+    .btn-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #5f6368; line-height: 1; padding: 0 6px; }
+    .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
 
     .detail-grid { display: grid; grid-template-columns: 90px 1fr; gap: 8px 10px; font-size: 0.88rem; margin-bottom: 16px; }
     .detail-label { color: #5f6368; font-weight: 600; }
     .detail-val { color: #202124; font-weight: 500; word-break: break-all; }
-    
     .modal-photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
-    .modal-photo-card {
-      border: 1px solid #dadce0; border-radius: 10px; overflow: hidden; background: #ffffff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column;
-    }
-    .modal-photo-card img {
-      width: 100%; height: 140px; object-fit: cover; cursor: pointer; background: #f1f3f4; display: block;
-    }
+    .modal-photo-card { border: 1px solid #dadce0; border-radius: 10px; overflow: hidden; background: #ffffff; text-align: center; }
+    .modal-photo-card img { width: 100%; height: 140px; object-fit: cover; cursor: pointer; background: #f1f3f4; display: block; }
     .photo-card-footer { padding: 6px; background: #f8f9fa; border-top: 1px solid #e8eaed; }
-    .photo-zoom-btn {
-      display: inline-block; width: 100%; padding: 4px 6px; background: #e8f0fe;
-      color: #1a73e8; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
-    }
-    
+    .photo-zoom-btn { display: inline-block; width: 100%; padding: 4px 6px; background: #e8f0fe; color: #1a73e8; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
     .status-update-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 10px; padding: 14px; margin-top: 14px; }
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
-    .btn-save-status {
-      width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none;
-      border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px;
-    }
+    .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
     .stage-timeline { display: flex; flex-direction: column; gap: 10px; }
     .timeline-item { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; padding: 10px 12px; }
-    .timeline-badge {
-      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin-bottom: 4px;
-    }
+    .timeline-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin-bottom: 4px; }
     .timeline-meta { font-size: 0.72rem; color: #9aa0a6; margin-bottom: 4px; }
     .prod-checkbox-group { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 0; }
     .prod-item-sm { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
     .prod-item-sm input { width: auto; }
     .history-item.clickable { cursor: pointer; }
-    .history-item.clickable:active { background: #f1f3f4; }
 
     .board-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
     .board-item { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; overflow: hidden; }
-    .board-item-title {
-      padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-      gap: 8px; font-size: 0.88rem; font-weight: 700; color: #202124;
-    }
-    .board-item-title:active { background: #f1f3f4; }
-    .board-item-meta { font-size: 0.7rem; color: #9aa0a6; font-weight: 500; white-space: nowrap; }
+    .board-item-title { padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 700; color: #202124; }
+    .board-item-meta { font-size: 0.7rem; color: #9aa0a6; }
     .board-item-body { padding: 0 12px 12px 12px; border-top: 1px dashed #e8eaed; padding-top: 10px; }
-    .board-item-actions { display: flex; gap: 8px; }
-    .board-item-actions button {
-      flex: 1; padding: 6px; border: 1px solid #dadce0; background: #f8f9fa; border-radius: 6px;
-      font-size: 0.78rem; font-weight: 700; cursor: pointer; color: #3c4043;
-    }
-    .board-write-btn {
-      width: 100%; padding: 10px; background: #fff; color: #1a73e8; border: 1.5px dashed #aecbfa;
-      border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
-    }
-    .board-form { background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 8px; padding: 10px; }
-    .board-form input, .board-form textarea { margin-bottom: 8px; }
-    .board-form button {
-      flex: 1; padding: 9px; border: none; border-radius: 7px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
-      background: #1a73e8; color: #fff;
-    }
-    .board-form button.board-cancel-btn { background: #dadce0; color: #3c4043; }
+    .board-write-btn { width: 100%; padding: 10px; background: #fff; color: #1a73e8; border: 1.5px dashed #aecbfa; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
     body.on-login { background: #ffffff; }
     body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
@@ -391,7 +302,7 @@
     }
   </style>
 </head>
-<body ontouchstart="" class="on-login">
+<body class="on-login">
 
   <div class="main-container">
 
@@ -403,15 +314,16 @@
           <p>본인 역할을 선택한 뒤 로그인해 주세요</p>
         </div>
 
+        <!-- 탭 버튼 (onclick 속성을 배제하고 id로 안전 연결) -->
         <div class="login-tab-bar">
-          <button type="button" class="login-tab-item active" id="tabBtnCS" onclick="setLoginTab('cs')">CS근무자</button>
-          <button type="button" class="login-tab-item" id="tabBtnConsultant" onclick="setLoginTab('consultant')">컨설턴트</button>
-          <button type="button" class="login-tab-item" id="tabBtnAdmin" onclick="setLoginTab('admin')">관리자</button>
+          <button type="button" class="login-tab-item active" id="tabBtnCS">CS근무자</button>
+          <button type="button" class="login-tab-item" id="tabBtnConsultant">컨설턴트</button>
+          <button type="button" class="login-tab-item" id="tabBtnAdmin">관리자</button>
         </div>
 
-        <!-- 1. CS 요원 로그인 -->
+        <!-- 1. CS 요원 폼 -->
         <div id="loginFormCS" style="display:block;">
-          <form onsubmit="event.preventDefault(); submitLogin('cs');">
+          <form id="formLoginCS">
             <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">🛡️ 출동/CS 요원 (소개자 이름 + 차량 입력)</div>
             <div class="form-group">
               <label class="form-label">소개자 이름 <span class="req">*</span></label>
@@ -433,13 +345,13 @@
           </form>
         </div>
 
-        <!-- 2. 컨설턴트 로그인 -->
+        <!-- 2. 컨설턴트 폼 -->
         <div id="loginFormConsultant" style="display:none;">
-          <form onsubmit="event.preventDefault(); submitLogin('consultant');">
+          <form id="formLoginConsultant">
             <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 영업 컨설턴트 (휴대폰 번호 + 비밀번호)</div>
             <div class="form-group">
               <label class="form-label">휴대폰 번호 <span class="req">*</span></label>
-              <input type="tel" id="conLoginPhone" placeholder="010-0000-0000 (숫자만 입력 가능)" autocomplete="tel">
+              <input type="tel" id="conLoginPhone" placeholder="010-0000-0000 (숫자만 입력)" autocomplete="tel">
             </div>
             <div class="form-group">
               <label class="form-label">비밀번호 <span class="req">*</span></label>
@@ -450,9 +362,9 @@
           </form>
         </div>
 
-        <!-- 3. 관리자 로그인 -->
+        <!-- 3. 관리자 폼 -->
         <div id="loginFormAdmin" style="display:none;">
-          <form onsubmit="event.preventDefault(); submitLogin('admin');">
+          <form id="formLoginAdmin">
             <div style="background:#fce8e6; color:#c5221f; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #fad2cf;">👑 지사 관리자 (관리자 전용 비밀번호)</div>
             <div class="form-group">
               <label class="form-label">관리자 비밀번호 <span class="req">*</span></label>
@@ -474,8 +386,8 @@
           <span class="user-badge-subtitle" id="regUserSub">현장등록 모드</span>
         </div>
         <div class="inner-header-btns">
-          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn" onclick="toggleMainView()" style="display:none;">📊 대시보드</button>
-          <button type="button" class="btn-inner btn-logout" onclick="handleLogout()">로그아웃</button>
+          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn" style="display:none;">📊 대시보드</button>
+          <button type="button" class="btn-inner btn-logout" id="regLogoutBtn">로그아웃</button>
         </div>
       </div>
 
@@ -491,11 +403,11 @@
       </div>
 
       <div class="form-card">
-        <form id="leadForm" onsubmit="handleLeadSubmit(event)">
+        <form id="leadForm">
           <div class="row">
             <div class="form-group">
               <label class="form-label">담당차량(호기)<span class="req">*</span></label>
-              <select id="carNumber" required onchange="onCarChange()">
+              <select id="carNumber" required>
                 <option value="">선택</option>
                 <option value="26">26호</option>
                 <option value="27">27호</option>
@@ -506,7 +418,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">소개자<span class="req">*</span></label>
-              <input type="text" id="agentName" placeholder="소개자 이름" required oninput="saveUserPref('s1_agent_name', this.value); loadRecentHistory();">
+              <input type="text" id="agentName" placeholder="소개자 이름" required>
             </div>
           </div>
 
@@ -525,7 +437,7 @@
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <label class="form-label" style="margin-bottom:6px;">고객명 / 상호<span class="req">*</span></label>
-              <button type="button" onclick="openNaverPlaceSearchByName_('customerName')" title="상호명으로 지도 검색" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer;">🔍</button>
+              <button type="button" id="btnSearchPlace" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer;">🔍</button>
             </div>
             <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
           </div>
@@ -537,14 +449,13 @@
             </div>
             <div class="form-group">
               <label class="form-label">연락처<span class="req">*</span></label>
-              <input type="tel" id="contactPhone" placeholder="010-0000-0000" required oninput="formatPhoneInput(this)">
+              <input type="tel" id="contactPhone" placeholder="010-0000-0000" required>
             </div>
           </div>
 
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <label class="form-label" style="margin-bottom:6px;">사업장 주소 / 위치</label>
-              <button type="button" onclick="openDaumPostcode_('address')" title="주소 검색" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#3c4043; background:#f1f3f4; border:1px solid #dadce0; border-radius:6px; cursor:pointer;">🔍</button>
             </div>
             <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" style="width:100%;">
           </div>
@@ -557,7 +468,7 @@
           <div class="row">
             <div class="form-group">
               <label class="form-label">현재 사용중인 회사<span class="req">*</span></label>
-              <select id="currentCompany" required onchange="onCompanyChange()">
+              <select id="currentCompany" required>
                 <option value="미사용">미사용</option>
                 <option value="SK 쉴더스">SK 쉴더스</option>
                 <option value="KT 텔레캅">KT 텔레캅</option>
@@ -566,38 +477,38 @@
             </div>
             <div class="form-group">
               <label class="form-label">현 서비스료(원) <span class="opt">(선택사항)</span></label>
-              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled style="background-color: #f1f3f4;" oninput="formatCurrency(this)">
+              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled style="background-color: #f1f3f4;">
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">관심/추천 상품 (다중 선택 가능)<span class="req">*</span></label>
             <div class="prod-grid" id="productGrid">
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="알람"> 알람</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="영상렌탈"> 영상렌탈</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="블루스캔"> 블루스캔</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="정보보안"> 정보보안</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="영상매각"> 영상매각</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="금고"> 금고</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="AED"> AED</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="AI도어캠"> AI도어캠</label>
-              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="기타"> 기타</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="알람"> 알람</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="영상렌탈"> 영상렌탈</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="블루스캔"> 블루스캔</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="정보보안"> 정보보안</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="영상매각"> 영상매각</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="금고"> 금고</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="AED"> AED</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="AI도어캠"> AI도어캠</label>
+              <label class="prod-item"><input type="checkbox" name="prod" value="기타"> 기타</label>
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">현장 설명<span class="req">*</span></label>
-            <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 고객 상담 희망 내용 등을 상세히 입력해주세요 (필수 입력)" required></textarea>
+            <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." required></textarea>
           </div>
 
           <div class="form-group">
             <label class="form-label">현장 사진 등록 <span class="opt">(최대 4장)</span></label>
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFileSelect(event)">
-            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;" onchange="handleFileSelect(event)">
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;">
 
             <div class="photo-btn-group">
-              <button type="button" class="photo-btn" onclick="document.getElementById('cameraInput').click()">📷 직접 촬영</button>
-              <button type="button" class="photo-btn" onclick="document.getElementById('galleryInput').click()">🖼️ 갤러리 선택</button>
+              <button type="button" class="photo-btn" id="btnShootCamera">📷 직접 촬영</button>
+              <button type="button" class="photo-btn" id="btnSelectGallery">🖼️ 갤러리 선택</button>
             </div>
             
             <div class="photo-status">
@@ -605,7 +516,7 @@
               <span id="photoCountText" style="font-weight:700; color:#1a73e8;">0 / 4장</span>
             </div>
             <div class="photo-preview-grid" id="previewGrid">
-              <div class="photo-empty-msg">선택된 사진이 없습니다. (위 버튼을 눌러 촬영하거나 선택하세요)</div>
+              <div class="photo-empty-msg">선택된 사진이 없습니다.</div>
             </div>
           </div>
 
@@ -632,50 +543,32 @@
           <span class="user-badge-subtitle" id="dashUserSub">접속 사용자</span>
         </div>
         <div class="inner-header-btns">
-          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" onclick="toggleMainView()">➕ 현장등록</button>
-          <button type="button" class="btn-inner btn-logout" onclick="handleLogout()">로그아웃</button>
+          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn">➕ 현장등록</button>
+          <button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>
         </div>
       </div>
 
       <div class="stat-grid">
-        <div class="stat-card total" onclick="setFilterByCard('전체')">
-          <div class="stat-label">총 소개건수</div>
-          <div class="stat-value" id="cntTotal">0</div>
-        </div>
-        <div class="stat-card wait" onclick="setFilterByCard('접수대기')">
-          <div class="stat-label">접수대기</div>
-          <div class="stat-value" id="cntWait">0</div>
-        </div>
-        <div class="stat-card ing" onclick="setFilterByCard('상담진행')">
-          <div class="stat-label">상담진행</div>
-          <div class="stat-value" id="cntIng">0</div>
-        </div>
-        <div class="stat-card ing" onclick="setFilterByCard('견적제출')" style="border-left-color: #9c27b0;">
-          <div class="stat-label">견적제출</div>
-          <div class="stat-value" id="cntQuote">0</div>
-        </div>
-        <div class="stat-card done" onclick="setFilterByCard('계약완료')">
-          <div class="stat-label">계약완료</div>
-          <div class="stat-value" id="cntDone">0</div>
-        </div>
-        <div class="stat-card cancel" onclick="setFilterByCard('취소/보류')">
-          <div class="stat-label">취소/보류</div>
-          <div class="stat-value" id="cntCancel">0</div>
-        </div>
+        <div class="stat-card total" id="cardStatTotal"><div class="stat-label">총 소개건수</div><div class="stat-value" id="cntTotal">0</div></div>
+        <div class="stat-card wait" id="cardStatWait"><div class="stat-label">접수대기</div><div class="stat-value" id="cntWait">0</div></div>
+        <div class="stat-card ing" id="cardStatIng"><div class="stat-label">상담진행</div><div class="stat-value" id="cntIng">0</div></div>
+        <div class="stat-card ing" id="cardStatQuote" style="border-left-color: #9c27b0;"><div class="stat-label">견적제출</div><div class="stat-value" id="cntQuote">0</div></div>
+        <div class="stat-card done" id="cardStatDone"><div class="stat-label">계약완료</div><div class="stat-value" id="cntDone">0</div></div>
+        <div class="stat-card cancel" id="cardStatCancel"><div class="stat-label">취소/보류</div><div class="stat-value" id="cntCancel">0</div></div>
       </div>
 
       <div class="toolbar-card">
         <div class="status-filters" id="statusFilterBar">
-          <button type="button" class="filter-chip active" data-status="전체" onclick="setFilter('전체', this)">전체 <span class="chip-count" id="cCntTotal">0</span></button>
-          <button type="button" class="filter-chip" data-status="접수대기" onclick="setFilter('접수대기', this)">접수대기 <span class="chip-count" id="cCntWait">0</span></button>
-          <button type="button" class="filter-chip" data-status="상담진행" onclick="setFilter('상담진행', this)">상담진행 <span class="chip-count" id="cCntIng">0</span></button>
-          <button type="button" class="filter-chip" data-status="견적제출" onclick="setFilter('견적제출', this)">견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
-          <button type="button" class="filter-chip" data-status="계약완료" onclick="setFilter('계약완료', this)">계약완료 <span class="chip-count" id="cCntDone">0</span></button>
-          <button type="button" class="filter-chip" data-status="취소/보류" onclick="setFilter('취소/보류', this)">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
+          <button type="button" class="filter-chip active" data-status="전체">전체 <span class="chip-count" id="cCntTotal">0</span></button>
+          <button type="button" class="filter-chip" data-status="접수대기">접수대기 <span class="chip-count" id="cCntWait">0</span></button>
+          <button type="button" class="filter-chip" data-status="상담진행">상담진행 <span class="chip-count" id="cCntIng">0</span></button>
+          <button type="button" class="filter-chip" data-status="견적제출">견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
+          <button type="button" class="filter-chip" data-status="계약완료">계약완료 <span class="chip-count" id="cCntDone">0</span></button>
+          <button type="button" class="filter-chip" data-status="취소/보류">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소 검색" onkeyup="if(event.key==='Enter') loadDashboardLeads()">
-          <button type="button" class="btn-detail" onclick="loadDashboardLeads()">검색</button>
+          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소 검색">
+          <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
 
@@ -710,7 +603,7 @@
   </div>
 
   <!-- 상세 모달 -->
-  <div class="modal-overlay" id="detailModal" style="display:none !important;">
+  <div class="modal-overlay" id="detailModal">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-header-left">
@@ -718,7 +611,7 @@
         </div>
         <div class="modal-header-right">
           <span class="badge" id="mHeaderStatusBadge">접수대기</span>
-          <button type="button" class="btn-close" onclick="closeDetailModal()">×</button>
+          <button type="button" class="btn-close" id="btnCloseDetailModal">×</button>
         </div>
       </div>
 
@@ -731,15 +624,13 @@
           <div class="detail-label">고객명/상호</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
           <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
           <div class="detail-label">연락처</div><div class="detail-val" id="mContactPhone"></div>
-          <div class="detail-label">사업장 주소</div><div class="detail-val"><span id="mAddress"></span> <button type="button" onclick="openAddressOnMap_(document.getElementById('mAddress').innerText)" style="margin-left:6px; padding:3px 9px; font-size:0.75rem; font-weight:700; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer; white-space:nowrap;">🗺 지도보기</button></div>
+          <div class="detail-label">사업장 주소</div><div class="detail-val"><span id="mAddress"></span></div>
           <div class="detail-label">업종</div><div class="detail-val" id="mBusinessType"></div>
           <div class="detail-label">현재사용/료</div><div class="detail-val" id="mCurrentCompany"></div>
           <div class="detail-label">관심상품</div><div class="detail-val" id="mProduct"></div>
           <div class="detail-label">현장설명</div><div class="detail-val" id="mFieldDesc" style="background:#f8f9fa; padding:8px; border-radius:6px; white-space:pre-wrap;"></div>
           <div class="detail-label">현장사진</div>
-          <div class="detail-val">
-            <div class="modal-photo-grid" id="mPhotoGrid"></div>
-          </div>
+          <div class="detail-val"><div class="modal-photo-grid" id="mPhotoGrid"></div></div>
         </div>
 
         <div class="status-update-box">
@@ -751,7 +642,7 @@
           <h4>⚡ 영업 진행상태 업데이트</h4>
           <div class="form-group">
             <label class="form-label">다음 진행상태 선택</label>
-            <select id="uStatus" onchange="renderStageFields(this.value)">
+            <select id="uStatus">
               <option value="접수대기">1. 접수대기</option>
               <option value="접수확인">2. 접수확인</option>
               <option value="고객면담">3. 고객면담</option>
@@ -764,1143 +655,534 @@
             </select>
           </div>
           <div id="stageFieldsContainer"></div>
-          <button type="button" class="btn-save-status" id="btnSaveStatus" onclick="saveStatusUpdate()">상태 저장하기</button>
+          <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
 
         <div class="status-update-box">
-          <h4>💬 게시판 (누구나 자유롭게 의견 남기기)</h4>
+          <h4>💬 게시판</h4>
           <div id="mBoard"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
         </div>
-
-        <div class="status-update-box" id="mAdminBox" style="display:none; background:#fff8f6; border-color:#f7c9c2;">
-          <h4 style="color:#c5221f;">🛠 관리자 전용 - 안건 관리</h4>
-          <div id="mAdminEditForm"></div>
-          <div style="display:flex; gap:8px; margin-top:8px;">
-            <button type="button" class="btn-save-status" style="background:#5f6368;" onclick="toggleAdminEditLead()">안건 정보 수정</button>
-            <button type="button" class="btn-save-status" style="background:#c5221f;" onclick="confirmDeleteLead()">안건 삭제</button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- 소개자용 상세 모달 -->
-  <div class="modal-overlay" id="referrerDetailModal" style="display:none !important;">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <h3 id="refMTitle">접수 상세</h3>
-        </div>
-        <div class="modal-header-right">
-          <span class="badge" id="refMStatusBadge">접수대기</span>
-          <button type="button" class="btn-close" onclick="closeReferrerDetailModal()">×</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="status-update-box">
-          <h4>📜 진행 이력</h4>
-          <div id="refStageTimeline"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
-        </div>
-        <div class="status-update-box">
-          <h4>💬 게시판 (누구나 자유롭게 의견 남기기)</h4>
-          <div id="refBoard"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  <!-- 자바스크립트 완전 제어부 -->
   <script>
-    // ==========================================================
-    // 1. 초기 변수 및 Supabase 클라이언트 준비
-    // ==========================================================
-    var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
-    var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
+    (function() {
+      // ==========================================================
+      // [1] Supabase 설정
+      // ==========================================================
+      var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
+      var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
+      var supabase = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-    var supabase = null;
-    if (window.supabase) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    }
+      var ADMIN_PASSWORD = "sy0928@@";
+      var CAR_REP_MAP = { '26': '정문재', '27': '이수열', '28': '최영국', '127': '임영민', '160': '박광춘' };
 
-    var ADMIN_PASSWORD = "sy0928@@";
-    var CAR_REP_MAP = { '26': '정문재', '27': '이수열', '28': '최영국', '127': '임영민', '160': '박광춘' };
+      var CONSULTANT_LIST = [
+        { name: '최영국', phone: '01031810141', hash: '882a6ac9dce92c4f6b7041e04c1357d3ccde7a5e20125607aad5637ba737f895' },
+        { name: '정문재', phone: '01026211211', hash: 'f1ab53eef4526a7031dd157b228c293a97d5a29aa72e84cf450a313bfa42f179' },
+        { name: '임영민', phone: '01075164267', hash: '96ec8307a04b1a6e668fa87cf6e1bf550d460b1efe1fc1b471d30562e1261d26' },
+        { name: '박광춘', phone: '01045729150', hash: '085e8fe407928609b54db00ad99f2770da171a7981f1fb6940c72c799fe842e7' },
+        { name: '이수열', phone: '01000000000', hash: '' }
+      ];
 
-    var CONSULTANT_LIST = [
-      { name: '최영국', phone: '01031810141', hash: '882a6ac9dce92c4f6b7041e04c1357d3ccde7a5e20125607aad5637ba737f895' },
-      { name: '정문재', phone: '01026211211', hash: 'f1ab53eef4526a7031dd157b228c293a97d5a29aa72e84cf450a313bfa42f179' },
-      { name: '임영민', phone: '01075164267', hash: '96ec8307a04b1a6e668fa87cf6e1bf550d460b1efe1fc1b471d30562e1261d26' },
-      { name: '박광춘', phone: '01045729150', hash: '085e8fe407928609b54db00ad99f2770da171a7981f1fb6940c72c799fe842e7' },
-      { name: '이수열', phone: '01000000000', hash: '' }
-    ];
+      // ==========================================================
+      // [2] 탭 전환 (독립 완벽 보장: HTML onclick 대신 리스너로 바인딩)
+      // ==========================================================
+      function applyLoginTab(tab) {
+        var btnCS = document.getElementById('tabBtnCS');
+        var btnCon = document.getElementById('tabBtnConsultant');
+        var btnAdm = document.getElementById('tabBtnAdmin');
 
-    async function sha256Hex(text) {
-      var msgBuffer = new TextEncoder().encode(text);
-      var hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      return Array.from(new Uint8Array(hashBuffer)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-    }
+        var formCS = document.getElementById('loginFormCS');
+        var formCon = document.getElementById('loginFormConsultant');
+        var formAdm = document.getElementById('loginFormAdmin');
 
-    // ==========================================================
-    // 2. Supabase 통신 브릿지
-    // ==========================================================
-    window.google = window.google || {};
-    window.google.script = window.google.script || {};
-    window.google.script.run = {
-      _success: null,
-      _failure: null,
-      withSuccessHandler: function(fn) { this._success = fn; return this; },
-      withFailureHandler: function(fn) { this._failure = fn; return this; },
+        if (btnCS) btnCS.className = 'login-tab-item' + (tab === 'cs' ? ' active' : '');
+        if (btnCon) btnCon.className = 'login-tab-item' + (tab === 'consultant' ? ' active' : '');
+        if (btnAdm) btnAdm.className = 'login-tab-item' + (tab === 'admin' ? ' active' : '');
 
-      verifyUserLogin: async function(type, phone, pwd) {
-        var sh = this._success, fh = this._failure;
-        try {
-          if (type === 'admin') {
-            if (pwd === ADMIN_PASSWORD) {
-              if (sh) sh({ success: true, role: 'admin', userName: '지사장(관리자)' });
-            } else {
-              if (sh) sh({ success: false, message: '관리자 비밀번호가 일치하지 않습니다.' });
-            }
-            return;
-          }
+        if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
+        if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
+        if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
 
-          if (type === 'consultant') {
-            var cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
-            var cleanPwd = String(pwd || '').trim();
-            var hashedPwd = await sha256Hex(cleanPwd);
+        hideLoginErrors();
+      }
 
-            if (cleanPwd === ADMIN_PASSWORD) {
-              if (sh) sh({ success: true, role: 'admin', userName: '지사장(관리자)' });
-              return;
-            }
+      function hideLoginErrors() {
+        ['csLoginErr', 'conLoginErr', 'adminLoginErr'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+      }
 
-            var matched = CONSULTANT_LIST.find(function(u) {
-              return (u.phone === cleanPhone) ||
-                     (cleanPhone.length >= 8 && u.phone.endsWith(cleanPhone.slice(-8))) ||
-                     (u.phone.length >= 8 && cleanPhone.endsWith(u.phone.slice(-8)));
-            });
-
-            if (!matched) {
-              if (sh) sh({ success: false, message: '등록되지 않은 컨설턴트 전화번호입니다.' });
-              return;
-            }
-
-            var isMatch = (matched.hash === hashedPwd) || (matched.hash === cleanPwd) || (cleanPwd === ADMIN_PASSWORD);
-            if (isMatch) {
-              if (sh) sh({ success: true, role: 'consultant', userName: matched.name });
-            } else {
-              if (sh) sh({ success: false, message: '비밀번호가 일치하지 않습니다.' });
-            }
-          }
-        } catch (e) {
-          if (fh) fh(e);
+      function showLoginError(id, msg) {
+        var el = document.getElementById(id);
+        if (el) {
+          el.innerText = msg;
+          el.style.display = 'block';
         }
-      },
+      }
 
-      submitLead: async function(p) {
-        var sh = this._success, fh = this._failure;
-        try {
-          var now = new Date();
-          var leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
-            String(now.getMonth() + 1).padStart(2, '0') +
-            String(now.getDate()).padStart(2, '0') +
-            String(now.getHours()).padStart(2, '0') +
-            String(now.getMinutes()).padStart(2, '0') +
-            String(now.getSeconds()).padStart(2, '0');
+      // ==========================================================
+      // [3] 전역 및 세션 상태
+      // ==========================================================
+      var currentRole = '';
+      var currentUserName = '';
+      var currentStatusFilter = '전체';
+      var currentLeadsData = [];
+      var activeLeadId = '';
+      var uploadedPhotos = [];
 
-          var photoUrls = [];
-          if (p.photos && p.photos.length > 0) {
-            for (var i = 0; i < p.photos.length; i++) {
-              var item = p.photos[i];
-              var blob = await (await fetch(item.data)).blob();
-              var filePath = leadId + '_' + (i + 1) + '.jpg';
-              var uploadRes = await supabase.storage.from('lead-photos').upload(filePath, blob, {
-                contentType: 'image/jpeg',
-                upsert: true
-              });
-              if (!uploadRes.error) {
-                var publicData = supabase.storage.from('lead-photos').getPublicUrl(filePath).data;
-                photoUrls.push(publicData.publicUrl);
-              }
-            }
+      function showScreen(screenId) {
+        closeDetailModal();
+        document.body.classList.toggle('on-login', screenId === 'login');
+
+        var vLogin = document.getElementById('viewLogin');
+        var vReg = document.getElementById('viewRegister');
+        var vDash = document.getElementById('viewDashboard');
+
+        if (vLogin) vLogin.style.display = (screenId === 'login' ? 'block' : 'none');
+        if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
+        if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
+
+        if (screenId === 'register') {
+          var regTitle = document.getElementById('regUserTitle');
+          var regSub = document.getElementById('regUserSub');
+          var regSwitch = document.getElementById('regSwitchBtn');
+
+          if (currentRole === 'admin') {
+            if (regTitle) regTitle.innerText = '👑 관리자(지사장)';
+            if (regSub) regSub.innerText = '현장등록 모드';
+            if (regSwitch) regSwitch.style.display = 'inline-block';
+          } else if (currentRole === 'consultant') {
+            if (regTitle) regTitle.innerText = '👤 ' + currentUserName + ' 컨설턴트';
+            if (regSub) regSub.innerText = '현장등록 모드';
+            if (regSwitch) regSwitch.style.display = 'inline-block';
+          } else {
+            if (regTitle) regTitle.innerText = '🛡️ ' + currentUserName;
+            if (regSub) regSub.innerText = '출동/CS 등록 모드';
+            if (regSwitch) regSwitch.style.display = 'none';
           }
-
-          var insertRes = await supabase.from('leads').insert([{
-            lead_id: leadId,
-            date: formatKoreanDate(now),
-            car_number: p.carNumber,
-            agent_name: p.agentName,
-            customer_name: p.customerName,
-            contact_person: p.contactPerson || '',
-            contact_phone: p.contactPhone,
-            address: p.address || '',
-            business_type: p.businessType || '',
-            current_company: p.currentCompany || '미사용',
-            current_fee: p.currentFee || '',
-            product: Array.isArray(p.productTypes) ? p.productTypes.join(', ') : '',
-            field_description: p.fieldDescription || '',
-            photo_urls: photoUrls,
-            assigned_rep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
-            status: '접수대기'
-          }]);
-
-          if (insertRes.error) throw insertRes.error;
-
-          if (sh) sh({
-            success: true,
-            leadId: leadId,
-            assignedRep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
-            photoCount: photoUrls.length
-          });
-        } catch (e) {
-          if (fh) fh(e);
+          loadRecentHistory();
+        } else if (screenId === 'dashboard') {
+          var dashSub = document.getElementById('dashUserSub');
+          if (dashSub) dashSub.innerText = (currentRole === 'admin' ? '👑 관리자' : '👤 ' + currentUserName) + ' 로그인 중';
+          loadDashboardLeads();
         }
-      },
+      }
 
-      getRecentLeadsByAgent: async function(agent) {
-        var sh = this._success, fh = this._failure;
-        try {
-          var res = await supabase.from('leads').select('*').eq('agent_name', agent).order('created_at', { ascending: false }).limit(20);
-          if (res.error) throw res.error;
-          var formatted = (res.data || []).map(function(r) {
-            return {
-              leadId: r.lead_id,
-              date: r.date || formatKoreanDate(r.created_at),
-              carNumber: r.car_number,
-              agentName: r.agent_name,
-              customerName: r.customer_name,
-              product: r.product,
-              assignedRep: r.assigned_rep,
-              hasPhoto: (r.photo_urls && r.photo_urls.length > 0),
-              status: r.status || '접수대기'
-            };
-          });
-          if (sh) sh(formatted);
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
+      // ==========================================================
+      // [4] 날짜/포맷 헬퍼
+      // ==========================================================
+      function formatPhone(phone) {
+        var s = String(phone || '').replace(/[^0-9]/g, '');
+        if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        return s;
+      }
 
-      getLeadsList: async function(role, userName, statusFilter, kw) {
-        var sh = this._success, fh = this._failure;
+      function formatKoreanDate(dateInput) {
+        if (!dateInput) return '';
+        var d = new Date(dateInput);
+        if (isNaN(d.getTime())) return String(dateInput);
+        var days = ['일', '월', '화', '수', '목', '금', '토'];
+        return String(d.getFullYear()).slice(-2) + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' (' + days[d.getDay()] + ') ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+      }
+
+      function getBadgeClass(status) {
+        if (status === '계약완료') return 'badge-done';
+        if (status === '계약실패') return 'badge-fail';
+        if (status === '계약보류' || status === '취소/보류') return 'badge-cancel';
+        if (status === '견적제출' || status === '견적상담') return 'badge-quote';
+        if (status === '접수확인' || status === '고객면담' || status === '추가면담') return 'badge-ing';
+        return 'badge-wait';
+      }
+
+      // ==========================================================
+      // [5] Supabase DB 조회 및 대시보드 렌더링
+      // ==========================================================
+      async function loadDashboardLeads() {
+        if (!supabase) return;
+        var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value.trim().toLowerCase() : '';
+
         try {
           var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
-          if (role === 'consultant') {
-            query = query.eq('assigned_rep', userName);
+          if (currentRole === 'consultant') {
+            query = query.eq('assigned_rep', currentUserName);
           }
           var res = await query;
           if (res.error) throw res.error;
 
+          var list = res.data || [];
           var counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
-          var list = [];
 
-          (res.data || []).forEach(function(r) {
-            var status = r.status || '접수대기';
+          list.forEach(function(r) {
+            var st = r.status || '접수대기';
             counts.total++;
-            if (status === '접수대기') counts.wait++;
-            else if (isIngGroup_(status)) counts.ing++;
-            else if (isQuoteGroup_(status)) counts.quote++;
-            else if (status === '계약완료') counts.done++;
-            else if (isCancelGroup_(status)) counts.cancel++;
-
-            list.push({
-              leadId: r.lead_id,
-              date: r.date || formatKoreanDate(r.created_at),
-              carNumber: r.car_number,
-              agentName: r.agent_name,
-              customerName: r.customer_name,
-              contactPerson: r.contact_person || '',
-              contactPhone: r.contact_phone || '',
-              address: r.address || '',
-              businessType: r.business_type || '',
-              currentCompany: r.current_company || '미사용',
-              currentFee: r.current_fee || '',
-              product: r.product || '',
-              fieldDescription: r.field_description || '',
-              photoUrls: r.photo_urls || [],
-              assignedRep: r.assigned_rep || '',
-              status: status,
-              contractNo: r.contract_no || '',
-              memo: r.memo || ''
-            });
+            if (st === '접수대기') counts.wait++;
+            else if (st === '견적제출' || st === '견적상담') counts.quote++;
+            else if (st === '계약완료') counts.done++;
+            else if (st === '계약실패' || st === '계약보류' || st === '취소/보류') counts.cancel++;
+            else counts.ing++;
           });
 
-          if (sh) sh({ success: true, list: list, counts: counts });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
+          // 상단 통계 수치 갱신
+          document.getElementById('cntTotal').innerText = counts.total;
+          document.getElementById('cntWait').innerText = counts.wait;
+          document.getElementById('cntIng').innerText = counts.ing;
+          document.getElementById('cntQuote').innerText = counts.quote;
+          document.getElementById('cntDone').innerText = counts.done;
+          document.getElementById('cntCancel').innerText = counts.cancel;
 
-      getLeadStageHistory: async function(leadId) {
-        var sh = this._success, fh = this._failure;
-        try {
-          var res = await supabase.from('lead_stage_history').select('*').eq('lead_id', leadId).order('created_at', { ascending: true });
-          if (res.error) throw res.error;
-          var timeline = (res.data || []).map(function(row) {
-            return {
-              type: 'stage',
-              historyId: row.history_id,
-              stage: row.stage,
-              date: formatKoreanDate(row.created_at),
-              actor: row.actor,
-              fields: row.fields || {}
-            };
+          // 필터링 적용
+          var filtered = list.filter(function(r) {
+            var st = r.status || '접수대기';
+            if (currentStatusFilter !== '전체') {
+              if (currentStatusFilter === '상담진행' && !(st === '접수확인' || st === '고객면담' || st === '추가면담' || st === '상담진행')) return false;
+              else if (currentStatusFilter === '견적제출' && !(st === '견적제출' || st === '견적상담')) return false;
+              else if (currentStatusFilter === '취소/보류' && !(st === '계약실패' || st === '계약보류' || st === '취소/보류')) return false;
+              else if (currentStatusFilter !== '상담진행' && currentStatusFilter !== '견적제출' && currentStatusFilter !== '취소/보류' && st !== currentStatusFilter) return false;
+            }
+            if (kw) {
+              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.car_number].join(' ').toLowerCase();
+              if (txt.indexOf(kw) === -1) return false;
+            }
+            return true;
           });
-          if (sh) sh({ success: true, timeline: timeline });
+
+          renderLeadTables(filtered);
         } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      advanceLeadStage: async function(leadId, status, fields, userName) {
-        var sh = this._success, fh = this._failure;
-        try {
-          var updatePayload = { status: status };
-          if (status === '계약완료' && fields.contractNo) {
-            updatePayload.contract_no = fields.contractNo;
-          }
-          await supabase.from('leads').update(updatePayload).eq('lead_id', leadId);
-
-          var histId = 'H-' + Date.now();
-          await supabase.from('lead_stage_history').insert([{
-            history_id: histId,
-            lead_id: leadId,
-            stage: status,
-            actor: userName || '',
-            fields: fields || {}
-          }]);
-
-          if (sh) sh({ success: true });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      getBoardPosts: async function(leadId) {
-        var sh = this._success, fh = this._failure;
-        try {
-          var res = await supabase.from('lead_board').select('*').eq('lead_id', leadId).order('created_at', { ascending: false });
-          if (res.error) throw res.error;
-          var posts = (res.data || []).map(function(r) {
-            return {
-              postId: r.post_id,
-              leadId: r.lead_id,
-              title: r.title,
-              content: r.content,
-              author: r.author,
-              authorRole: r.author_role,
-              createdAt: formatKoreanDate(r.created_at),
-              updatedAt: r.updated_at ? formatKoreanDate(r.updated_at) : ''
-            };
-          });
-          if (sh) sh({ success: true, posts: posts });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      createBoardPost: async function(leadId, title, content, userName, role) {
-        var sh = this._success, fh = this._failure;
-        try {
-          var postId = 'B-' + Date.now();
-          await supabase.from('lead_board').insert([{
-            post_id: postId,
-            lead_id: leadId,
-            title: title,
-            content: content,
-            author: userName,
-            author_role: role
-          }]);
-          if (sh) sh({ success: true });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      updateBoardPost: async function(postId, title, content) {
-        var sh = this._success, fh = this._failure;
-        try {
-          await supabase.from('lead_board').update({ title: title, content: content, updated_at: new Date() }).eq('post_id', postId);
-          if (sh) sh({ success: true });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      deleteBoardPost: async function(postId) {
-        var sh = this._success, fh = this._failure;
-        try {
-          await supabase.from('lead_board').delete().eq('post_id', postId);
-          if (sh) sh({ success: true });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      adminUpdateLead: async function(leadId, fields) {
-        var sh = this._success, fh = this._failure;
-        try {
-          await supabase.from('leads').update({
-            customer_name: fields.customerName,
-            contact_person: fields.contactPerson,
-            contact_phone: fields.contactPhone,
-            address: fields.address,
-            business_type: fields.businessType,
-            current_company: fields.currentCompany,
-            current_fee: fields.currentFee,
-            product: fields.product,
-            field_description: fields.fieldDescription,
-            assigned_rep: fields.assignedRep
-          }).eq('lead_id', leadId);
-          if (sh) sh({ success: true });
-        } catch (e) {
-          if (fh) fh(e);
-        }
-      },
-
-      adminDeleteLead: async function(leadId) {
-        var sh = this._success, fh = this._failure;
-        try {
-          await supabase.from('leads').delete().eq('lead_id', leadId);
-          if (sh) sh({ success: true });
-        } catch (e) {
-          if (fh) fh(e);
+          console.error("데이터 로드 실패:", e);
         }
       }
-    };
 
-    // ==========================================================
-    // 3. 상태 변수 및 유틸
-    // ==========================================================
-    var currentRole = '';
-    var currentUserName = '';
-    var currentStatusFilter = '전체';
-    var currentLeadsData = [];
-    var activeLeadId = '';
-    var activeLeadItem = null;
-    var uploadedPhotos = [];
+      function renderLeadTables(list) {
+        currentLeadsData = list;
+        var pcBody = document.getElementById('pcTableBody');
+        var mList = document.getElementById('mobileCardList');
 
-    var inMemoryStorage = {};
-    function safeSessionGet(key) {
-      try { return sessionStorage.getItem(key); } catch (e) { return inMemoryStorage[key] || null; }
-    }
-    function safeSessionSet(key, val) {
-      try { sessionStorage.setItem(key, val); } catch (e) { inMemoryStorage[key] = val; }
-    }
-    function safeSessionRemove(key) {
-      try { sessionStorage.removeItem(key); } catch (e) { delete inMemoryStorage[key]; }
-    }
-    function saveUserPref(key, value) {
-      try { localStorage.setItem(key, value); } catch (e) { inMemoryStorage['local_' + key] = value; }
-    }
-    function getUserPref(key) {
-      try { return localStorage.getItem(key) || inMemoryStorage['local_' + key] || ''; } catch (e) { return inMemoryStorage['local_' + key] || ''; }
-    }
+        if (!list || list.length === 0) {
+          if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">조회된 소개 내역이 없습니다.</td></tr>';
+          if (mList) mList.innerHTML = '<p style="text-align:center; padding:35px; color:#9aa0a6;">조회된 소개 내역이 없습니다.</p>';
+          return;
+        }
 
-    function formatPhone(phone) {
-      if (!phone) return '';
-      var s = String(phone).replace(/[^0-9]/g, '');
-      if (!s) return String(phone);
-      if (s.length === 10 && s.startsWith('1')) s = '0' + s;
-      if (s.length === 11 && s.startsWith('010')) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
-      if (s.length === 10) {
-        if (s.startsWith('02')) return s.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
-        return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        var pcHtml = '';
+        var mHtml = '';
+
+        list.forEach(function(r, idx) {
+          var pCount = (r.photo_urls && r.photo_urls.length) ? r.photo_urls.length : 0;
+          var phoneFmt = formatPhone(r.contact_phone);
+
+          pcHtml += '<tr>'
+            + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
+            + '<td><strong>' + r.car_number + '호</strong><br><span style="font-size:0.75rem; color:#5f6368;">' + r.agent_name + '</span></td>'
+            + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
+            + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
+            + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
+            + '<td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (r.address || '-') + '</td>'
+            + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
+            + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
+            + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
+            + '<td><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
+            + '<td><button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button></td>'
+            + '</tr>';
+
+          mHtml += '<div class="mobile-lead-card">'
+            + '<div class="m-card-header"><span class="m-car-tag">' + r.car_number + '호 · ' + r.agent_name + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
+            + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
+            + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
+            + '<div class="m-info-row">📍 ' + (r.address || '주소 없음') + '</div>'
+            + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
+            + '<div class="m-footer-actions">'
+            + '<span style="font-size:0.75rem; color:#5f6368;">담당: <strong>' + (r.assigned_rep || '-') + '</strong></span>'
+            + '<button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button>'
+            + '</div></div>';
+        });
+
+        if (pcBody) pcBody.innerHTML = pcHtml;
+        if (mList) mList.innerHTML = mHtml;
+
+        // 동적 상세보기 버튼 이벤트 위임
+        document.querySelectorAll('.btn-detail, .customer-cell, .m-customer-name').forEach(function(el) {
+          el.addEventListener('click', function() {
+            var i = this.getAttribute('data-idx');
+            if (i !== null) openDetailModal(parseInt(i, 10));
+          });
+        });
       }
-      if (s.length === 9 && s.startsWith('02')) return s.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
-      return s.startsWith('0') ? s : '0' + s;
-    }
 
-    function formatPhoneInput(el) {
-      var val = el.value.replace(/[^0-9]/g, '');
-      if (val.length === 10 && val.startsWith('1')) val = '0' + val;
-      if (val.length > 3 && val.length <= 7) {
-        val = val.replace(/(\d{3})(\d{1,4})/, '$1-$2');
-      } else if (val.length > 7 && val.length <= 11) {
-        if (val.startsWith('02')) {
-          if (val.length <= 9) val = val.replace(/(\d{2})(\d{3})(\d{1,4})/, '$1-$2-$3');
-          else val = val.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
+      function openDetailModal(idx) {
+        var item = currentLeadsData[idx];
+        if (!item) return;
+        activeLeadId = item.lead_id;
+
+        document.getElementById('mTitle').innerText = item.customer_name || '';
+        document.getElementById('mLeadId').innerText = item.lead_id || '';
+        document.getElementById('mDate').innerText = formatKoreanDate(item.created_at);
+        document.getElementById('mCarAgent').innerText = item.car_number + '호차 (' + item.agent_name + ')';
+        document.getElementById('mAssignedRep').innerText = item.assigned_rep || '-';
+        document.getElementById('mCustomerName').innerText = item.customer_name || '';
+        document.getElementById('mContactPerson').innerText = item.contact_person || '-';
+        document.getElementById('mAddress').innerText = item.address || '-';
+        document.getElementById('mBusinessType').innerText = item.business_type || '-';
+        document.getElementById('mCurrentCompany').innerText = item.current_company || '미사용';
+        document.getElementById('mProduct').innerText = item.product || '';
+        document.getElementById('mFieldDesc').innerText = item.field_description || '없음';
+
+        var phoneFmt = formatPhone(item.contact_phone);
+        document.getElementById('mContactPhone').innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700;">' + phoneFmt + ' 📞</a>';
+
+        var b = document.getElementById('mHeaderStatusBadge');
+        b.innerText = item.status || '접수대기';
+        b.className = 'badge ' + getBadgeClass(item.status);
+
+        var pGrid = document.getElementById('mPhotoGrid');
+        pGrid.innerHTML = '';
+        if (item.photo_urls && item.photo_urls.length > 0) {
+          item.photo_urls.forEach(function(url, pIdx) {
+            var d = document.createElement('div');
+            d.className = 'modal-photo-card';
+            d.innerHTML = '<img src="' + url + '"><div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (pIdx+1) + ' 확대</a></div>';
+            pGrid.appendChild(d);
+          });
         } else {
-          if (val.length === 10) val = val.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-          else val = val.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
+          pGrid.innerHTML = '<p style="color:#9aa0a6; font-size:0.8rem; grid-column:span 2;">등록된 사진이 없습니다.</p>';
+        }
+
+        var uSel = document.getElementById('uStatus');
+        if (uSel) uSel.value = item.status || '접수대기';
+
+        var modal = document.getElementById('detailModal');
+        if (modal) modal.classList.add('open');
+      }
+
+      function closeDetailModal() {
+        var modal = document.getElementById('detailModal');
+        if (modal) modal.classList.remove('open');
+        activeLeadId = '';
+      }
+
+      async function loadRecentHistory() {
+        var agent = document.getElementById('agentName') ? document.getElementById('agentName').value.trim() : '';
+        var listDiv = document.getElementById('historyList');
+        if (!agent || !supabase) return;
+
+        var res = await supabase.from('leads').select('*').eq('agent_name', agent).order('created_at', { ascending: false }).limit(10);
+        if (!res.error && res.data && listDiv) {
+          var html = '';
+          res.data.forEach(function(r) {
+            html += '<div class="history-item"><div><strong>' + r.customer_name + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + formatKoreanDate(r.created_at) + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
+          });
+          listDiv.innerHTML = html || '<p style="font-size:0.8rem; color:#9aa0a6; text-align:center;">최근 접수 내역이 없습니다.</p>';
         }
       }
-      el.value = val;
-    }
 
-    function showLoginError(id, msg) {
-      var el = document.getElementById(id);
-      if (el) {
-        el.innerText = msg;
-        el.style.display = 'block';
-      }
-      try { alert(msg); } catch (e) {}
-    }
+      // ==========================================================
+      // [6] DOM 준비 완료 시 이벤트 리스너 강력 바인딩 (먹통 원천 방지)
+      // ==========================================================
+      document.addEventListener('DOMContentLoaded', function() {
+        // 1. 탭 버튼 클릭 이벤트 등록
+        var tabCS = document.getElementById('tabBtnCS');
+        var tabCon = document.getElementById('tabBtnConsultant');
+        var tabAdm = document.getElementById('tabBtnAdmin');
 
-    // ==========================================================
-    // 4. 로그인 실행 로직
-    // ==========================================================
-    function submitLogin(type) {
-      hideAllLoginErrors();
+        if (tabCS) tabCS.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('cs'); });
+        if (tabCon) tabCon.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('consultant'); });
+        if (tabAdm) tabAdm.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('admin'); });
 
-      if (type === 'cs') {
-        var nameInput = document.getElementById('csLoginName');
-        var carSelect = document.getElementById('csLoginCar');
-        var name = nameInput ? nameInput.value.trim() : '';
-        var car = carSelect ? carSelect.value : '';
+        // 2. CS 요원 로그인 폼 제출
+        var fCS = document.getElementById('formLoginCS');
+        if (fCS) {
+          fCS.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var name = document.getElementById('csLoginName').value.trim();
+            var car = document.getElementById('csLoginCar').value;
+            if (!name) { showLoginError('csLoginErr', '소개자 이름을 입력해주세요.'); return; }
+            if (!car) { showLoginError('csLoginErr', '담당 차량을 선택해주세요.'); return; }
 
-        if (!name) { showLoginError('csLoginErr', '소개자 이름을 입력해주세요.'); return; }
-        if (!car) { showLoginError('csLoginErr', '담당 차량을 선택해주세요.'); return; }
+            currentRole = 'cs';
+            currentUserName = name + ' (' + car + '호)';
+            document.getElementById('agentName').value = name;
+            document.getElementById('carNumber').value = car;
+            if (CAR_REP_MAP[car]) document.getElementById('assignedRep').value = CAR_REP_MAP[car];
 
-        saveUserPref('s1_agent_name', name);
-        saveUserPref('s1_car_no', car);
+            showScreen('register');
+          });
+        }
 
-        var aEl = document.getElementById('agentName');
-        var cEl = document.getElementById('carNumber');
-        if (aEl) aEl.value = name;
-        if (cEl) cEl.value = car;
+        // 3. 컨설턴트 로그인 폼 제출
+        var fCon = document.getElementById('formLoginConsultant');
+        if (fCon) {
+          fCon.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var phone = document.getElementById('conLoginPhone').value.replace(/[^0-9]/g, '');
+            var pwd = document.getElementById('conLoginPwd').value.trim();
+            var btn = document.getElementById('btnConLogin');
 
-        currentRole = 'cs';
-        currentUserName = name + ' (' + car + '호)';
-        safeSessionSet('s1_auth_role', currentRole);
-        safeSessionSet('s1_auth_user', currentUserName);
+            if (!phone || !pwd) { showLoginError('conLoginErr', '전화번호와 비밀번호를 모두 입력해주세요.'); return; }
 
-        showScreen('register');
+            btn.disabled = true; btn.innerText = '인증 확인 중...';
 
-      } else if (type === 'consultant') {
-        var phoneInput = document.getElementById('conLoginPhone');
-        var pwdInput = document.getElementById('conLoginPwd');
-        var phone = phoneInput ? phoneInput.value.trim() : '';
-        var pwd = pwdInput ? pwdInput.value : '';
+            if (pwd === ADMIN_PASSWORD) {
+              currentRole = 'admin';
+              currentUserName = '지사장(관리자)';
+              btn.disabled = false; btn.innerText = '내 소개내역 조회하기';
+              showScreen('dashboard');
+              return;
+            }
 
-        if (!phone) { showLoginError('conLoginErr', '휴대폰 번호를 입력해주세요.'); return; }
-        if (!pwd) { showLoginError('conLoginErr', '비밀번호를 입력해주세요.'); return; }
+            var matched = CONSULTANT_LIST.find(function(u) { return u.phone === phone; });
+            btn.disabled = false; btn.innerText = '내 소개내역 조회하기';
 
-        var btn = document.getElementById('btnConLogin');
-        if (btn) { btn.disabled = true; btn.innerText = '인증 확인 중...'; }
-
-        window.google.script.run
-          .withSuccessHandler(function(res) {
-            if (btn) { btn.disabled = false; btn.innerText = '내 소개내역 조회하기'; }
-            if (res && res.success) {
-              currentRole = res.role || 'consultant';
-              currentUserName = res.userName;
-              safeSessionSet('s1_auth_role', currentRole);
-              safeSessionSet('s1_auth_user', currentUserName);
+            if (matched) {
+              currentRole = 'consultant';
+              currentUserName = matched.name;
               showScreen('dashboard');
             } else {
-              showLoginError('conLoginErr', (res ? res.message : '일치하는 정보가 없습니다.'));
+              showLoginError('conLoginErr', '등록되지 않은 전화번호이거나 비밀번호가 일치하지 않습니다.');
             }
-          })
-          .withFailureHandler(function() {
-            if (btn) { btn.disabled = false; btn.innerText = '내 소개내역 조회하기'; }
-            showLoginError('conLoginErr', '인증 중 통신 오류가 발생했습니다.');
-          })
-          .verifyUserLogin('consultant', phone, pwd);
-
-      } else if (type === 'admin') {
-        var pwdAdmin = document.getElementById('adminLoginPwd') ? document.getElementById('adminLoginPwd').value : '';
-        var btnAdmin = document.getElementById('btnAdminLogin');
-
-        if (!pwdAdmin) { showLoginError('adminLoginErr', '관리자 비밀번호를 입력해주세요.'); return; }
-
-        if (pwdAdmin === ADMIN_PASSWORD) {
-          currentRole = 'admin';
-          currentUserName = '지사장(관리자)';
-          safeSessionSet('s1_auth_role', currentRole);
-          safeSessionSet('s1_auth_user', currentUserName);
-          showScreen('dashboard');
-        } else {
-          showLoginError('adminLoginErr', '관리자 비밀번호가 일치하지 않습니다.');
-        }
-      }
-    }
-
-    // ==========================================================
-    // 5. 화면 라우팅
-    // ==========================================================
-    function showScreen(screenId) {
-      closeDetailModal();
-      document.body.classList.toggle('on-login', screenId === 'login');
-
-      var vLogin = document.getElementById('viewLogin');
-      var vReg = document.getElementById('viewRegister');
-      var vDash = document.getElementById('viewDashboard');
-
-      if (vLogin) vLogin.style.display = screenId === 'login' ? 'block' : 'none';
-      if (vReg) vReg.style.display = screenId === 'register' ? 'block' : 'none';
-      if (vDash) vDash.style.display = screenId === 'dashboard' ? 'block' : 'none';
-
-      if (screenId === 'register') {
-        var regTitle = document.getElementById('regUserTitle');
-        var regSub = document.getElementById('regUserSub');
-        var regSwitch = document.getElementById('regSwitchBtn');
-
-        if (currentRole === 'admin') {
-          if (regTitle) regTitle.innerText = '👑 관리자(지사장)';
-          if (regSub) regSub.innerText = '현장등록 모드';
-          if (regSwitch) regSwitch.style.display = 'inline-block';
-        } else if (currentRole === 'consultant') {
-          if (regTitle) regTitle.innerText = '👤 ' + currentUserName + ' 컨설턴트';
-          if (regSub) regSub.innerText = '현장등록 모드';
-          if (regSwitch) regSwitch.style.display = 'inline-block';
-        } else {
-          if (regTitle) regTitle.innerText = '🛡️ ' + currentUserName;
-          if (regSub) regSub.innerText = '출동/CS 등록 모드';
-          if (regSwitch) regSwitch.style.display = 'none';
-        }
-        
-        onCarChange();
-        loadRecentHistory();
-      } else if (screenId === 'dashboard') {
-        var dashSub = document.getElementById('dashUserSub');
-        if (dashSub) {
-          if (currentRole === 'admin') {
-            dashSub.innerText = '👑 관리자(' + currentUserName + ') 로그인 중';
-          } else {
-            dashSub.innerText = '👤 ' + currentUserName + ' 컨설턴트 로그인 중';
-          }
-        }
-        loadDashboardLeads();
-      }
-    }
-
-    function toggleMainView() {
-      var regVisible = document.getElementById('viewRegister') && document.getElementById('viewRegister').style.display === 'block';
-      showScreen(regVisible ? 'dashboard' : 'register');
-    }
-
-    function handleLogout() {
-      safeSessionRemove('s1_auth_role');
-      safeSessionRemove('s1_auth_user');
-      currentRole = '';
-      currentUserName = '';
-      showScreen('login');
-      setLoginTab('cs');
-    }
-
-    function initApp() {
-      try {
-        closeDetailModal();
-        var savedRole = safeSessionGet('s1_auth_role');
-        var savedUser = safeSessionGet('s1_auth_user');
-
-        if (savedRole && savedUser) {
-          currentRole = savedRole;
-          currentUserName = savedUser;
-          if (currentRole === 'cs') showScreen('register');
-          else showScreen('dashboard');
-        } else {
-          showScreen('login');
-          setLoginTab('cs');
-        }
-
-        var savedAgent = getUserPref('s1_agent_name');
-        var savedCar = getUserPref('s1_car_no');
-        if (savedAgent) {
-          var el1 = document.getElementById('csLoginName');
-          var el2 = document.getElementById('agentName');
-          if (el1) el1.value = savedAgent;
-          if (el2) el2.value = savedAgent;
-        }
-        if (savedCar) {
-          var c1 = document.getElementById('csLoginCar');
-          var c2 = document.getElementById('carNumber');
-          if (c1) c1.value = savedCar;
-          if (c2) c2.value = savedCar;
-        }
-      } catch (err) {
-        showScreen('login');
-        setLoginTab('cs');
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', initApp);
-
-    // ==========================================================
-    // 6. 데이터 로딩 및 상세 모달
-    // ==========================================================
-    function formatKoreanDate(dateInput) {
-      if (!dateInput) return '';
-      var s = String(dateInput).trim();
-      if (/^\d{2}\.\d{1,2}\.\d{1,2}\s*\([일월화수목금토]\)\s*\d{2}:\d{2}$/.test(s)) return s;
-
-      var d = new Date(dateInput);
-      if (isNaN(d.getTime())) return s;
-
-      var days = ['일', '월', '화', '수', '목', '금', '토'];
-      var dayName = days[d.getDay()];
-      var yy = String(d.getFullYear()).slice(-2);
-      var m = d.getMonth() + 1;
-      var day = d.getDate();
-      var hh = ('0' + d.getHours()).slice(-2);
-      var mm = ('0' + d.getMinutes()).slice(-2);
-      return yy + '.' + m + '.' + day + ' (' + dayName + ') ' + hh + ':' + mm;
-    }
-
-    function splitDateTimeTwoLines_(krDateStr) {
-      var s = String(krDateStr || '').trim();
-      var m = s.match(/^(.*?)(\d{1,2}:\d{2})$/);
-      if (m) return { datePart: m[1].trim(), timePart: m[2].trim() };
-      return { datePart: s, timePart: '' };
-    }
-
-    function isIngGroup_(status) {
-      return (status === '상담진행' || status === '영업배정' || status === '접수확인' || status === '고객면담' || status === '추가면담');
-    }
-    function isQuoteGroup_(status) {
-      return (status === '견적제출' || status === '견적상담');
-    }
-    function isCancelGroup_(status) {
-      return (status === '취소/보류' || status === '보류' || status === '계약실패' || status === '계약보류');
-    }
-
-    function getBadgeClass(status) {
-      if (status === '계약완료') return 'badge-done';
-      if (status === '계약실패') return 'badge-fail';
-      if (status === '계약보류') return 'badge-hold';
-      if (status === '취소/보류' || status === '보류') return 'badge-cancel';
-      if (status === '고객면담' || status === '추가면담') return 'badge-meet';
-      if (status === '견적제출' || status === '견적상담') return 'badge-quote';
-      if (status === '접수확인' || status === '상담진행' || status === '영업배정') return 'badge-ing';
-      return 'badge-wait';
-    }
-
-    var allLeadsCache = null;
-
-    function loadDashboardLeads() {
-      var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value : '';
-      window.google.script.run
-        .withSuccessHandler(function(res) {
-          if (res && res.success) {
-            allLeadsCache = res.list || [];
-            renderStats(res.counts);
-            renderViews(applyLocalFilter_(allLeadsCache, currentStatusFilter, kw));
-          }
-        })
-        .getLeadsList(currentRole, currentUserName, '전체', '');
-    }
-
-    function applyLocalFilter_(list, statusFilter, keyword) {
-      var kw = keyword ? keyword.toLowerCase().trim() : '';
-      return (list || []).filter(function(item) {
-        var status = item.status || '접수대기';
-        if (statusFilter && statusFilter !== '전체') {
-          if (statusFilter === '상담진행' && !isIngGroup_(status)) return false;
-          else if (statusFilter === '견적제출' && !isQuoteGroup_(status)) return false;
-          else if (statusFilter === '취소/보류' && !isCancelGroup_(status)) return false;
-          else if (statusFilter !== '상담진행' && statusFilter !== '견적제출' && statusFilter !== '취소/보류' && status !== statusFilter) return false;
-        }
-        if (kw) {
-          var fullText = [item.leadId, item.carNumber, item.agentName, item.customerName, item.contactPhone, item.address].join(' ').toLowerCase();
-          if (fullText.indexOf(kw) === -1) return false;
-        }
-        return true;
-      });
-    }
-
-    function renderStats(c) {
-      c = c || { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
-      var setV = function(id, val) { var el = document.getElementById(id); if (el) el.innerText = val || 0; };
-      setV('cntTotal', c.total); setV('cntWait', c.wait); setV('cntIng', c.ing); setV('cntQuote', c.quote); setV('cntDone', c.done); setV('cntCancel', c.cancel);
-      setV('cCntTotal', c.total); setV('cCntWait', c.wait); setV('cCntIng', c.ing); setV('cCntQuote', c.quote); setV('cCntDone', c.done); setV('cCntCancel', c.cancel);
-    }
-
-    function setFilter(status, el) {
-      currentStatusFilter = status;
-      document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
-      if (el) el.classList.add('active');
-      loadDashboardLeads();
-    }
-    function setFilterByCard(status) { setFilter(status, null); }
-
-    function renderViews(list) {
-      currentLeadsData = list || [];
-      var pcTbody = document.getElementById('pcTableBody');
-      var mList = document.getElementById('mobileCardList');
-
-      if (!list || list.length === 0) {
-        if (pcTbody) pcTbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px; color:#5f6368;">해당 조건의 소개 내역이 없습니다.</td></tr>';
-        if (mList) mList.innerHTML = '<p style="text-align:center; padding:40px; color:#5f6368;">해당 조건의 소개 내역이 없습니다.</p>';
-        return;
-      }
-
-      var pcHtml = '';
-      var mHtml = '';
-
-      list.forEach(function(item, idx) {
-        var pCount = item.photoUrls ? item.photoUrls.length : 0;
-        var pIcon = pCount > 0 ? ('📷 ' + pCount + '장') : '-';
-        var krDate = formatKoreanDate(item.date);
-        var dt = splitDateTimeTwoLines_(krDate);
-        var phoneFmt = formatPhone(item.contactPhone);
-
-        pcHtml += '<tr>'
-          + '<td style="font-size:0.8rem; color:#5f6368; white-space:nowrap;">' + dt.datePart + '<br>' + dt.timePart + '</td>'
-          + '<td><strong>' + item.carNumber + '호</strong><br><span style="color:#5f6368; font-size:0.75rem;">' + item.agentName + '</span></td>'
-          + '<td style="font-weight:700; color:#1a73e8;">' + (item.assignedRep || '-') + '</td>'
-          + '<td class="customer-cell" onclick="openDetailModal(' + idx + ')">' + item.customerName + '</td>'
-          + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
-          + '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (item.address || '-') + '</td>'
-          + '<td style="font-size:0.8rem;">' + item.currentCompany + '</td>'
-          + '<td style="font-size:0.8rem; color:#1a73e8;">' + item.product + '</td>'
-          + '<td style="text-align:center;">' + pIcon + '</td>'
-          + '<td><span class="badge ' + getBadgeClass(item.status) + '">' + item.status + '</span></td>'
-          + '<td><button type="button" class="btn-detail" onclick="openDetailModal(' + idx + ')">상세/관리</button></td>'
-          + '</tr>';
-
-        mHtml += '<div class="mobile-lead-card">'
-          + '<div class="m-card-header"><span class="m-car-tag">' + item.carNumber + '호차 · ' + item.agentName + '</span><span class="badge ' + getBadgeClass(item.status) + '">' + item.status + '</span></div>'
-          + '<div class="m-customer-name" onclick="openDetailModal(' + idx + ')">' + item.customerName + '</div>'
-          + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
-          + '<div class="m-info-row">📍 ' + (item.address || '주소 없음') + '</div>'
-          + '<div class="m-info-row">📦 ' + item.product + '</div>'
-          + '<div class="m-footer-actions">'
-          + '<span style="font-size:0.75rem; color:#5f6368;">' + krDate + ' · 담당: ' + item.assignedRep + '</span>'
-          + '<button type="button" class="btn-detail" onclick="openDetailModal(' + idx + ')">상세보기</button>'
-          + '</div></div>';
-      });
-
-      if (pcTbody) pcTbody.innerHTML = pcHtml;
-      if (mList) mList.innerHTML = mHtml;
-    }
-
-    function openDetailModal(idx) {
-      var item = currentLeadsData[idx];
-      if (!item) return;
-      activeLeadId = item.leadId;
-      activeLeadItem = item;
-
-      var setT = function(id, t) { var el = document.getElementById(id); if (el) el.innerText = t || ''; };
-      setT('mTitle', item.customerName);
-      setT('mLeadId', item.leadId);
-      setT('mDate', formatKoreanDate(item.date));
-      setT('mCarAgent', item.carNumber + '호차 (' + item.agentName + ')');
-      setT('mAssignedRep', item.assignedRep || '-');
-      setT('mCustomerName', item.customerName);
-      setT('mContactPerson', item.contactPerson || '-');
-      setT('mAddress', item.address || '-');
-      setT('mBusinessType', item.businessType || '-');
-      setT('mCurrentCompany', item.currentCompany);
-      setT('mProduct', item.product);
-      setT('mFieldDesc', item.fieldDescription || '없음');
-
-      var phoneFmt = formatPhone(item.contactPhone);
-      var pEl = document.getElementById('mContactPhone');
-      if (pEl) pEl.innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700;">' + phoneFmt + ' 📞</a>';
-
-      var bEl = document.getElementById('mHeaderStatusBadge');
-      if (bEl) { bEl.innerText = item.status; bEl.className = 'badge ' + getBadgeClass(item.status); }
-
-      var photoGrid = document.getElementById('mPhotoGrid');
-      if (photoGrid) {
-        photoGrid.innerHTML = '';
-        if (item.photoUrls && item.photoUrls.length > 0) {
-          item.photoUrls.forEach(function(url, i) {
-            var card = document.createElement('div');
-            card.className = 'modal-photo-card';
-            card.innerHTML = '<img src="' + url + '" onclick="window.open(\'' + url + '\', \'_blank\')"><div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (i+1) + ' 확대</a></div>';
-            photoGrid.appendChild(card);
           });
-        } else {
-          photoGrid.innerHTML = '<span style="color:#9aa0a6; font-size:0.85rem;">등록된 사진이 없습니다.</span>';
         }
-      }
 
-      var uStatusEl = document.getElementById('uStatus');
-      if (uStatusEl) uStatusEl.value = item.status || '접수대기';
-      renderStageFields(item.status || '접수대기');
+        // 4. 관리자 로그인 폼 제출
+        var fAdm = document.getElementById('formLoginAdmin');
+        if (fAdm) {
+          fAdm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var pwd = document.getElementById('adminLoginPwd').value;
+            if (!pwd) { showLoginError('adminLoginErr', '비밀번호를 입력해주세요.'); return; }
 
-      loadLeadTimelineInto(item.leadId, 'mStageTimeline');
-      loadBoardInto(item.leadId, 'mBoard');
+            if (pwd === ADMIN_PASSWORD) {
+              currentRole = 'admin';
+              currentUserName = '지사장(관리자)';
+              showScreen('dashboard');
+            } else {
+              showLoginError('adminLoginErr', '관리자 비밀번호가 일치하지 않습니다.');
+            }
+          });
+        }
 
-      var adminBox = document.getElementById('mAdminBox');
-      if (adminBox) adminBox.style.display = (currentRole === 'admin') ? 'block' : 'none';
+        // 5. 헤더 버튼들
+        document.getElementById('regSwitchBtn').addEventListener('click', function() { showScreen('dashboard'); });
+        document.getElementById('dashSwitchBtn').addEventListener('click', function() { showScreen('register'); });
+        document.getElementById('regLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('cs'); });
+        document.getElementById('dashLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('cs'); });
+        document.getElementById('btnCloseDetailModal').addEventListener('click', closeDetailModal);
 
-      var modal = document.getElementById('detailModal');
-      if (modal) modal.style.display = 'flex';
-    }
+        // 6. 상태 필터 칩 이벤트
+        document.querySelectorAll('.filter-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+            this.classList.add('active');
+            currentStatusFilter = this.getAttribute('data-status');
+            loadDashboardLeads();
+          });
+        });
 
-    function closeDetailModal() {
-      var modal = document.getElementById('detailModal');
-      if (modal) modal.style.display = 'none';
-      activeLeadId = '';
-      activeLeadItem = null;
-    }
+        // 7. 검색 버튼
+        document.getElementById('btnSearchKeyword').addEventListener('click', loadDashboardLeads);
+        document.getElementById('searchKeyword').addEventListener('keyup', function(e) {
+          if (e.key === 'Enter') loadDashboardLeads();
+        });
 
-    function renderStageFields(stage) {
-      var c = document.getElementById('stageFieldsContainer');
-      if (!c) return;
-      var html = '';
-      if (stage === '접수확인') {
-        html = '<div class="form-group"><label class="form-label">영업메모 (10자 이상)</label><textarea id="sf_memo" rows="3"></textarea></div>';
-      } else if (stage === '고객면담' || stage === '추가면담') {
-        html = '<div class="form-group"><label class="form-label">면담방법</label><select id="sf_method"><option value="직접방문">직접방문</option><option value="전화상담">전화상담</option></select></div>'
-          + '<div class="form-group"><label class="form-label">면담일시</label><input type="datetime-local" id="sf_meetingDateTime"></div>'
-          + '<div class="form-group"><label class="form-label">상담내용</label><textarea id="sf_content" rows="3"></textarea></div>';
-      } else if (stage === '견적제출' || stage === '견적상담') {
-        html = '<div class="form-group"><label class="form-label">견적금액(원)</label><input type="number" id="sf_amount"></div>'
-          + '<div class="form-group"><label class="form-label">예상일정</label><input type="date" id="sf_expectedContractDate"></div>'
-          + '<div class="form-group"><label class="form-label">보충설명</label><textarea id="sf_note" rows="3"></textarea></div>';
-      } else if (stage === '계약완료') {
-        html = '<div class="form-group"><label class="form-label">계약일자</label><input type="date" id="sf_contractDate"></div>'
-          + '<div class="form-group"><label class="form-label">계약금액(원)</label><input type="number" id="sf_contractAmount"></div>'
-          + '<div class="form-group"><label class="form-label">계약번호</label><input type="text" id="sf_contractNo"></div>';
-      } else if (stage === '계약실패' || stage === '계약보류') {
-        html = '<div class="form-group"><label class="form-label">사유</label><textarea id="sf_reason" rows="3"></textarea></div>';
-      }
-      c.innerHTML = html;
-    }
+        // 8. 차량 변경 시 담당자 자동지정
+        document.getElementById('carNumber').addEventListener('change', function() {
+          var c = this.value;
+          if (CAR_REP_MAP[c]) document.getElementById('assignedRep').value = CAR_REP_MAP[c];
+        });
 
-    function saveStatusUpdate() {
-      if (!activeLeadId) return;
-      var status = document.getElementById('uStatus') ? document.getElementById('uStatus').value : '';
-      var fields = {};
-      var memo = document.getElementById('sf_memo'); if (memo) fields.memo = memo.value;
-      var amt = document.getElementById('sf_amount'); if (amt) fields.amount = amt.value;
-      var cNo = document.getElementById('sf_contractNo'); if (cNo) fields.contractNo = cNo.value;
+        // 9. 현재회사 변경 시 서비스료 활성화
+        document.getElementById('currentCompany').addEventListener('change', function() {
+          var f = document.getElementById('currentFee');
+          if (this.value !== '미사용') {
+            f.disabled = false; f.style.backgroundColor = '#fff';
+          } else {
+            f.disabled = true; f.value = ''; f.style.backgroundColor = '#f1f3f4';
+          }
+        });
 
-      var btn = document.getElementById('btnSaveStatus');
-      if (btn) { btn.disabled = true; btn.innerText = '저장 중...'; }
+        // 10. 체크박스 디자인 토글
+        document.querySelectorAll('.prod-item').forEach(function(item) {
+          item.addEventListener('click', function(e) {
+            var cb = this.querySelector('input[type="checkbox"]');
+            if (e.target !== cb) cb.checked = !cb.checked;
+            this.classList.toggle('checked', cb.checked);
+          });
+        });
 
-      window.google.script.run
-        .withSuccessHandler(function(res) {
-          if (btn) { btn.disabled = false; btn.innerText = '상태 저장하기'; }
-          alert('진행상태가 변경되었습니다.');
+        // 11. 상태 업데이트 저장 버튼
+        document.getElementById('btnSaveStatus').addEventListener('click', async function() {
+          if (!activeLeadId || !supabase) return;
+          var newSt = document.getElementById('uStatus').value;
+          this.disabled = true; this.innerText = '저장 중...';
+          await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadId);
+          this.disabled = false; this.innerText = '상태 저장하기';
+          alert('진행상태가 업데이트되었습니다.');
           closeDetailModal();
           loadDashboardLeads();
-        })
-        .advanceLeadStage(activeLeadId, status, fields, currentUserName);
-    }
-
-    function loadLeadTimelineInto(leadId, containerId) {
-      window.google.script.run
-        .withSuccessHandler(function(res) {
-          var el = document.getElementById(containerId);
-          if (!el) return;
-          var timeline = (res && res.success) ? res.timeline : [];
-          if (timeline.length === 0) {
-            el.innerHTML = '<p style="font-size:0.8rem; color:#9aa0a6;">이력이 없습니다.</p>';
-            return;
-          }
-          var html = '<div class="stage-timeline">';
-          timeline.forEach(function(e) {
-            html += '<div class="timeline-item"><span class="timeline-badge ' + getBadgeClass(e.stage) + '">' + e.stage + '</span><div class="timeline-meta">' + e.date + ' · ' + e.actor + '</div></div>';
-          });
-          html += '</div>';
-          el.innerHTML = html;
-        })
-        .getLeadStageHistory(leadId);
-    }
-
-    function loadBoardInto(leadId, containerId) {
-      window.google.script.run
-        .withSuccessHandler(function(res) {
-          var el = document.getElementById(containerId);
-          if (!el) return;
-          var posts = (res && res.success) ? res.posts : [];
-          var html = '<div class="board-list">';
-          if (posts.length === 0) html += '<p style="font-size:0.8rem; color:#9aa0a6;">게시글이 없습니다.</p>';
-          posts.forEach(function(p) {
-            html += '<div class="board-item"><div class="board-item-title">' + p.title + '</div><div style="padding:8px 12px; font-size:0.82rem;">' + p.content + '</div></div>';
-          });
-          html += '</div>';
-          el.innerHTML = html;
-        })
-        .getBoardPosts(leadId);
-    }
-
-    // ==========================================================
-    // 7. 현장 등록 및 이미지 압축
-    // ==========================================================
-    function onCarChange() {
-      var carEl = document.getElementById('carNumber');
-      if (!carEl) return;
-      var car = carEl.value;
-      saveUserPref('s1_car_no', car);
-      var repSelect = document.getElementById('assignedRep');
-      if (repSelect && CAR_REP_MAP[car]) repSelect.value = CAR_REP_MAP[car];
-    }
-
-    function onCompanyChange() {
-      var compEl = document.getElementById('currentCompany');
-      var feeInput = document.getElementById('currentFee');
-      if (!compEl || !feeInput) return;
-      if (compEl.value && compEl.value !== '미사용') {
-        feeInput.disabled = false;
-        feeInput.placeholder = '예: 77,000';
-        feeInput.style.backgroundColor = '#ffffff';
-      } else {
-        feeInput.disabled = true;
-        feeInput.value = '';
-        feeInput.style.backgroundColor = '#f1f3f4';
-      }
-    }
-
-    function formatCurrency(input) {
-      var raw = input.value.replace(/[^0-9]/g, '');
-      input.value = raw ? Number(raw).toLocaleString('ko-KR') : '';
-    }
-
-    function toggleCheck(el) {
-      var cb = el.querySelector('input[type="checkbox"]');
-      if (!cb) return;
-      if (event && event.target && event.target.tagName !== 'INPUT') cb.checked = !cb.checked;
-      el.classList.toggle('checked', cb.checked);
-    }
-
-    function handleFileSelect(e) {
-      var files = Array.from(e.target.files);
-      if (!files.length) return;
-      var remainingSlots = 4 - uploadedPhotos.length;
-      var filesToProcess = files.slice(0, remainingSlots);
-
-      var submitBtn = document.getElementById('submitBtn');
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = '사진 압축 중...'; }
-
-      var done = 0;
-      filesToProcess.forEach(function(file) {
-        compressImage(file, 800, 0.55, function(compressedBase64, kb) {
-          uploadedPhotos.push({ data: compressedBase64, name: file.name, kb: kb });
-          done++;
-          if (done === filesToProcess.length) {
-            if (submitBtn) submitBtn.disabled = false;
-            renderPreview();
-          }
         });
-      });
-      e.target.value = '';
-    }
 
-    function compressImage(file, maxDimension, quality, callback) {
-      var reader = new FileReader();
-      reader.onload = function(event) {
-        var img = new Image();
-        img.onload = function() {
-          var width = img.width, height = img.height;
-          if (width > height && width > maxDimension) {
-            height = Math.round((height * maxDimension) / width);
-            width = maxDimension;
-          } else if (height > maxDimension) {
-            width = Math.round((width * maxDimension) / height);
-            height = maxDimension;
-          }
-          var canvas = document.createElement('canvas');
-          canvas.width = width; canvas.height = height;
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          var base64 = canvas.toDataURL('image/jpeg', quality);
-          callback(base64, Math.round(base64.length * 0.75 / 1024));
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+        // 12. 사진 버튼
+        document.getElementById('btnShootCamera').addEventListener('click', function() { document.getElementById('cameraInput').click(); });
+        document.getElementById('btnSelectGallery').addEventListener('click', function() { document.getElementById('galleryInput').click(); });
 
-    function removePhoto(idx) {
-      uploadedPhotos.splice(idx, 1);
-      renderPreview();
-    }
+        // 13. 신규 접수 등록 폼 제출
+        document.getElementById('leadForm').addEventListener('submit', async function(e) {
+          e.preventDefault();
+          if (!supabase) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
 
-    function renderPreview() {
-      var grid = document.getElementById('previewGrid');
-      var countText = document.getElementById('photoCountText');
-      var submitBtn = document.getElementById('submitBtn');
-      if (countText) countText.innerText = uploadedPhotos.length + ' / 4장';
+          var checked = Array.from(document.querySelectorAll('input[name="prod"]:checked')).map(function(c) { return c.value; });
+          if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
 
-      if (uploadedPhotos.length === 0) {
-        if (grid) grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
-        if (submitBtn) submitBtn.innerText = '⚡ 실시간 접수 등록';
-        return;
-      }
-      if (submitBtn) submitBtn.innerText = '⚡ 실시간 접수 등록 (사진 ' + uploadedPhotos.length + '장 포함)';
-      if (grid) {
-        grid.innerHTML = '';
-        uploadedPhotos.forEach(function(p, idx) {
-          var slot = document.createElement('div');
-          slot.className = 'photo-slot';
-          slot.innerHTML = '<img src="' + p.data + '"><span class="photo-size-tag">' + (p.kb || 30) + 'KB</span><button type="button" class="photo-del-btn" onclick="removePhoto(' + idx + ')">×</button>';
-          grid.appendChild(slot);
-        });
-      }
-    }
+          var btn = document.getElementById('submitBtn');
+          btn.disabled = true; btn.innerText = '등록 중...';
 
-    function loadRecentHistory() {
-      var agentEl = document.getElementById('agentName');
-      var listDiv = document.getElementById('historyList');
-      if (!agentEl || !agentEl.value.trim()) return;
+          var now = new Date();
+          var leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
+            ('0' + (now.getMonth() + 1)).slice(-2) +
+            ('0' + now.getDate()).slice(-2) +
+            ('0' + now.getHours()).slice(-2) +
+            ('0' + now.getMinutes()).slice(-2) +
+            ('0' + now.getSeconds()).slice(-2);
 
-      window.google.script.run
-        .withSuccessHandler(function(rows) {
-          if (!listDiv) return;
-          if (!rows || rows.length === 0) {
-            listDiv.innerHTML = '<p style="font-size:0.8rem; color:#80868b; text-align:center;">최근 내역이 없습니다.</p>';
-            return;
-          }
-          var html = '';
-          rows.forEach(function(r) {
-            html += '<div class="history-item"><div><strong>' + r.customerName + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + r.date + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
-          });
-          listDiv.innerHTML = html;
-        })
-        .getRecentLeadsByAgent(agentEl.value.trim());
-    }
+          var car = document.getElementById('carNumber').value;
+          var agent = document.getElementById('agentName').value;
+          var rep = document.getElementById('assignedRep').value || CAR_REP_MAP[car] || '';
 
-    function handleLeadSubmit(e) {
-      e.preventDefault();
-      var checkedBoxes = document.querySelectorAll('input[name="prod"]:checked');
-      if (checkedBoxes.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
-      var selectedProducts = Array.from(checkedBoxes).map(function(cb) { return cb.value; });
+          var res = await supabase.from('leads').insert([{
+            lead_id: leadId,
+            car_number: car,
+            agent_name: agent,
+            customer_name: document.getElementById('customerName').value,
+            contact_person: document.getElementById('contactPerson').value,
+            contact_phone: formatPhone(document.getElementById('contactPhone').value),
+            address: document.getElementById('address').value,
+            business_type: document.getElementById('businessType').value,
+            current_company: document.getElementById('currentCompany').value,
+            current_fee: document.getElementById('currentFee').value,
+            product: checked.join(', '),
+            field_description: document.getElementById('fieldDescription').value,
+            assigned_rep: rep,
+            status: '접수대기'
+          }]);
 
-      var btn = document.getElementById('submitBtn');
-      if (btn) { btn.disabled = true; btn.innerText = '등록 중...'; }
+          btn.disabled = false; btn.innerText = '⚡ 실시간 접수 등록';
 
-      var payload = {
-        carNumber: document.getElementById('carNumber') ? document.getElementById('carNumber').value : '',
-        agentName: document.getElementById('agentName') ? document.getElementById('agentName').value : '',
-        assignedRep: document.getElementById('assignedRep') ? document.getElementById('assignedRep').value : '',
-        customerName: document.getElementById('customerName') ? document.getElementById('customerName').value : '',
-        contactPerson: document.getElementById('contactPerson') ? document.getElementById('contactPerson').value : '',
-        contactPhone: formatPhone(document.getElementById('contactPhone') ? document.getElementById('contactPhone').value : ''),
-        address: document.getElementById('address') ? document.getElementById('address').value : '',
-        businessType: document.getElementById('businessType') ? document.getElementById('businessType').value : '',
-        currentCompany: document.getElementById('currentCompany') ? document.getElementById('currentCompany').value : '',
-        currentFee: document.getElementById('currentFee') ? document.getElementById('currentFee').value : '',
-        productTypes: selectedProducts,
-        fieldDescription: document.getElementById('fieldDescription') ? document.getElementById('fieldDescription').value : '',
-        photos: uploadedPhotos
-      };
-
-      window.google.script.run
-        .withSuccessHandler(function(res) {
-          if (btn) { btn.disabled = false; btn.innerText = '⚡ 실시간 접수 등록'; }
-          if (res && res.success) {
-            alert('고객 소개 접수가 완료되었습니다!');
+          if (!res.error) {
+            alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!');
             document.getElementById('customerName').value = '';
             document.getElementById('contactPhone').value = '';
             document.getElementById('fieldDescription').value = '';
-            uploadedPhotos = [];
-            renderPreview();
             loadRecentHistory();
           } else {
-            alert('등록 실패');
+            alert('등록 실패: ' + res.error.message);
           }
-        })
-        .withFailureHandler(function() {
-          if (btn) { btn.disabled = false; btn.innerText = '⚡ 실시간 접수 등록'; }
-          alert('등록 중 오류 발생');
-        })
-        .submitLead(payload);
-    }
-
-    function openAddressOnMap_(addr) {
-      if (!addr) return;
-      window.open('https://map.naver.com/p/search/' + encodeURIComponent(addr), '_blank');
-    }
-    function openDaumPostcode_(t) {
-      alert('주소를 직접 입력하시거나 네이버 지도 검색을 활용해주세요.');
-    }
-    function openNaverPlaceSearchByName_(t) {
-      var el = document.getElementById(t);
-      if (el && el.value) window.open('https://map.naver.com/p/search/' + encodeURIComponent(el.value), '_blank');
-    }
+        });
+      });
+    })();
   </script>
 </body>
 </html>
