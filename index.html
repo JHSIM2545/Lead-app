@@ -286,7 +286,7 @@
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
     .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-    /* [게시판 디자인] */
+    /* [소개 게시판 디자인] */
     .board-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 16px; }
     .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1.5px solid #edf2f7; padding-bottom: 8px; }
     .board-header h4 { margin: 0; font-size: 0.96rem; color: #202124; display: flex; align-items: center; gap: 6px; }
@@ -302,7 +302,6 @@
     .board-content { font-size: 0.85rem; color: #334155; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
     .board-del-btn { background: none; border: none; color: #ef4444; font-size: 0.74rem; cursor: pointer; padding: 0 4px; font-weight: 600; }
     
-    /* 첨부파일 렌더링 영역 */
     .board-attachment { margin-top: 8px; padding-top: 6px; border-top: 1px dashed #cbd5e1; }
     .board-attachment a { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; color: #1a73e8; text-decoration: none; font-weight: 700; background: #e8f0fe; padding: 4px 8px; border-radius: 6px; }
     .board-attachment-img { max-width: 100%; max-height: 160px; border-radius: 6px; margin-top: 6px; display: block; cursor: pointer; border: 1px solid #e2e8f0; }
@@ -313,22 +312,19 @@
     .btn-attach-file { padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .board-submit-btn { padding: 8px 18px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
+    /* 안건수정 / 안건삭제 액션 박스 */
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
       padding: 12px 14px; margin-top: 16px; display: none;
     }
-    .lead-author-actions-title {
-      font-size: 0.86rem; font-weight: 800; color: #c5221f; margin-bottom: 8px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
     .lead-action-btns { display: flex; gap: 8px; }
     .btn-action-edit {
-      flex: 1; padding: 9px; background: #ffffff; color: #1a73e8; border: 1.5px solid #1a73e8;
-      border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      flex: 1; padding: 10px; background: #ffffff; color: #1a73e8; border: 1.5px solid #1a73e8;
+      border-radius: 6px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
     }
     .btn-action-del {
-      flex: 1; padding: 9px; background: #fce8e6; color: #d93025; border: 1px solid #fad2cf;
-      border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      flex: 1; padding: 10px; background: #fce8e6; color: #d93025; border: 1px solid #fad2cf;
+      border-radius: 6px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
     }
 
     #editLeadContainer { display: none; margin-top: 10px; background: #fff; border-radius: 8px; padding: 10px; border: 1px solid #dadce0; }
@@ -476,7 +472,7 @@
               <input type="text" id="agentName" placeholder="소개자 이름" required>
             </div>
             <div class="form-group">
-              <label class="form-label">담당 영업컨설턴트 <span class="req">*</span></label>
+              <label class="form-label">컨설턴트 <span class="req">*</span></label>
               <select id="assignedRep" class="rep-select" required>
                 <option value="">컨설턴트 선택</option>
                 <option value="정문재">정문재</option>
@@ -489,7 +485,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" style="margin-bottom:6px;">고객명 / 상호 <span class="req">*</span></label>
+            <label class="form-label" style="margin-bottom:6px;">고객(상호) <span class="req">*</span></label>
             <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
           </div>
 
@@ -617,7 +613,7 @@
           <button type="button" class="filter-chip" data-status="취소/보류">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소 검색">
+          <input type="text" id="searchKeyword" placeholder="고객(상호), 연락처, 주소 검색">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -628,11 +624,11 @@
             <tr>
               <th>접수일시</th>
               <th>소개자</th>
-              <th>담당컨설턴트</th>
-              <th>고객명/상호</th>
+              <th>컨설턴트</th>
+              <th>고객(상호)</th>
               <th>연락처</th>
               <th>사업장 주소</th>
-              <th>현재사용회사/료</th>
+              <th>사용회사</th>
               <th>관심상품</th>
               <th>사진</th>
               <th>진행상태</th>
@@ -670,13 +666,13 @@
           <div class="detail-label">접수번호</div><div class="detail-val" id="mLeadId"></div>
           <div class="detail-label">접수일시</div><div class="detail-val" id="mDate" style="font-weight:700; color:#1a73e8;"></div>
           <div class="detail-label">소개자</div><div class="detail-val" id="mAgentName"></div>
-          <div class="detail-label">담당컨설턴트</div><div class="detail-val" id="mAssignedRep" style="font-weight:700; color:#1a73e8;"></div>
-          <div class="detail-label">고객명/상호</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
+          <div class="detail-label">컨설턴트</div><div class="detail-val" id="mAssignedRep" style="font-weight:700; color:#1a73e8;"></div>
+          <div class="detail-label">고객(상호)</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
           <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
           <div class="detail-label">연락처</div><div class="detail-val" id="mContactPhone"></div>
           <div class="detail-label">사업장 주소</div><div class="detail-val"><span id="mAddress"></span></div>
           <div class="detail-label">업종</div><div class="detail-val" id="mBusinessType"></div>
-          <div class="detail-label">현재사용/료</div><div class="detail-val" id="mCurrentCompany"></div>
+          <div class="detail-label">사용회사</div><div class="detail-val" id="mCurrentCompany"></div>
           <div class="detail-label">관심상품</div><div class="detail-val" id="mProduct"></div>
           <div class="detail-label">현장설명</div><div class="detail-val" id="mFieldDesc" style="background:#f8f9fa; padding:8px; border-radius:6px; white-space:pre-wrap;"></div>
           <div class="detail-label">현장사진</div>
@@ -687,7 +683,7 @@
         <div id="editLeadContainer">
           <h4 style="margin:0 0 8px 0; color:#1a73e8; font-size:0.9rem;">📝 안건 상세 수정</h4>
           <div class="form-group">
-            <label class="form-label">고객명/상호</label>
+            <label class="form-label">고객(상호)</label>
             <input type="text" id="editCustomerName">
           </div>
           <div class="row">
@@ -710,7 +706,7 @@
               <input type="text" id="editBusinessType">
             </div>
             <div class="form-group">
-              <label class="form-label">현재사용회사</label>
+              <label class="form-label">사용회사</label>
               <input type="text" id="editCurrentCompany">
             </div>
           </div>
@@ -730,19 +726,15 @@
 
         <!-- 안건 관리 액션 (수정/삭제: 관리자 또는 작성자) -->
         <div class="lead-author-actions" id="authorActionsBox">
-          <div class="lead-author-actions-title">
-            <span>⚙️ 안건 정보 관리</span>
-            <span id="authorTag" style="font-size:0.75rem; color:#5f6368; font-weight:normal;"></span>
-          </div>
           <div class="lead-action-btns">
-            <button type="button" class="btn-action-edit" id="btnEditLead">✏️ 안건 정보 수정</button>
-            <button type="button" class="btn-action-del" id="btnDeleteLead">🗑️ 안건 완전 삭제</button>
+            <button type="button" class="btn-action-edit" id="btnEditLead">안건수정</button>
+            <button type="button" class="btn-action-del" id="btnDeleteLead">안건삭제</button>
           </div>
         </div>
 
         <!-- 영업 진행상태 업데이트 (컨설턴트 및 관리자 권한) -->
         <div class="status-update-box" id="statusUpdateBox">
-          <h4>⚡ 영업 진행상태 업데이트 <span id="statusPermissionTag" style="font-size:0.75rem; color:#5f6368; font-weight:normal;"></span></h4>
+          <h4>⚡ 컨설턴트 진행상태</h4>
           <div class="form-group">
             <label class="form-label">진행상태 선택</label>
             <select id="uStatus">
@@ -760,10 +752,10 @@
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
 
-        <!-- ★ [안건별 전용 게시판] 첫 소절 타이틀 표시 & 파일 첨부 기능 탑재 -->
+        <!-- 안건별 전용 소개 게시판 -->
         <div class="board-box">
           <div class="board-header">
-            <h4>💬 안건 의견 및 피드백 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
+            <h4>💬 소개 게시판 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
           </div>
 
           <!-- 댓글 목록 -->
@@ -906,7 +898,7 @@
       }
 
       // ==========================================================
-      // [4] 전역 상태 및 화면 전환 (상단 타이틀: 오직 사용자 이름만 표기)
+      // [4] 전역 상태 및 화면 전환
       // ==========================================================
       var currentRole = ''; // 'admin' | '컨설턴트' | 'CS근무자' | 'CS관리자' | '기술사원'
       var currentUserName = '';
@@ -931,14 +923,12 @@
         if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
         if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
 
-        // 비밀번호 변경 버튼
         var regPwdBtn = document.getElementById('regPwdBtn');
         var dashPwdBtn = document.getElementById('dashPwdBtn');
         var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
         if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
         if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
 
-        // ★ [핵심] 상단 타이틀에는 불필요한 보조문구를 제거하고 오직 사용자 이름만 표기
         var displayName = (currentRole === 'admin') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
         var regUserTitle = document.getElementById('regUserTitle');
         var dashUserTitle = document.getElementById('dashUserTitle');
@@ -1187,7 +1177,7 @@
             + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
             + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
             + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
-            + '<td><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
+            + '<td><span class="badge " + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
             + '<td><button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button></td>'
             + '</tr>';
 
@@ -1215,7 +1205,7 @@
       }
 
       // ==========================================================
-      // [7] 안건별 전용 게시판 로직 (첫 소절 타이틀 표시 & 파일 첨부 기능)
+      // [7] 안건별 전용 소개 게시판 로직 (첫 소절 타이틀 & 파일 첨부)
       // ==========================================================
       async function loadLeadBoardPosts(leadId) {
         var listContainer = document.getElementById('boardPostList');
@@ -1243,13 +1233,13 @@
             var canDelete = (currentRole === 'admin') || (p.author === currentUserName);
             var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" onclick="deleteBoardPost(\'' + p.post_id + '\')">삭제</button>' : '';
 
-            // ★ [요청반영] 첫 소절(첫 문장 또는 30자)을 굵은 타이틀로 생성
+            // 첫 소절(첫 문장 또는 30자)을 굵은 타이틀로 생성
             var rawText = (p.content || '').trim();
             var firstLine = rawText.split('\n')[0].trim();
             var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
             if (!titleSnippet) titleSnippet = '안건 의견';
 
-            // 첨부파일 파싱 (URL 링크가 포함된 경우)
+            // 첨부파일 파싱
             var attachHtml = '';
             var fileUrlMatch = rawText.match(/https:\/\/[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.pdf|\.xlsx|\.docx)/i);
             if (fileUrlMatch) {
@@ -1310,7 +1300,6 @@
 
         try {
           var fileUrl = '';
-          // 첨부파일이 선택된 경우 Supabase Storage 업로드
           if (selectedBoardFile) {
             var ext = selectedBoardFile.name.split('.').pop();
             var filePath = 'board_files/' + activeLeadItem.lead_id + '_' + Date.now() + '.' + ext;
@@ -1408,21 +1397,18 @@
         var uSel = document.getElementById('uStatus');
         if (uSel) uSel.value = item.status || '접수대기';
 
-        // 1. 안건 정보 수정/삭제 권한 (지사 관리자 또는 최초 작성자 본인)
+        // 1. 안건수정 / 안건삭제 버튼 노출 (지사 관리자 또는 최초 작성자 본인)
         var actionsBox = document.getElementById('authorActionsBox');
-        var authorTag = document.getElementById('authorTag');
         var editContainer = document.getElementById('editLeadContainer');
         if (editContainer) editContainer.style.display = 'none';
 
         var canModify = (currentRole === 'admin') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
         if (actionsBox) {
           actionsBox.style.display = canModify ? 'block' : 'none';
-          if (authorTag) authorTag.innerText = (currentRole === 'admin') ? '👑 지사 관리자' : '🛡️ 본인 등록 안건';
         }
 
         // 2. 상태 변경 권한 (컨설턴트 및 지사 관리자만 가능)
         var statusBox = document.getElementById('statusUpdateBox');
-        var statusPermTag = document.getElementById('statusPermissionTag');
         var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
 
         if (statusBox) {
@@ -1430,15 +1416,13 @@
           if (canChangeStatus) {
             uSel.disabled = false;
             if (btnSave) btnSave.style.display = 'block';
-            if (statusPermTag) statusPermTag.innerText = (currentRole === 'admin') ? '(관리자 수정 가능)' : '(배당 컨설턴트 처리 가능)';
           } else {
             uSel.disabled = true;
             if (btnSave) btnSave.style.display = 'none';
-            if (statusPermTag) statusPermTag.innerText = '(컨설턴트/관리자 전용)';
           }
         }
 
-        // 3. 해당 안건 전용 게시판 불러오기
+        // 3. 해당 안건 소개 게시판 불러오기
         clearBoardFile();
         loadLeadBoardPosts(item.lead_id);
         var bInput = document.getElementById('boardContentInput');
@@ -1705,7 +1689,7 @@
           }
         });
 
-        // ★ [게시판 파일 첨부 및 등록 이벤트]
+        // 게시판 파일 첨부 이벤트
         document.getElementById('btnAttachBoardFile').addEventListener('click', function() {
           document.getElementById('boardFileInput').click();
         });
@@ -1811,7 +1795,7 @@
 
           var cName = document.getElementById('editCustomerName').value.trim();
           var cPhone = document.getElementById('editContactPhone').value.trim();
-          if (!cName) { alert('고객명을 입력해주세요.'); return; }
+          if (!cName) { alert('고객(상호)을 입력해주세요.'); return; }
           if (!cPhone) { alert('연락처를 입력해주세요.'); return; }
 
           this.disabled = true; this.innerText = '수정 저장 중...';
@@ -1843,13 +1827,13 @@
         document.getElementById('btnDeleteLead').addEventListener('click', async function() {
           if (!activeLeadItem || !supabase) return;
 
-          var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객명: ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
+          var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
           if (!confirmDel) return;
 
           this.disabled = true; this.innerText = '삭제 처리 중...';
 
           var res = await supabase.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
-          this.disabled = false; this.innerText = '🗑️ 안건 완전 삭제';
+          this.disabled = false; this.innerText = '안건삭제';
 
           if (!res.error) {
             alert('🗑️ 안건이 삭제되었습니다.');
@@ -1875,7 +1859,7 @@
           if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
 
           var rep = document.getElementById('assignedRep').value;
-          if (!rep) { alert('담당 영업컨설턴트를 선택해주세요.'); return; }
+          if (!rep) { alert('담당 컨설턴트를 선택해주세요.'); return; }
 
           var btn = document.getElementById('submitBtn');
           btn.disabled = true;
@@ -1919,7 +1903,6 @@
 
             alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
 
-            // 폼 초기화
             document.getElementById('customerName').value = '';
             document.getElementById('contactPerson').value = '';
             document.getElementById('contactPhone').value = '';
