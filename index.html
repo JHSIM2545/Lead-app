@@ -18,7 +18,6 @@
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
     body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; }
 
-    /* PC 화면 원래대로 널찍하고 시원한 구조 */
     .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 16px; position: relative; z-index: 10; }
 
     .inner-header-bar {
@@ -51,7 +50,6 @@
     .login-header h2 { margin: 0; font-size: 1.5rem; color: #1a73e8; font-weight: 800; }
     .login-header p { margin: 6px 0 0 0; font-size: 0.85rem; color: #5f6368; }
 
-    /* 로그인 탭 바 */
     .login-tab-bar {
       display: flex; background: #eef2f6; border-radius: 12px; padding: 5px; margin-bottom: 20px;
       position: relative; z-index: 60; gap: 4px; border: 1px solid #dadce0;
@@ -237,17 +235,17 @@
 
     .mobile-card-list { display: none; }
 
+    /* 모바일 반응형 분기 */
     @media (max-width: 768px) {
       .main-container { width: 100%; padding: 8px; }
-      .inner-header-bar { padding: 8px 10px; gap: 4px; }
-      .user-badge-title { font-size: 0.88rem; }
-      .inner-header-btns { gap: 4px; }
-      .btn-inner { padding: 5px 8px; font-size: 0.7rem; }
+      .inner-header-bar { padding: 10px 12px; }
+      .user-badge-title { font-size: 0.95rem; }
+      .btn-inner { padding: 6px 10px; font-size: 0.75rem; }
 
       .stat-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
       .stat-card { padding: 10px 12px; }
       .stat-label { font-size: 0.72rem; }
-      .stat-value { font-size: 1.2rem; }
+      .stat-value { font-size: 1.25rem; }
 
       .toolbar-card { flex-direction: column; align-items: stretch; padding: 12px; }
       .search-box { max-width: 100%; }
@@ -331,7 +329,6 @@
     .btn-attach-file { padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .board-submit-btn { padding: 8px 18px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
-    /* 안건수정 / 안건삭제 액션 박스 */
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
       padding: 12px 14px; margin-top: 16px; display: none;
@@ -348,7 +345,6 @@
 
     #editLeadContainer { display: none; margin-top: 10px; background: #fff; border-radius: 8px; padding: 10px; border: 1px solid #dadce0; }
 
-    /* 사용자 관리 모달 테이블 */
     .user-table-wrapper { overflow-x: auto; max-height: 55vh; border: 1px solid #e2e8f0; border-radius: 8px; }
     .user-data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; text-align: left; }
     .user-data-table th { background: #f8f9fa; padding: 10px; font-weight: 700; color: #3c4043; border-bottom: 2px solid #e8eaed; white-space: nowrap; position: sticky; top: 0; }
@@ -922,9 +918,6 @@
   <!-- 자바스크립트 완전 제어부 -->
   <script>
     (function() {
-      // ==========================================================
-      // [1] Supabase 설정
-      // ==========================================================
       var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
       var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
       var supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -947,9 +940,6 @@
         window.open(mapUrl, '_blank');
       }
 
-      // ==========================================================
-      // [2] 탭 전환
-      // ==========================================================
       function applyLoginTab(tab) {
         hideLoginErrors();
         var btnMember = document.getElementById('tabBtnMember');
@@ -991,9 +981,6 @@
         }
       }
 
-      // ==========================================================
-      // [3] 암호화 및 유효성 검사
-      // ==========================================================
       async function sha256(str) {
         try {
           var buf = new TextEncoder().encode(str);
@@ -1018,9 +1005,6 @@
         return '';
       }
 
-      // ==========================================================
-      // [4] 화면 전환 (PC 화면 원래대로 복원 및 관리자 버튼 동적 주입)
-      // ==========================================================
       function showScreen(screenId) {
         closeDetailModal();
         closePwdModal();
@@ -1109,9 +1093,6 @@
         return 'badge-wait';
       }
 
-      // ==========================================================
-      // [5] 사진 압축 및 Supabase Storage 업로드
-      // ==========================================================
       function compressImage(file, maxDim, quality, callback) {
         var reader = new FileReader();
         reader.onload = function(e) {
@@ -1226,9 +1207,6 @@
         return urls;
       }
 
-      // ==========================================================
-      // [6] DB 조회 및 목록 표시
-      // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
         var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value.trim().toLowerCase() : '';
@@ -1360,9 +1338,6 @@
         });
       }
 
-      // ==========================================================
-      // [7] 안건별 전용 소개 게시판 로직
-      // ==========================================================
       async function loadLeadBoardPosts(leadId) {
         var listContainer = document.getElementById('boardPostList');
         var badge = document.getElementById('boardCountBadge');
@@ -1513,9 +1488,6 @@
         if (statusBox) statusBox.style.display = 'none';
       }
 
-      // ==========================================================
-      // [8] 상세 모달 오픈 및 닫기
-      // ==========================================================
       function openDetailModal(idx) {
         var item = currentLeadsData[idx];
         if (!item) return;
@@ -1624,9 +1596,6 @@
         hideLoginErrors();
       }
 
-      // ==========================================================
-      // [★] 관리자 전용 사용자 관리 모달 로직
-      // ==========================================================
       async function openUserModal() {
         if (currentRole !== 'admin') return;
         var modal = document.getElementById('userManageModal');
@@ -1790,9 +1759,6 @@
         }
       }
 
-      // ==========================================================
-      // [9] 이벤트 리스너 바인딩
-      // ==========================================================
       document.addEventListener('DOMContentLoaded', function() {
         var tabMember = document.getElementById('tabBtnMember');
         var tabAdm = document.getElementById('tabBtnAdmin');
@@ -1818,7 +1784,6 @@
           });
         }
 
-        // 1. 신규 회원가입 폼 제출
         var fSignup = document.getElementById('formSignup');
         if (fSignup) {
           fSignup.addEventListener('submit', async function(e) {
@@ -1883,7 +1848,6 @@
           });
         }
 
-        // 2. 통합 직원 로그인 폼 제출
         var fMember = document.getElementById('formLoginMember');
         if (fMember) {
           fMember.addEventListener('submit', async function(e) {
@@ -1932,7 +1896,6 @@
           });
         }
 
-        // 3. 지사 관리자 전용 로그인 폼 제출
         var fAdm = document.getElementById('formLoginAdmin');
         if (fAdm) {
           fAdm.addEventListener('submit', function(e) {
@@ -1951,7 +1914,6 @@
           });
         }
 
-        // 사용자 관리 모달 닫기
         var closeUserBtn = document.getElementById('btnCloseUserModal');
         var refreshUsersBtn = document.getElementById('btnRefreshUsers');
         var saveUserEditBtn = document.getElementById('btnSaveUserEdit');
@@ -1964,7 +1926,6 @@
           document.getElementById('userEditBox').style.display = 'none';
         });
 
-        // 비밀번호 변경 모달 이벤트
         var regPwdBtn = document.getElementById('regPwdBtn');
         var closePwdBtn = document.getElementById('btnClosePwdModal');
         if (regPwdBtn) regPwdBtn.addEventListener('click', openPwdModal);
@@ -2036,7 +1997,6 @@
           });
         }
 
-        // 게시판 파일 첨부 이벤트
         var btnAttach = document.getElementById('btnAttachBoardFile');
         var fileInput = document.getElementById('boardFileInput');
         var btnRemoveFile = document.getElementById('btnRemoveBoardFile');
@@ -2060,7 +2020,6 @@
         if (btnRemoveFile) btnRemoveFile.addEventListener('click', clearBoardFile);
         if (btnSubmitPost) btnSubmitPost.addEventListener('click', submitBoardPost);
 
-        // 화면 전환 버튼
         var regSwitch = document.getElementById('regSwitchBtn');
         var dashSwitch = document.getElementById('dashSwitchBtn');
         var regLogout = document.getElementById('regLogoutBtn');
@@ -2073,7 +2032,6 @@
         if (dashLogout) dashLogout.addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
         if (closeDetail) closeDetail.addEventListener('click', closeDetailModal);
 
-        // 필터 및 검색
         document.querySelectorAll('.filter-chip').forEach(function(chip) {
           chip.addEventListener('click', function() {
             document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
@@ -2092,7 +2050,6 @@
           });
         }
 
-        // 사용회사 변경 시 서비스료 활성화
         var curComp = document.getElementById('currentCompany');
         if (curComp) {
           curComp.addEventListener('change', function() {
@@ -2105,7 +2062,6 @@
           });
         }
 
-        // 체크박스 클릭 디자인 토글
         document.querySelectorAll('.prod-item').forEach(function(item) {
           item.addEventListener('click', function(e) {
             var cb = this.querySelector('input[type="checkbox"]');
@@ -2114,7 +2070,6 @@
           });
         });
 
-        // 상태 저장
         var btnSaveStatus = document.getElementById('btnSaveStatus');
         if (btnSaveStatus) {
           btnSaveStatus.addEventListener('click', async function() {
@@ -2135,7 +2090,6 @@
           });
         }
 
-        // 안건 정보 수정
         var btnEditLead = document.getElementById('btnEditLead');
         var btnCancelEdit = document.getElementById('btnCancelEditLead');
         var btnConfirmEdit = document.getElementById('btnConfirmEditLead');
@@ -2201,7 +2155,6 @@
           });
         }
 
-        // 안건 완전 삭제
         var btnDelLead = document.getElementById('btnDeleteLead');
         if (btnDelLead) {
           btnDelLead.addEventListener('click', async function() {
@@ -2225,7 +2178,6 @@
           });
         }
 
-        // 사진 파일 이벤트
         var btnShoot = document.getElementById('btnShootCamera');
         var btnGallery = document.getElementById('btnSelectGallery');
         var camInput = document.getElementById('cameraInput');
@@ -2236,7 +2188,6 @@
         if (camInput) camInput.addEventListener('change', handleFileSelect);
         if (galInput) galInput.addEventListener('change', handleFileSelect);
 
-        // 신규 접수 등록
         var formLead = document.getElementById('leadForm');
         if (formLead) {
           formLead.addEventListener('submit', async function(e) {
