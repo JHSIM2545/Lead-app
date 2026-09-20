@@ -11,14 +11,14 @@
   <meta name="apple-mobile-web-app-title" content="북서울 소개영업">
   <meta name="theme-color" content="#1a73e8">
 
-  <!-- Supabase CDN -->
+  <!-- Supabase CDN (실패해도 앱 전체가 멈추지 않도록 안전 로드) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
     body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; }
 
-    .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 14px; position: relative; z-index: 10; }
+    .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 14px; position: relative; z-index: 1; }
     @media (max-width: 900px) { .main-container { width: 100%; } }
 
     .inner-header-bar {
@@ -37,12 +37,12 @@
     .btn-inner.btn-pwd { background: #fef7e0; color: #b06000; border-color: #fce8b2; }
     .btn-inner.btn-logout { background: #f8f9fa; color: #5f6368; border-color: #dadce0; }
 
-    /* 로그인 뷰 영역: 클릭 방해 차단 완벽 보장 */
-    #viewLogin { max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 5000; }
+    /* 로그인 뷰 영역 */
+    #viewLogin { max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 100; }
     .login-card {
       background: #ffffff; border-radius: 18px; padding: 26px 22px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
-      position: relative; z-index: 5001; pointer-events: auto !important;
+      position: relative; z-index: 101; pointer-events: auto !important;
     }
     .login-header {
       text-align: center; margin-bottom: 22px; border-bottom: 2px solid #e8f0fe; padding-bottom: 16px;
@@ -53,7 +53,7 @@
     /* 로그인 탭 바 */
     .login-tab-bar {
       display: flex; background: #eef2f6; border-radius: 12px; padding: 5px; margin-bottom: 20px;
-      position: relative; z-index: 5002; gap: 4px; border: 1px solid #dadce0;
+      position: relative; z-index: 102; gap: 4px; border: 1px solid #dadce0;
     }
     .login-tab-item {
       flex: 1; padding: 12px 4px; border: none; background: transparent; font-size: 0.9rem;
@@ -90,7 +90,8 @@
       border-top: 1px dashed #dadce0; padding-top: 14px;
     }
     .signup-toggle-btn {
-      color: #1a73e8; font-weight: 700; cursor: pointer; text-decoration: underline; background: none; border: none; font-size: 0.86rem;
+      color: #1a73e8; font-weight: 700; cursor: pointer !important; text-decoration: underline; background: none; border: none; font-size: 0.86rem;
+      pointer-events: auto !important;
     }
 
     .login-error-msg {
@@ -248,7 +249,7 @@
       .search-box { max-width: 100%; }
     }
 
-    /* ★ [핵심 해결] 모달이 닫혀 있을 때 화면 클릭을 100% 보장하는 CSS */
+    /* ★★★ 모달이 닫혀 있을 때 화면 클릭을 100% 보장하는 CSS ★★★ */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 99999;
@@ -316,6 +317,7 @@
     .btn-attach-file { padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 4px; }
     .board-submit-btn { padding: 8px 18px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
+    /* 안건수정 / 안건삭제 액션 박스 */
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
       padding: 12px 14px; margin-top: 16px; display: none;
@@ -354,7 +356,6 @@
           <p id="loginGuideText">휴대전화번호와 비밀번호로 로그인해 주세요</p>
         </div>
 
-        <!-- 인라인 onclick을 부여하여 스크립트 실행 지연 시에도 탭 즉각 반응 보장 -->
         <div class="login-tab-bar" id="loginTabBar">
           <button type="button" class="login-tab-item active" id="tabBtnMember" onclick="window.applyLoginTab('member')">직원 로그인</button>
           <button type="button" class="login-tab-item" id="tabBtnAdmin" onclick="window.applyLoginTab('admin')">지사 관리자</button>
@@ -724,7 +725,7 @@
           </div>
           <div style="display:flex; gap:8px; margin-top:8px;">
             <button type="button" class="btn-save-status" id="btnConfirmEditLead" style="margin-top:0;">수정 완료 저장</button>
-            <button type="button" id="btnCancelEditLead" style="padding:10px 16px; background:#f1f3f4; border:none; border-radius:8px; font-weight:700; cursor:pointer;">취소</button>
+            <button type="button" id="btnCancelEditLead" style="padding:10px 16px; background:#f1f3f4; border:none; border-radius:8px; font-weight:700; cursor:pointer;" onclick="document.getElementById('editLeadContainer').style.display='none'">취소</button>
           </div>
         </div>
 
@@ -822,11 +823,22 @@
   <!-- 자바스크립트 전역 제어부 -->
   <script>
     // ==========================================================
-    // [1] Supabase 설정
+    // [1] Supabase 설정 (에러 방어 완벽 처리)
     // ==========================================================
     var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
     var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
-    var supabase = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    var supabase = null;
+
+    function getSupabaseClient() {
+      if (!supabase && window.supabase && window.supabase.createClient) {
+        try {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+          console.error("Supabase 초기화 실패:", e);
+        }
+      }
+      return supabase;
+    }
 
     var ADMIN_PASSWORD = "sy0928@@";
 
@@ -840,7 +852,7 @@
     var selectedBoardFile = null;
 
     // ==========================================================
-    // [2] 탭 전환 (window 객체에 바인딩하여 무조건 작동 보장)
+    // [2] 탭 전환 (어떤 상황에서도 100% 즉시 동작)
     // ==========================================================
     window.applyLoginTab = function(tab) {
       hideLoginErrors();
@@ -887,9 +899,13 @@
     // [3] 암호화 및 유효성 검사
     // ==========================================================
     async function sha256(str) {
-      var buf = new TextEncoder().encode(str);
-      var hashBuf = await crypto.subtle.digest('SHA-256', buf);
-      return Array.from(new Uint8Array(hashBuf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      try {
+        var buf = new TextEncoder().encode(str);
+        var hashBuf = await crypto.subtle.digest('SHA-256', buf);
+        return Array.from(new Uint8Array(hashBuf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+      } catch (e) {
+        return '';
+      }
     }
 
     function validatePassword(pwd) {
@@ -979,7 +995,7 @@
     }
 
     // ==========================================================
-    // [5] 사진 압축 및 Supabase Storage 업로드
+    // [5] 사진 압축 및 업로드
     // ==========================================================
     function compressImage(file, maxDim, quality, callback) {
       var reader = new FileReader();
@@ -1063,8 +1079,9 @@
     };
 
     async function uploadPhotosToSupabase(leadId, photos) {
+      var client = getSupabaseClient();
       var urls = [];
-      if (!photos || photos.length === 0 || !supabase) return urls;
+      if (!photos || photos.length === 0 || !client) return urls;
 
       for (var i = 0; i < photos.length; i++) {
         try {
@@ -1073,7 +1090,7 @@
           var blob = await res.blob();
           var filePath = leadId + '/photo_' + (i + 1) + '_' + Date.now() + '.jpg';
 
-          var upRes = await supabase.storage
+          var upRes = await client.storage
             .from('lead-photos')
             .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
 
@@ -1082,7 +1099,7 @@
             continue;
           }
 
-          var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+          var pub = client.storage.from('lead-photos').getPublicUrl(filePath);
           if (pub && pub.data && pub.data.publicUrl) {
             urls.push(pub.data.publicUrl);
           }
@@ -1097,11 +1114,12 @@
     // [6] DB 조회 및 목록 표시
     // ==========================================================
     window.loadDashboardLeads = async function() {
-      if (!supabase) return;
+      var client = getSupabaseClient();
+      if (!client) return;
       var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value.trim().toLowerCase() : '';
 
       try {
-        var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+        var query = client.from('leads').select('*').order('created_at', { ascending: false });
 
         if (currentRole === '컨설턴트') {
           query = query.eq('assigned_rep', currentUserName);
@@ -1207,12 +1225,13 @@
     // [7] 안건별 전용 소개 게시판 로직
     // ==========================================================
     async function loadLeadBoardPosts(leadId) {
+      var client = getSupabaseClient();
       var listContainer = document.getElementById('boardPostList');
       var badge = document.getElementById('boardCountBadge');
-      if (!listContainer || !supabase || !leadId) return;
+      if (!listContainer || !client || !leadId) return;
 
       try {
-        var res = await supabase.from('lead_board')
+        var res = await client.from('lead_board')
           .select('*')
           .eq('lead_id', leadId)
           .order('created_at', { ascending: true });
@@ -1274,10 +1293,11 @@
     }
 
     window.deleteBoardPost = async function(postId) {
+      var client = getSupabaseClient();
       if (!confirm('이 의견을 삭제하시겠습니까?')) return;
-      if (!supabase || !activeLeadItem) return;
+      if (!client || !activeLeadItem) return;
 
-      var res = await supabase.from('lead_board').delete().eq('post_id', postId);
+      var res = await client.from('lead_board').delete().eq('post_id', postId);
       if (!res.error) {
         loadLeadBoardPosts(activeLeadItem.lead_id);
       } else {
@@ -1286,8 +1306,9 @@
     };
 
     window.submitBoardPost = async function() {
+      var client = getSupabaseClient();
       var input = document.getElementById('boardContentInput');
-      if (!input || !activeLeadItem || !supabase) return;
+      if (!input || !activeLeadItem || !client) return;
 
       var content = input.value.trim();
       if (!content && !selectedBoardFile) { alert('의견 내용 또는 첨부파일을 선택해주세요.'); return; }
@@ -1300,9 +1321,9 @@
         if (selectedBoardFile) {
           var ext = selectedBoardFile.name.split('.').pop();
           var filePath = 'board_files/' + activeLeadItem.lead_id + '_' + Date.now() + '.' + ext;
-          var upRes = await supabase.storage.from('lead-photos').upload(filePath, selectedBoardFile);
+          var upRes = await client.storage.from('lead-photos').upload(filePath, selectedBoardFile);
           if (!upRes.error) {
-            var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+            var pub = client.storage.from('lead-photos').getPublicUrl(filePath);
             if (pub && pub.data && pub.data.publicUrl) {
               fileUrl = pub.data.publicUrl;
             }
@@ -1320,7 +1341,7 @@
         var postId = 'B-' + Date.now();
         var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
 
-        var res = await supabase.from('lead_board').insert([{
+        var res = await client.from('lead_board').insert([{
           post_id: postId,
           lead_id: activeLeadItem.lead_id,
           title: titleSnippet,
@@ -1476,10 +1497,11 @@
     };
 
     async function loadRecentHistory() {
+      var client = getSupabaseClient();
       var listDiv = document.getElementById('historyList');
-      if (!supabase) return;
+      if (!client) return;
 
-      var query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
+      var query = client.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
       if (currentRole !== 'admin' && currentUserName) {
         query = query.eq('agent_name', currentUserName);
       }
@@ -1498,16 +1520,18 @@
     // [9] 로그인, 가입 및 저장 핸들러
     // ==========================================================
     window.handleMemberLogin = async function() {
+      var client = getSupabaseClient();
       var phone = document.getElementById('memberLoginPhone').value.replace(/[^0-9]/g, '');
       var pwd = document.getElementById('memberLoginPwd').value.trim();
       var btn = document.getElementById('btnMemberLogin');
 
       if (!phone || !pwd) { showLoginError('memberLoginErr', '전화번호와 비밀번호를 모두 입력해주세요.'); return; }
+      if (!client) { showLoginError('memberLoginErr', '데이터베이스 연결을 준비 중입니다. 1~2초 후 다시 시도해주세요.'); return; }
 
       btn.disabled = true; btn.innerText = '인증 확인 중...';
 
       try {
-        var q = await supabase.from('app_users').select('*').eq('phone', phone);
+        var q = await client.from('app_users').select('*').eq('phone', phone);
         btn.disabled = false; btn.innerText = '로그인 접속';
 
         if (q.error || !q.data || q.data.length === 0) {
@@ -1556,7 +1580,8 @@
     };
 
     window.handleSignup = async function() {
-      if (!supabase) { alert('데이터베이스에 연결할 수 없습니다.'); return; }
+      var client = getSupabaseClient();
+      if (!client) { alert('데이터베이스에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.'); return; }
 
       var phone = document.getElementById('regPhone').value.replace(/[^0-9]/g, '');
       var name = document.getElementById('regName').value.trim();
@@ -1580,7 +1605,7 @@
       btn.disabled = true; btn.innerText = '가입 처리 중...';
 
       try {
-        var chk = await supabase.from('app_users').select('phone').eq('phone', phone);
+        var chk = await client.from('app_users').select('phone').eq('phone', phone);
         if (chk.data && chk.data.length > 0) {
           btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
           showLoginError('signupErr', '이미 가입된 휴대전화번호입니다. 로그인해 주세요.');
@@ -1589,7 +1614,7 @@
 
         var hashedPwd = await sha256(pwd);
 
-        var ins = await supabase.from('app_users').insert([{
+        var ins = await client.from('app_users').insert([{
           phone: phone,
           name: name,
           job: job,
@@ -1616,7 +1641,8 @@
     };
 
     window.handleLeadSubmit = async function() {
-      if (!supabase) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
+      var client = getSupabaseClient();
+      if (!client) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
 
       var checked = Array.from(document.querySelectorAll('input[name="prod"]:checked')).map(function(c) { return c.value; });
       if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
@@ -1644,7 +1670,7 @@
           photoUrls = await uploadPhotosToSupabase(leadId, uploadedPhotos);
         }
 
-        var res = await supabase.from('leads').insert([{
+        var res = await client.from('leads').insert([{
           lead_id: leadId,
           car_number: '',
           agent_name: agent,
@@ -1693,6 +1719,9 @@
     // [10] 부가 이벤트 리스너 바인딩
     // ==========================================================
     document.addEventListener('DOMContentLoaded', function() {
+      // 초기 클라이언트 확보
+      getSupabaseClient();
+
       // 필터 칩 이벤트
       document.querySelectorAll('.filter-chip').forEach(function(chip) {
         chip.addEventListener('click', function() {
@@ -1724,11 +1753,12 @@
       var btnSave = document.getElementById('btnSaveStatus');
       if (btnSave) {
         btnSave.addEventListener('click', async function() {
-          if (!activeLeadItem || !supabase) return;
+          var client = getSupabaseClient();
+          if (!activeLeadItem || !client) return;
           var newSt = document.getElementById('uStatus').value;
           this.disabled = true; this.innerText = '저장 중...';
 
-          var res = await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
+          var res = await client.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
           this.disabled = false; this.innerText = '상태 저장하기';
 
           if (!res.error) {
@@ -1763,17 +1793,11 @@
         });
       }
 
-      var btnCancelEdit = document.getElementById('btnCancelEditLead');
-      if (btnCancelEdit) {
-        btnCancelEdit.addEventListener('click', function() {
-          document.getElementById('editLeadContainer').style.display = 'none';
-        });
-      }
-
       var btnConfirmEdit = document.getElementById('btnConfirmEditLead');
       if (btnConfirmEdit) {
         btnConfirmEdit.addEventListener('click', async function() {
-          if (!activeLeadItem || !supabase) return;
+          var client = getSupabaseClient();
+          if (!activeLeadItem || !client) return;
 
           var cName = document.getElementById('editCustomerName').value.trim();
           var cPhone = document.getElementById('editContactPhone').value.trim();
@@ -1793,7 +1817,7 @@
             field_description: document.getElementById('editFieldDesc').value.trim()
           };
 
-          var res = await supabase.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
+          var res = await client.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
           this.disabled = false; this.innerText = '수정 완료 저장';
 
           if (!res.error) {
@@ -1810,14 +1834,15 @@
       var btnDel = document.getElementById('btnDeleteLead');
       if (btnDel) {
         btnDel.addEventListener('click', async function() {
-          if (!activeLeadItem || !supabase) return;
+          var client = getSupabaseClient();
+          if (!activeLeadItem || !client) return;
 
           var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
           if (!confirmDel) return;
 
           this.disabled = true; this.innerText = '삭제 처리 중...';
 
-          var res = await supabase.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
+          var res = await client.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
           this.disabled = false; this.innerText = '안건삭제';
 
           if (!res.error) {
@@ -1834,6 +1859,7 @@
       var btnChangePwd = document.getElementById('btnSubmitChangePwd');
       if (btnChangePwd) {
         btnChangePwd.addEventListener('click', async function() {
+          var client = getSupabaseClient();
           if (!currentUserPhone) {
             alert('로그인 세션 정보가 없습니다. 다시 로그인해 주세요.');
             return;
@@ -1858,7 +1884,7 @@
           btn.disabled = true; btn.innerText = '비밀번호 변경 처리 중...';
 
           try {
-            var res = await supabase.from('app_users').select('*').eq('phone', currentUserPhone).single();
+            var res = await client.from('app_users').select('*').eq('phone', currentUserPhone).single();
             if (res.error || !res.data) {
               btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
               showLoginError('pwdChangeErr', '사용자 정보를 찾을 수 없습니다.');
@@ -1876,7 +1902,7 @@
             }
 
             var newHashed = await sha256(newPwd);
-            var upRes = await supabase.from('app_users').update({
+            var upRes = await client.from('app_users').update({
               password: newPwd,
               hash: newHashed,
               updated_at: new Date().toISOString()
