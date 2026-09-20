@@ -34,6 +34,7 @@
       cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; white-space: nowrap;
     }
     .btn-inner.btn-switch { background: #e8f0fe; color: #1a73e8; border-color: #aecbfa; }
+    .btn-inner.btn-users { background: #e6f4ea; color: #137333; border-color: #ceead6; }
     .btn-inner.btn-pwd { background: #fef7e0; color: #b06000; border-color: #fce8b2; }
     .btn-inner.btn-logout { background: #f8f9fa; color: #5f6368; border-color: #dadce0; }
 
@@ -76,7 +77,6 @@
     .row { display: flex; gap: 10px; }
     .row > div { flex: 1; }
 
-    /* 지도 핀 아이콘 버튼 스타일 */
     .map-pin-btn {
       display: inline-flex; align-items: center; justify-content: center;
       background: #fff0f0; border: 1px solid #ffcdd2; border-radius: 6px;
@@ -84,7 +84,6 @@
       text-decoration: none; cursor: pointer; transition: all 0.15s;
     }
     .map-pin-btn:hover { background: #ffebee; border-color: #e53935; }
-    .map-pin-icon { width: 14px; height: 14px; vertical-align: middle; margin-right: 3px; }
 
     .btn-login-action {
       width: 100%; padding: 14px; background: #1a73e8; color: #ffffff; border: none;
@@ -337,6 +336,15 @@
 
     #editLeadContainer { display: none; margin-top: 10px; background: #fff; border-radius: 8px; padding: 10px; border: 1px solid #dadce0; }
 
+    /* 관리자 전용 사용자 관리 모달 테이블 스타일 */
+    .user-table-wrapper { overflow-x: auto; max-height: 55vh; border: 1px solid #e2e8f0; border-radius: 8px; }
+    .user-data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; text-align: left; }
+    .user-data-table th { background: #f8f9fa; padding: 10px; font-weight: 700; color: #3c4043; border-bottom: 2px solid #e8eaed; white-space: nowrap; position: sticky; top: 0; }
+    .user-data-table td { padding: 10px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; }
+    .btn-user-edit { padding: 4px 8px; background: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .btn-user-del { padding: 4px 8px; background: #fce8e6; color: #d93025; border: 1px solid #fad2cf; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-left: 4px; }
+    .user-edit-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 8px; padding: 12px; margin-top: 12px; display: none; }
+
     body.on-login { background: #ffffff; }
     body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
     body.on-login #viewLogin { margin: 0 auto; width: 100%; max-width: 420px; }
@@ -508,7 +516,7 @@
             </div>
           </div>
 
-          <!-- 사업장 주소 (네이버 지도 핀 포인트 연동) -->
+          <!-- 사업장 주소 -->
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <label class="form-label" style="margin-bottom:0;">사업장 주소 / 위치</label>
@@ -602,6 +610,8 @@
           <span class="user-badge-title" id="dashUserTitle">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns">
+          <!-- ★ [관리자 전용 사용자 버튼] -->
+          <button type="button" class="btn-inner btn-users" id="dashUsersBtn" style="display:none;">👥 사용자</button>
           <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>
           <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>
           <button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>
@@ -662,7 +672,7 @@
 
   </div>
 
-  <!-- 안건 상세 모달 (상세정보 + 게시판 + 상태변경) -->
+  <!-- 안건 상세 모달 -->
   <div class="modal-overlay" id="detailModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -685,7 +695,6 @@
           <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
           <div class="detail-label">연락처</div><div class="detail-val" id="mContactPhone"></div>
           
-          <!-- 모달 내 사업장 주소 및 네이버 지도 연동 -->
           <div class="detail-label">사업장 주소</div>
           <div class="detail-val" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span id="mAddress"></span>
@@ -745,7 +754,7 @@
           </div>
         </div>
 
-        <!-- 안건 관리 액션 (수정/삭제: 관리자 또는 작성자) -->
+        <!-- 안건 관리 액션 -->
         <div class="lead-author-actions" id="authorActionsBox">
           <div class="lead-action-btns">
             <button type="button" class="btn-action-edit" id="btnEditLead">안건수정</button>
@@ -753,7 +762,7 @@
           </div>
         </div>
 
-        <!-- 영업 진행상태 업데이트 (컨설턴트 및 관리자 권한) -->
+        <!-- 영업 진행상태 업데이트 -->
         <div class="status-update-box" id="statusUpdateBox">
           <h4>⚡ 컨설턴트 진행상태</h4>
           <div class="form-group">
@@ -773,18 +782,16 @@
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
 
-        <!-- 안건별 전용 소개 게시판 -->
+        <!-- 소개 게시판 -->
         <div class="board-box">
           <div class="board-header">
             <h4>💬 소개 게시판 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
           </div>
 
-          <!-- 댓글 목록 -->
           <div class="board-list" id="boardPostList">
             <p style="text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;">등록된 의견이 없습니다.</p>
           </div>
 
-          <!-- 의견 작성 입력창 -->
           <div class="board-input-box">
             <textarea id="boardContentInput" placeholder="의견 및 피드백 내용을 자유롭게 입력해주세요..."></textarea>
             
@@ -798,6 +805,70 @@
               <button type="button" class="btn-attach-file" id="btnAttachBoardFile">📎 사진/파일 첨부</button>
               <button type="button" class="board-submit-btn" id="btnSubmitBoardPost">의견 등록</button>
             </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ★ [관리자 전용] 등록된 사용자 관리 팝업 모달 -->
+  <div class="modal-overlay" id="userManageModal">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h3>👥 등록된 사용자 관리</h3>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseUserModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:0.84rem; color:#5f6368;">총 등록된 사용자: <strong id="totalUserCount" style="color:#1a73e8;">0</strong>명</span>
+          <button type="button" class="btn-inner btn-switch" id="btnRefreshUsers" style="padding:5px 10px; font-size:0.75rem;">🔄 새로고침</button>
+        </div>
+
+        <div class="user-table-wrapper">
+          <table class="user-data-table">
+            <thead>
+              <tr>
+                <th>이름</th>
+                <th>전화번호(아이디)</th>
+                <th>직무</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 인라인 사용자 정보 수정 폼 -->
+        <div class="user-edit-box" id="userEditBox">
+          <h4 style="margin:0 0 10px 0; font-size:0.9rem; color:#1a73e8;">✏️ 사용자 정보 수정</h4>
+          <input type="hidden" id="editUserTargetPhone">
+          <div class="row">
+            <div class="form-group">
+              <label class="form-label">이름</label>
+              <input type="text" id="editUserNameInput">
+            </div>
+            <div class="form-group">
+              <label class="form-label">직무</label>
+              <select id="editUserJobSelect">
+                <option value="CS근무자">CS근무자</option>
+                <option value="CS관리자">CS관리자</option>
+                <option value="컨설턴트">컨설턴트</option>
+                <option value="기술사원">기술사원</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">비밀번호 변경 <span class="opt">(변경 시에만 8~10자 입력)</span></label>
+            <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10">
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn-save-status" id="btnSaveUserEdit" style="margin-top:0;">수정 저장</button>
+            <button type="button" id="btnCancelUserEdit" style="padding:10px 16px; background:#f1f3f4; border:none; border-radius:8px; font-weight:700; cursor:pointer;">취소</button>
           </div>
         </div>
 
@@ -836,7 +907,7 @@
     </div>
   </div>
 
-  <!-- 자바스크립트 완전 제어부 -->
+  <!-- 자바스크립트 제어부 -->
   <script>
     (function() {
       // ==========================================================
@@ -857,12 +928,9 @@
       var uploadedPhotos = [];
       var selectedBoardFile = null;
 
-      // ==========================================================
-      // [네이버 지도 열기 헬퍼 함수]
-      // ==========================================================
       function openNaverMap(query) {
         if (!query) return;
-        var cleanQuery = query.replace(/\([^)]*\)/g, '').trim(); // 괄호 안 내용 정리
+        var cleanQuery = query.replace(/\([^)]*\)/g, '').trim();
         var mapUrl = "https://map.naver.com/v5/search/" + encodeURIComponent(cleanQuery);
         window.open(mapUrl, '_blank');
       }
@@ -939,11 +1007,12 @@
       }
 
       // ==========================================================
-      // [4] 화면 전환
+      // [4] 화면 전환 (관리자 전용 사용자 버튼 제어 포함)
       // ==========================================================
       function showScreen(screenId) {
         closeDetailModal();
         closePwdModal();
+        closeUserModal();
 
         document.body.classList.toggle('on-login', screenId === 'login');
 
@@ -960,6 +1029,12 @@
         var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
         if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
         if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
+
+        // ★ 관리자 전용 "사용자" 버튼 노출 제어
+        var dashUsersBtn = document.getElementById('dashUsersBtn');
+        if (dashUsersBtn) {
+          dashUsersBtn.style.display = (currentRole === 'admin') ? 'inline-block' : 'none';
+        }
 
         var displayName = (currentRole === 'admin') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
         var regUserTitle = document.getElementById('regUserTitle');
@@ -1120,7 +1195,7 @@
       }
 
       // ==========================================================
-      // [6] DB 조회 및 목록 표시 (네이버 지도 핀 아이콘 버튼 추가)
+      // [6] DB 조회 및 목록 표시
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -1237,7 +1312,6 @@
         if (pcBody) pcBody.innerHTML = pcHtml;
         if (mList) mList.innerHTML = mHtml;
 
-        // 동적 이벤트 바인딩
         document.querySelectorAll('.btn-detail, .customer-cell, .m-customer-name').forEach(function(el) {
           el.addEventListener('click', function() {
             var i = this.getAttribute('data-idx');
@@ -1435,7 +1509,6 @@
         b.innerText = item.status || '접수대기';
         b.className = 'badge ' + getBadgeClass(item.status);
 
-        // 모달 내 지도 버튼 이벤트 바인딩
         var btnModalMap = document.getElementById('btnModalMap');
         if (btnModalMap) {
           if (item.address) {
@@ -1517,6 +1590,153 @@
         var m = document.getElementById('pwdChangeModal');
         if (m) m.classList.remove('open');
         hideLoginErrors();
+      }
+
+      // ==========================================================
+      // [★ 신규] 관리자 전용 사용자 관리 모달 로직
+      // ==========================================================
+      async function openUserModal() {
+        if (currentRole !== 'admin') return;
+        var modal = document.getElementById('userManageModal');
+        if (modal) modal.classList.add('open');
+        document.getElementById('userEditBox').style.display = 'none';
+        await loadAllUsers();
+      }
+
+      function closeUserModal() {
+        var modal = document.getElementById('userManageModal');
+        if (modal) modal.classList.remove('open');
+        document.getElementById('userEditBox').style.display = 'none';
+      }
+
+      async function loadAllUsers() {
+        var tbody = document.getElementById('userTableBody');
+        var countEl = document.getElementById('totalUserCount');
+        if (!tbody || !supabase) return;
+
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
+
+        try {
+          var res = await supabase.from('app_users').select('*').order('created_at', { ascending: false });
+          if (res.error) throw res.error;
+
+          var users = res.data || [];
+          if (countEl) countEl.innerText = users.length;
+
+          if (users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
+            return;
+          }
+
+          var html = '';
+          users.forEach(function(u) {
+            var phoneFmt = formatPhone(u.phone);
+            html += '<tr>'
+              + '<td><strong>' + (u.name || '-') + '</strong></td>'
+              + '<td>' + phoneFmt + '</td>'
+              + '<td><span style="background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-weight:700; font-size:0.75rem;">' + (u.job || '미지정') + '</span></td>'
+              + '<td>'
+              + '<button type="button" class="btn-user-edit" data-phone="' + u.phone + '" data-name="' + (u.name || '') + '" data-job="' + (u.job || 'CS근무자') + '">수정</button>'
+              + '<button type="button" class="btn-user-del" data-phone="' + u.phone + '" data-name="' + (u.name || '') + '">삭제</button>'
+              + '</td>'
+              + '</tr>';
+          });
+
+          tbody.innerHTML = html;
+
+          tbody.querySelectorAll('.btn-user-edit').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var p = this.getAttribute('data-phone');
+              var n = this.getAttribute('data-name');
+              var j = this.getAttribute('data-job');
+              openUserEditForm(p, n, j);
+            });
+          });
+
+          tbody.querySelectorAll('.btn-user-del').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var p = this.getAttribute('data-phone');
+              var n = this.getAttribute('data-name');
+              deleteUserAccount(p, n);
+            });
+          });
+
+        } catch (err) {
+          console.error("사용자 로드 실패:", err);
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + err.message + '</td></tr>';
+        }
+      }
+
+      function openUserEditForm(phone, name, job) {
+        var box = document.getElementById('userEditBox');
+        document.getElementById('editUserTargetPhone').value = phone;
+        document.getElementById('editUserNameInput').value = name;
+        document.getElementById('editUserJobSelect').value = job;
+        document.getElementById('editUserNewPwdInput').value = '';
+        box.style.display = 'block';
+        box.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      async function saveUserEdit() {
+        var phone = document.getElementById('editUserTargetPhone').value;
+        var name = document.getElementById('editUserNameInput').value.trim();
+        var job = document.getElementById('editUserJobSelect').value;
+        var newPwd = document.getElementById('editUserNewPwdInput').value.trim();
+
+        if (!phone || !name || !job) {
+          alert('이름과 직무를 모두 입력해주세요.');
+          return;
+        }
+
+        var btn = document.getElementById('btnSaveUserEdit');
+        btn.disabled = true; btn.innerText = '저장 중...';
+
+        var updateData = {
+          name: name,
+          job: job,
+          updated_at: new Date().toISOString()
+        };
+
+        if (newPwd) {
+          var valErr = validatePassword(newPwd);
+          if (valErr) {
+            alert(valErr);
+            btn.disabled = false; btn.innerText = '수정 저장';
+            return;
+          }
+          var hashed = await sha256(newPwd);
+          updateData.password = newPwd;
+          updateData.hash = hashed;
+        }
+
+        try {
+          var res = await supabase.from('app_users').update(updateData).eq('phone', phone);
+          if (res.error) throw res.error;
+
+          alert('✅ 사용자 정보가 성공적으로 수정되었습니다.');
+          document.getElementById('userEditBox').style.display = 'none';
+          await loadAllUsers();
+        } catch (e) {
+          alert('수정 실패: ' + e.message);
+        } finally {
+          btn.disabled = false; btn.innerText = '수정 저장';
+        }
+      }
+
+      async function deleteUserAccount(phone, name) {
+        if (!confirm('⚠️ 정말로 [' + name + ' / ' + phone + '] 사용자를 영구 삭제하시겠습니까?\n삭제 후 해당 계정으로 로그인할 수 없습니다.')) {
+          return;
+        }
+
+        try {
+          var res = await supabase.from('app_users').delete().eq('phone', phone);
+          if (res.error) throw res.error;
+
+          alert('🗑️ 사용자가 삭제되었습니다.');
+          await loadAllUsers();
+        } catch (e) {
+          alert('삭제 실패: ' + e.message);
+        }
       }
 
       async function loadRecentHistory() {
@@ -1700,6 +1920,21 @@
           });
         }
 
+        // ★ 관리자 전용 사용자 버튼 이벤트
+        var dashUsersBtn = document.getElementById('dashUsersBtn');
+        var closeUserBtn = document.getElementById('btnCloseUserModal');
+        var refreshUsersBtn = document.getElementById('btnRefreshUsers');
+        var saveUserEditBtn = document.getElementById('btnSaveUserEdit');
+        var cancelUserEditBtn = document.getElementById('btnCancelUserEdit');
+
+        if (dashUsersBtn) dashUsersBtn.addEventListener('click', openUserModal);
+        if (closeUserBtn) closeUserBtn.addEventListener('click', closeUserModal);
+        if (refreshUsersBtn) refreshUsersBtn.addEventListener('click', loadAllUsers);
+        if (saveUserEditBtn) saveUserEditBtn.addEventListener('click', saveUserEdit);
+        if (cancelUserEditBtn) cancelUserEditBtn.addEventListener('click', function() {
+          document.getElementById('userEditBox').style.display = 'none';
+        });
+
         // 비밀번호 변경 모달 이벤트
         var regPwdBtn = document.getElementById('regPwdBtn');
         var dashPwdBtn = document.getElementById('dashPwdBtn');
@@ -1852,7 +2087,7 @@
           });
         });
 
-        // 상태 저장 (컨설턴트 및 관리자만 가능)
+        // 상태 저장
         var btnSaveStatus = document.getElementById('btnSaveStatus');
         if (btnSaveStatus) {
           btnSaveStatus.addEventListener('click', async function() {
