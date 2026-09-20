@@ -238,7 +238,7 @@
       .search-box { max-width: 100%; }
     }
 
-    /* 상세 모달: 닫혀 있을 때 화면 클릭을 절대 방해하지 않도록 pointer-events: none 부여 */
+    /* 상세 모달 */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 99999;
@@ -272,25 +272,10 @@
     .modal-photo-card img { width: 100%; height: 140px; object-fit: cover; cursor: pointer; background: #f1f3f4; display: block; }
     .photo-card-footer { padding: 6px; background: #f8f9fa; border-top: 1px solid #e8eaed; }
     .photo-zoom-btn { display: inline-block; width: 100%; padding: 4px 6px; background: #e8f0fe; color: #1a73e8; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+    
     .status-update-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 10px; padding: 14px; margin-top: 14px; }
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
     .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
-
-    .stage-timeline { display: flex; flex-direction: column; gap: 10px; }
-    .timeline-item { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; padding: 10px 12px; }
-    .timeline-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin-bottom: 4px; }
-    .timeline-meta { font-size: 0.72rem; color: #9aa0a6; margin-bottom: 4px; }
-    .prod-checkbox-group { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 0; }
-    .prod-item-sm { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-    .prod-item-sm input { width: auto; }
-    .history-item.clickable { cursor: pointer; }
-
-    .board-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-    .board-item { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; overflow: hidden; }
-    .board-item-title { padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 700; color: #202124; }
-    .board-item-meta { font-size: 0.7rem; color: #9aa0a6; }
-    .board-item-body { padding: 0 12px 12px 12px; border-top: 1px dashed #e8eaed; padding-top: 10px; }
-    .board-write-btn { width: 100%; padding: 10px; background: #fff; color: #1a73e8; border: 1.5px dashed #aecbfa; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
     body.on-login { background: #ffffff; }
     body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
@@ -314,7 +299,6 @@
           <p>본인 역할을 선택한 뒤 로그인해 주세요</p>
         </div>
 
-        <!-- 탭 버튼 (onclick 속성을 배제하고 id로 안전 연결) -->
         <div class="login-tab-bar">
           <button type="button" class="login-tab-item active" id="tabBtnCS">CS근무자</button>
           <button type="button" class="login-tab-item" id="tabBtnConsultant">컨설턴트</button>
@@ -435,10 +419,7 @@
           </div>
 
           <div class="form-group">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <label class="form-label" style="margin-bottom:6px;">고객명 / 상호<span class="req">*</span></label>
-              <button type="button" id="btnSearchPlace" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer;">🔍</button>
-            </div>
+            <label class="form-label" style="margin-bottom:6px;">고객명 / 상호<span class="req">*</span></label>
             <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
           </div>
 
@@ -454,9 +435,7 @@
           </div>
 
           <div class="form-group">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <label class="form-label" style="margin-bottom:6px;">사업장 주소 / 위치</label>
-            </div>
+            <label class="form-label" style="margin-bottom:6px;">사업장 주소 / 위치</label>
             <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" style="width:100%;">
           </div>
 
@@ -501,6 +480,7 @@
             <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." required></textarea>
           </div>
 
+          <!-- 현장 사진 등록 -->
           <div class="form-group">
             <label class="form-label">현장 사진 등록 <span class="opt">(최대 4장)</span></label>
             <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
@@ -634,11 +614,6 @@
         </div>
 
         <div class="status-update-box">
-          <h4>📜 진행 이력</h4>
-          <div id="mStageTimeline"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
-        </div>
-
-        <div class="status-update-box">
           <h4>⚡ 영업 진행상태 업데이트</h4>
           <div class="form-group">
             <label class="form-label">다음 진행상태 선택</label>
@@ -654,13 +629,7 @@
               <option value="계약보류">9. 계약보류</option>
             </select>
           </div>
-          <div id="stageFieldsContainer"></div>
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
-        </div>
-
-        <div class="status-update-box">
-          <h4>💬 게시판</h4>
-          <div id="mBoard"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
         </div>
       </div>
     </div>
@@ -670,7 +639,7 @@
   <script>
     (function() {
       // ==========================================================
-      // [1] Supabase 설정
+      // [1] Supabase 클라이언트 설정
       // ==========================================================
       var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
       var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
@@ -680,15 +649,15 @@
       var CAR_REP_MAP = { '26': '정문재', '27': '이수열', '28': '최영국', '127': '임영민', '160': '박광춘' };
 
       var CONSULTANT_LIST = [
-        { name: '최영국', phone: '01031810141', hash: '882a6ac9dce92c4f6b7041e04c1357d3ccde7a5e20125607aad5637ba737f895' },
-        { name: '정문재', phone: '01026211211', hash: 'f1ab53eef4526a7031dd157b228c293a97d5a29aa72e84cf450a313bfa42f179' },
-        { name: '임영민', phone: '01075164267', hash: '96ec8307a04b1a6e668fa87cf6e1bf550d460b1efe1fc1b471d30562e1261d26' },
-        { name: '박광춘', phone: '01045729150', hash: '085e8fe407928609b54db00ad99f2770da171a7981f1fb6940c72c799fe842e7' },
-        { name: '이수열', phone: '01000000000', hash: '' }
+        { name: '최영국', phone: '01031810141' },
+        { name: '정문재', phone: '01026211211' },
+        { name: '임영민', phone: '01075164267' },
+        { name: '박광춘', phone: '01045729150' },
+        { name: '이수열', phone: '01000000000' }
       ];
 
       // ==========================================================
-      // [2] 탭 전환 (독립 완벽 보장: HTML onclick 대신 리스너로 바인딩)
+      // [2] 탭 전환
       // ==========================================================
       function applyLoginTab(tab) {
         var btnCS = document.getElementById('tabBtnCS');
@@ -774,7 +743,7 @@
       }
 
       // ==========================================================
-      // [4] 날짜/포맷 헬퍼
+      // [4] 포맷 및 헬퍼
       // ==========================================================
       function formatPhone(phone) {
         var s = String(phone || '').replace(/[^0-9]/g, '');
@@ -801,7 +770,124 @@
       }
 
       // ==========================================================
-      // [5] Supabase DB 조회 및 대시보드 렌더링
+      // [5] 사진 압축 및 Supabase Storage 업로드
+      // ==========================================================
+      function compressImage(file, maxDim, quality, callback) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var w = img.width, h = img.height;
+            if (w > h) {
+              if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            } else {
+              if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            var base64 = canvas.toDataURL('image/jpeg', quality);
+            var kb = Math.round(base64.length * 0.75 / 1024);
+            callback(base64, kb);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function handleFileSelect(e) {
+        var files = Array.from(e.target.files);
+        if (!files.length) return;
+        if (uploadedPhotos.length + files.length > 4) {
+          alert('사진은 최대 4장까지만 등록 가능합니다.');
+        }
+        var remaining = 4 - uploadedPhotos.length;
+        var targets = files.slice(0, remaining);
+        var btn = document.getElementById('submitBtn');
+        if (btn) { btn.disabled = true; btn.innerText = '사진 압축 변환 중...'; }
+
+        var count = 0;
+        targets.forEach(function(file) {
+          compressImage(file, 900, 0.65, function(base64, kb) {
+            uploadedPhotos.push({ data: base64, name: file.name, kb: kb });
+            count++;
+            if (count === targets.length) {
+              if (btn) btn.disabled = false;
+              renderPreview();
+            }
+          });
+        });
+        e.target.value = '';
+      }
+
+      function renderPreview() {
+        var grid = document.getElementById('previewGrid');
+        var countText = document.getElementById('photoCountText');
+        var btn = document.getElementById('submitBtn');
+
+        if (countText) countText.innerText = uploadedPhotos.length + ' / 4장';
+
+        if (uploadedPhotos.length === 0) {
+          if (grid) grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
+          if (btn) btn.innerText = '⚡ 실시간 접수 등록';
+          return;
+        }
+
+        if (btn) btn.innerText = '⚡ 실시간 접수 등록 (사진 ' + uploadedPhotos.length + '장)';
+        if (grid) {
+          grid.innerHTML = '';
+          uploadedPhotos.forEach(function(p, idx) {
+            var slot = document.createElement('div');
+            slot.className = 'photo-slot';
+            slot.innerHTML = '<img src="' + p.data + '">'
+              + '<span class="photo-size-tag">' + p.kb + 'KB</span>'
+              + '<button type="button" class="photo-del-btn" data-del="' + idx + '">×</button>';
+            grid.appendChild(slot);
+          });
+          grid.querySelectorAll('.photo-del-btn').forEach(function(b) {
+            b.addEventListener('click', function() {
+              var delIdx = parseInt(this.getAttribute('data-del'), 10);
+              uploadedPhotos.splice(delIdx, 1);
+              renderPreview();
+            });
+          });
+        }
+      }
+
+      async function uploadPhotosToSupabase(leadId, photos) {
+        var urls = [];
+        if (!photos || photos.length === 0 || !supabase) return urls;
+
+        for (var i = 0; i < photos.length; i++) {
+          try {
+            var p = photos[i];
+            var res = await fetch(p.data);
+            var blob = await res.blob();
+            var filePath = leadId + '/photo_' + (i + 1) + '_' + Date.now() + '.jpg';
+
+            var upRes = await supabase.storage
+              .from('lead-photos')
+              .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
+
+            if (upRes.error) {
+              console.error('스토리지 저장 실패:', upRes.error);
+              continue;
+            }
+
+            var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+            if (pub && pub.data && pub.data.publicUrl) {
+              urls.push(pub.data.publicUrl);
+            }
+          } catch (err) {
+            console.error('사진 변환 업로드 오류:', err);
+          }
+        }
+        return urls;
+      }
+
+      // ==========================================================
+      // [6] DB 조회 및 모달 처리
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -828,7 +914,6 @@
             else counts.ing++;
           });
 
-          // 상단 통계 수치 갱신
           document.getElementById('cntTotal').innerText = counts.total;
           document.getElementById('cntWait').innerText = counts.wait;
           document.getElementById('cntIng').innerText = counts.ing;
@@ -836,7 +921,6 @@
           document.getElementById('cntDone').innerText = counts.done;
           document.getElementById('cntCancel').innerText = counts.cancel;
 
-          // 필터링 적용
           var filtered = list.filter(function(r) {
             var st = r.status || '접수대기';
             if (currentStatusFilter !== '전체') {
@@ -905,7 +989,6 @@
         if (pcBody) pcBody.innerHTML = pcHtml;
         if (mList) mList.innerHTML = mHtml;
 
-        // 동적 상세보기 버튼 이벤트 위임
         document.querySelectorAll('.btn-detail, .customer-cell, .m-customer-name').forEach(function(el) {
           el.addEventListener('click', function() {
             var i = this.getAttribute('data-idx');
@@ -945,11 +1028,12 @@
           item.photo_urls.forEach(function(url, pIdx) {
             var d = document.createElement('div');
             d.className = 'modal-photo-card';
-            d.innerHTML = '<img src="' + url + '"><div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (pIdx+1) + ' 확대</a></div>';
+            d.innerHTML = '<img src="' + url + '" onclick="window.open(\'' + url + '\', \'_blank\')">'
+              + '<div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (pIdx + 1) + ' 원본보기 ↗</a></div>';
             pGrid.appendChild(d);
           });
         } else {
-          pGrid.innerHTML = '<p style="color:#9aa0a6; font-size:0.8rem; grid-column:span 2;">등록된 사진이 없습니다.</p>';
+          pGrid.innerHTML = '<p style="color:#9aa0a6; font-size:0.8rem; grid-column:span 2; padding:10px 0;">등록된 사진이 없습니다.</p>';
         }
 
         var uSel = document.getElementById('uStatus');
@@ -981,10 +1065,9 @@
       }
 
       // ==========================================================
-      // [6] DOM 준비 완료 시 이벤트 리스너 강력 바인딩 (먹통 원천 방지)
+      // [7] 이벤트 리스너 바인딩
       // ==========================================================
       document.addEventListener('DOMContentLoaded', function() {
-        // 1. 탭 버튼 클릭 이벤트 등록
         var tabCS = document.getElementById('tabBtnCS');
         var tabCon = document.getElementById('tabBtnConsultant');
         var tabAdm = document.getElementById('tabBtnAdmin');
@@ -993,7 +1076,6 @@
         if (tabCon) tabCon.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('consultant'); });
         if (tabAdm) tabAdm.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('admin'); });
 
-        // 2. CS 요원 로그인 폼 제출
         var fCS = document.getElementById('formLoginCS');
         if (fCS) {
           fCS.addEventListener('submit', function(e) {
@@ -1013,7 +1095,6 @@
           });
         }
 
-        // 3. 컨설턴트 로그인 폼 제출
         var fCon = document.getElementById('formLoginConsultant');
         if (fCon) {
           fCon.addEventListener('submit', async function(e) {
@@ -1047,7 +1128,6 @@
           });
         }
 
-        // 4. 관리자 로그인 폼 제출
         var fAdm = document.getElementById('formLoginAdmin');
         if (fAdm) {
           fAdm.addEventListener('submit', function(e) {
@@ -1065,14 +1145,12 @@
           });
         }
 
-        // 5. 헤더 버튼들
         document.getElementById('regSwitchBtn').addEventListener('click', function() { showScreen('dashboard'); });
         document.getElementById('dashSwitchBtn').addEventListener('click', function() { showScreen('register'); });
         document.getElementById('regLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('cs'); });
         document.getElementById('dashLogoutBtn').addEventListener('click', function() { showScreen('login'); applyLoginTab('cs'); });
         document.getElementById('btnCloseDetailModal').addEventListener('click', closeDetailModal);
 
-        // 6. 상태 필터 칩 이벤트
         document.querySelectorAll('.filter-chip').forEach(function(chip) {
           chip.addEventListener('click', function() {
             document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
@@ -1082,19 +1160,16 @@
           });
         });
 
-        // 7. 검색 버튼
         document.getElementById('btnSearchKeyword').addEventListener('click', loadDashboardLeads);
         document.getElementById('searchKeyword').addEventListener('keyup', function(e) {
           if (e.key === 'Enter') loadDashboardLeads();
         });
 
-        // 8. 차량 변경 시 담당자 자동지정
         document.getElementById('carNumber').addEventListener('change', function() {
           var c = this.value;
           if (CAR_REP_MAP[c]) document.getElementById('assignedRep').value = CAR_REP_MAP[c];
         });
 
-        // 9. 현재회사 변경 시 서비스료 활성화
         document.getElementById('currentCompany').addEventListener('change', function() {
           var f = document.getElementById('currentFee');
           if (this.value !== '미사용') {
@@ -1104,7 +1179,6 @@
           }
         });
 
-        // 10. 체크박스 디자인 토글
         document.querySelectorAll('.prod-item').forEach(function(item) {
           item.addEventListener('click', function(e) {
             var cb = this.querySelector('input[type="checkbox"]');
@@ -1113,7 +1187,6 @@
           });
         });
 
-        // 11. 상태 업데이트 저장 버튼
         document.getElementById('btnSaveStatus').addEventListener('click', async function() {
           if (!activeLeadId || !supabase) return;
           var newSt = document.getElementById('uStatus').value;
@@ -1125,11 +1198,13 @@
           loadDashboardLeads();
         });
 
-        // 12. 사진 버튼
+        // 사진 파일 선택 및 촬영 이벤트
         document.getElementById('btnShootCamera').addEventListener('click', function() { document.getElementById('cameraInput').click(); });
         document.getElementById('btnSelectGallery').addEventListener('click', function() { document.getElementById('galleryInput').click(); });
+        document.getElementById('cameraInput').addEventListener('change', handleFileSelect);
+        document.getElementById('galleryInput').addEventListener('change', handleFileSelect);
 
-        // 13. 신규 접수 등록 폼 제출
+        // 신규 접수 등록 및 사진 Supabase Storage 업로드
         document.getElementById('leadForm').addEventListener('submit', async function(e) {
           e.preventDefault();
           if (!supabase) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
@@ -1138,7 +1213,8 @@
           if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
 
           var btn = document.getElementById('submitBtn');
-          btn.disabled = true; btn.innerText = '등록 중...';
+          btn.disabled = true;
+          btn.innerText = uploadedPhotos.length > 0 ? '사진 업로드 및 저장 중...' : '접수 등록 중...';
 
           var now = new Date();
           var leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
@@ -1152,33 +1228,57 @@
           var agent = document.getElementById('agentName').value;
           var rep = document.getElementById('assignedRep').value || CAR_REP_MAP[car] || '';
 
-          var res = await supabase.from('leads').insert([{
-            lead_id: leadId,
-            car_number: car,
-            agent_name: agent,
-            customer_name: document.getElementById('customerName').value,
-            contact_person: document.getElementById('contactPerson').value,
-            contact_phone: formatPhone(document.getElementById('contactPhone').value),
-            address: document.getElementById('address').value,
-            business_type: document.getElementById('businessType').value,
-            current_company: document.getElementById('currentCompany').value,
-            current_fee: document.getElementById('currentFee').value,
-            product: checked.join(', '),
-            field_description: document.getElementById('fieldDescription').value,
-            assigned_rep: rep,
-            status: '접수대기'
-          }]);
+          try {
+            // 1. 사진 파일 Supabase Storage 전송
+            var photoUrls = [];
+            if (uploadedPhotos.length > 0) {
+              photoUrls = await uploadPhotosToSupabase(leadId, uploadedPhotos);
+            }
 
-          btn.disabled = false; btn.innerText = '⚡ 실시간 접수 등록';
+            // 2. leads 테이블 레코드 생성
+            var res = await supabase.from('leads').insert([{
+              lead_id: leadId,
+              car_number: car,
+              agent_name: agent,
+              customer_name: document.getElementById('customerName').value,
+              contact_person: document.getElementById('contactPerson').value,
+              contact_phone: formatPhone(document.getElementById('contactPhone').value),
+              address: document.getElementById('address').value,
+              business_type: document.getElementById('businessType').value,
+              current_company: document.getElementById('currentCompany').value,
+              current_fee: document.getElementById('currentFee').value,
+              product: checked.join(', '),
+              field_description: document.getElementById('fieldDescription').value,
+              photo_urls: photoUrls,
+              assigned_rep: rep,
+              status: '접수대기'
+            }]);
 
-          if (!res.error) {
-            alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!');
+            if (res.error) throw res.error;
+
+            alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
+
+            // 폼 초기화
             document.getElementById('customerName').value = '';
+            document.getElementById('contactPerson').value = '';
             document.getElementById('contactPhone').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('businessType').value = '';
             document.getElementById('fieldDescription').value = '';
+            document.querySelectorAll('input[name="prod"]').forEach(function(cb) {
+              cb.checked = false;
+              if (cb.closest('.prod-item')) cb.closest('.prod-item').classList.remove('checked');
+            });
+
+            uploadedPhotos = [];
+            renderPreview();
             loadRecentHistory();
-          } else {
-            alert('등록 실패: ' + res.error.message);
+
+          } catch (err) {
+            alert('등록 실패: ' + (err.message || err));
+          } finally {
+            btn.disabled = false;
+            btn.innerText = '⚡ 실시간 접수 등록';
           }
         });
       });
