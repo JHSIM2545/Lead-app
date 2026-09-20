@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고객 소개 관리</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f1f5f9; display: flex; justify-content: center; padding: 24px 16px; }
+    .card { background: #ffffff; width: 100%; max-width: 400px; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h2 { color: #1e3a8a; text-align: center; font-size: 22px; margin-bottom: 6px; font-weight: 700; }
+    p.sub { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 20px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 10px 0; border: none; border-radius: 8px; font-weight: bold; background: #e2e8f0; color: #475569; font-size: 14px; }
+    .tab-btn.active { background: #1d4ed8; color: #ffffff; }
+    .banner { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 20px; font-weight: 600; }
+    label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; display: block; }
+    label span { color: #ef4444; }
+    input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 18px; font-size: 15px; outline: none; }
+    input:focus, select:focus { border-color: #1d4ed8; }
+    .submit-btn { width: 100%; padding: 14px; background: #1d4ed8; color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>고객 소개 관리</h2>
+  <p class="sub">본인 역할을 선택한 뒤 로그인해 주세요</p>
+
+  <div class="tabs">
+    <button type="button" class="tab-btn active">CS근무자</button>
+    <button type="button" class="tab-btn">컨설턴트</button>
+    <button type="button" class="tab-btn">관리자</button>
+  </div>
+
+  <div class="banner">🛡️ 출동/CS 요원 (소개자 이름 + 차량 입력)</div>
+
+  <form id="leadForm">
+    <label>소개자 이름 <span>*</span></label>
+    <input type="text" id="userName" placeholder="이름을 입력하세요" required>
+
+    <label>담당차량(호기) <span>*</span></label>
+    <select id="vehicleNo" required>
+      <option value="">차량을 선택하세요</option>
+      <option value="27호">27호</option>
+      <option value="28호">28호</option>
+      <option value="29호">29호</option>
+      <option value="30호">30호</option>
+    </select>
+
+    <button type="submit" id="submitBtn" class="submit-btn">⚡ 현장 가망고객 등록 시작</button>
+  </form>
+</div>
+
+<script>
+  // [STEP 3]에서 복사한 웹 앱 URL을 아래 따옴표 사이에 넣으세요.
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxYLnfnamK2EdjPqQtnQ4EMoim_LXtZb4uGdWoZMEkJdFlwbyHocHUUca6bAqCSJpDJWw/exec";
+
+  document.getElementById("leadForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.innerText = "저장 중입니다...";
+
+    const payload = {
+      role: "CS근무자",
+      name: document.getElementById("userName").value.trim(),
+      vehicleNo: document.getElementById("vehicleNo").value
+    };
+
+    try {
+      const response = await fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "text/plain;charset=utf-8" }
+      });
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        alert("성공적으로 등록되었습니다!");
+        document.getElementById("userName").value = "";
+        document.getElementById("vehicleNo").value = "";
+      } else {
+        alert("등록 실패: " + result.message);
+      }
+    } catch (error) {
+      alert("네트워크 오류가 발생했습니다.");
+      console.error(error);
+    } finally {
+      btn.disabled = false;
+      btn.innerText = "⚡ 현장 가망고객 등록 시작";
+    }
+  });
+</script>
+
+</body>
+</html>
