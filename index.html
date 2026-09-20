@@ -1,100 +1,2832 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>고객 소개 관리</title>
+  <base target="_top">
+  <meta charset="utf-8">
+  <title>북서울 소개영업 포털</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+  <!-- 모바일 전체화면 독립 앱(PWA Standalone) 메타태그 -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="북서울 소개영업">
+  <meta name="theme-color" content="#1a73e8">
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f1f5f9; display: flex; justify-content: center; padding: 24px 16px; }
-    .card { background: #ffffff; width: 100%; max-width: 400px; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    h2 { color: #1e3a8a; text-align: center; font-size: 22px; margin-bottom: 6px; font-weight: 700; }
-    p.sub { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 20px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; padding: 10px 0; border: none; border-radius: 8px; font-weight: bold; background: #e2e8f0; color: #475569; font-size: 14px; }
-    .tab-btn.active { background: #1d4ed8; color: #ffffff; }
-    .banner { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 10px; border-radius: 8px; font-size: 13px; text-align: center; margin-bottom: 20px; font-weight: 600; }
-    label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; display: block; }
-    label span { color: #ef4444; }
-    input, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 18px; font-size: 15px; outline: none; }
-    input:focus, select:focus { border-color: #1d4ed8; }
-    .submit-btn { width: 100%; padding: 14px; background: #1d4ed8; color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    .submit-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
+    body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; -webkit-tap-highlight-color: transparent; }
+
+    .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 14px; position: relative; z-index: 1; }
+    @media (max-width: 900px) { .main-container { width: 100%; } }
+
+    /* 화면 내부 헤더 바 (로그아웃 및 화면 전환) */
+    .inner-header-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #ffffff; padding: 12px 16px; border-radius: 14px; margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+    }
+    .user-badge-group { display: flex; flex-direction: column; gap: 2px; }
+    .user-badge-title { font-size: 1.05rem; font-weight: 800; color: #202124; }
+    .user-badge-subtitle { font-size: 0.82rem; font-weight: 600; color: #1a73e8; }
+    .inner-header-btns { display: flex; align-items: center; gap: 8px; }
+    .btn-inner {
+      padding: 8px 13px; border-radius: 8px; font-size: 0.82rem; font-weight: 700;
+      cursor: pointer; border: 1px solid transparent; transition: all 0.15s ease; white-space: nowrap;
+      touch-action: manipulation;
+    }
+    .btn-inner.btn-switch { background: #e8f0fe; color: #1a73e8; border-color: #aecbfa; }
+    .btn-inner.btn-switch:hover { background: #d2e3fc; }
+    .btn-inner.btn-logout { background: #f8f9fa; color: #5f6368; border-color: #dadce0; }
+    .btn-inner.btn-logout:hover { background: #fce8e6; color: #d93025; border-color: #fad2cf; }
+
+    /* ==========================================================
+       [화면 1] 최초 진입 통합 로그인 화면 (#viewLogin)
+       - 기본 화면 (CS 요원 입력 폼 기본 활성화)
+       ========================================================== */
+    #viewLogin {
+      max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 100;
+    }
+    .login-card {
+      background: #ffffff; border-radius: 18px; padding: 26px 22px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;
+      position: relative; z-index: 101;
+    }
+    .login-header {
+      text-align: center; margin-bottom: 22px; border-bottom: 2px solid #e8f0fe; padding-bottom: 16px;
+    }
+    .login-header h2 { margin: 0; font-size: 1.5rem; color: #1a73e8; font-weight: 800; }
+    .login-header p { margin: 6px 0 0 0; font-size: 0.85rem; color: #5f6368; }
+
+    /* 로그인 탭 바 (CS / 컨설턴트 / 관리자) */
+    .login-tab-bar {
+      display: flex; background: #eef2f6; border-radius: 12px; padding: 5px; margin-bottom: 20px;
+      position: relative; z-index: 102; gap: 4px; border: 1px solid #dadce0;
+    }
+    .login-tab-item {
+      flex: 1; padding: 11px 4px; border: none; background: transparent; font-size: 0.84rem;
+      font-weight: 700; color: #5f6368; cursor: pointer; border-radius: 8px; text-align: center;
+      transition: all 0.15s ease; user-select: none; -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .login-tab-item.active {
+      background: #1a73e8; color: #ffffff !important; box-shadow: 0 2px 8px rgba(26,115,232,0.35);
+    }
+
+    .form-group { margin-bottom: 14px; }
+    label.form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #3c4043; }
+    .req { color: #d93025; margin-left: 2px; }
+    .opt { color: #5f6368; font-weight: normal; font-size: 0.75rem; margin-left: 4px; }
+    input[type="text"], input[type="tel"], input[type="password"], select, textarea {
+      width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 8px;
+      font-size: 0.95rem; background-color: #fafbfc; transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #1a73e8; background-color: #fff; outline: none; }
+    .row { display: flex; gap: 10px; }
+    .row > div { flex: 1; }
+
+    .btn-login-action {
+      width: 100%; padding: 14px; background: #1a73e8; color: #ffffff; border: none;
+      border-radius: 9px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(26,115,232,0.3); margin-top: 10px; user-select: none;
+      transition: background 0.15s; touch-action: manipulation;
+    }
+    .btn-login-action:active { background: #1557b0; }
+    .btn-login-action:disabled { background: #9aa0a6; cursor: not-allowed; }
+
+    .login-error-msg {
+      background: #fce8e6; color: #d93025; font-size: 0.85rem; font-weight: 600;
+      padding: 10px; border-radius: 8px; margin-top: 10px; display: none; text-align: center;
+      border: 1px solid #fad2cf;
+    }
+
+    /* ==========================================================
+       [화면 2] 현장 등록 화면 (#viewRegister)
+       ========================================================== */
+    #viewRegister { display: none; max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
+    
+    .intro-card {
+      background: #ffffff; border-radius: 16px; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 14px; border: 1px solid #e2e8f0;
+    }
+    .intro-hero {
+      position: relative; width: 100%; min-height: 125px;
+      background: linear-gradient(135deg, #0b1a30 0%, #1a73e8 100%);
+      display: flex; align-items: flex-end;
+    }
+    .intro-hero-gradient {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, rgba(11,26,48,0.2) 0%, rgba(11,26,48,0.85) 100%);
+    }
+    .intro-hero-content { position: relative; z-index: 2; padding: 16px; width: 100%; color: #ffffff; }
+    .intro-badge {
+      display: inline-block; background: #1a73e8; color: #ffffff; font-size: 0.78rem;
+      font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-bottom: 4px; border: 1px solid rgba(255,255,255,0.4);
+    }
+    .intro-title { margin: 0; font-size: 1.4rem; font-weight: 800; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .intro-subtitle { margin: 4px 0 0 0; font-size: 0.82rem; color: #e8f0fe; font-weight: 500; }
+
+    .form-card {
+      background: #ffffff; border-radius: 16px; padding: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08); margin-bottom: 14px; border: 1px solid #e2e8f0;
+    }
+    .rep-select { background-color: #f8fbff; border-color: #1a73e8; font-weight: 700; color: #1a73e8; font-size: 1rem; }
+
+    .prod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .prod-item {
+      display: flex; align-items: center; gap: 7px; padding: 10px 8px; background: #ffffff;
+      border: 1.5px solid #dadce0; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+      color: #3c4043; cursor: pointer; user-select: none;
+    }
+    .prod-item.checked { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; font-weight: 600; }
+    .prod-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #1a73e8; margin: 0; }
+
+    /* 사진 업로드 버튼 */
+    .photo-btn-group { display: flex; gap: 8px; margin-bottom: 8px; }
+    .photo-btn {
+      flex: 1; padding: 12px 6px; border: 1.5px dashed #1a73e8; border-radius: 8px;
+      background: #f8fbff; color: #1a73e8; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;
+      touch-action: manipulation;
+    }
+    .photo-btn:active { background: #e8f0fe; }
+    .photo-status { display: flex; justify-content: space-between; font-size: 0.82rem; margin: 6px 0; color: #5f6368; }
+    .photo-preview-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; min-height: 80px;
+      background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 10px; padding: 8px;
+    }
+    .photo-empty-msg { grid-column: span 4; text-align: center; color: #9aa0a6; font-size: 0.8rem; padding: 22px 0; }
+    .photo-slot { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 1.5px solid #1a73e8; background: #000; }
+    .photo-slot img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-del-btn {
+      position: absolute; top: 3px; right: 3px; width: 22px; height: 22px;
+      background: rgba(217, 48, 37, 0.85); color: #fff; border: none; border-radius: 50%;
+      font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .photo-size-tag {
+      position: absolute; bottom: 2px; left: 2px; background: rgba(0,0,0,0.65);
+      color: #fff; font-size: 0.65rem; padding: 1px 4px; border-radius: 4px;
+    }
+
+    button.submit-btn {
+      width: 100%; padding: 15px; background: #1a73e8; color: #fff; border: none;
+      border-radius: 10px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(26,115,232,0.3); margin-top: 10px; touch-action: manipulation;
+    }
+    button.submit-btn:disabled { background: #9aa0a6; cursor: not-allowed; }
+
+    .history-card { background: #ffffff; border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .history-title { font-size: 0.9rem; font-weight: 700; color: #3c4043; }
+    .history-item { border-bottom: 1px solid #f1f3f4; padding: 8px 0; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center; }
+
+    /* ==========================================================
+       [화면 3] 소개내역 조회 대시보드 (#viewDashboard)
+       ========================================================== */
+    #viewDashboard { display: none; }
+
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #fff; padding: 14px 16px; border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-left: 4px solid #dadce0;
+      cursor: pointer; transition: transform 0.1s ease;
+    }
+    .stat-card:active { transform: scale(0.98); }
+    .stat-card.total { border-left-color: #1a73e8; }
+    .stat-card.wait { border-left-color: #f29900; }
+    .stat-card.ing { border-left-color: #1a73e8; }
+    .stat-card.done { border-left-color: #137333; }
+    .stat-card.cancel { border-left-color: #d93025; }
+    .stat-label { font-size: 0.78rem; font-weight: 600; color: #5f6368; }
+    .stat-value { font-size: 1.4rem; font-weight: 800; color: #202124; margin-top: 4px; }
+
+    .toolbar-card {
+      background: #fff; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: space-between; align-items: center;
+    }
+    .status-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-chip {
+      padding: 6px 12px; border-radius: 16px; font-size: 0.8rem; font-weight: 600;
+      border: 1px solid #dadce0; background: #fff; color: #5f6368; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease;
+    }
+    .filter-chip.active { background: #e8f0fe; color: #1a73e8; border-color: #1a73e8; font-weight: 700; }
+    .chip-count {
+      background: rgba(0,0,0,0.08); padding: 1px 6px; border-radius: 10px; font-size: 0.72rem; font-weight: 700;
+    }
+    .filter-chip.active .chip-count { background: #1a73e8; color: #fff; }
+
+    .search-box { display: flex; gap: 6px; flex: 1; max-width: 320px; min-width: 200px; }
+    .search-box input { padding: 7px 12px; border: 1px solid #dadce0; border-radius: 8px; width: 100%; font-size: 0.88rem; }
+
+    .badge { display: inline-block; padding: 4px 9px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; }
+    .badge-wait { background: #fef7e0; color: #b06000; border: 1px solid #fce8b2; }
+    .badge-ing { background: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa; }
+    .badge-meet { background: #f3e8fd; color: #7627bb; border: 1px solid #d7bdfb; }
+    .badge-quote { background: #fef3e0; color: #b8590a; border: 1px solid #fcd9a6; }
+    .badge-done { background: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
+    .badge-fail { background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+    .badge-hold { background: #eeeeee; color: #5f6368; border: 1px solid #dadce0; }
+    .badge-cancel { background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+
+    /* PC 가로 대시보드 테이블 */
+    .pc-table-wrapper {
+      background: #fff; border-radius: 12px; overflow-x: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+    }
+    table.data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    table.data-table th {
+      background: #f8f9fa; padding: 12px 14px; font-weight: 700; color: #3c4043;
+      border-bottom: 2px solid #e8eaed; white-space: nowrap;
+    }
+    table.data-table td { padding: 12px 14px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; }
+    table.data-table tr:hover { background-color: #f8fbff; }
+    .customer-cell { font-weight: 700; color: #1a73e8; cursor: pointer; white-space: nowrap; }
+    .customer-cell:hover { text-decoration: underline; }
+
+    /* 스마트폰 카드 리스트 */
+    .mobile-card-list { display: none; }
+    .mobile-lead-card {
+      background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+    }
+    .m-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .m-car-tag { background: #f1f3f4; color: #3c4043; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+    .m-customer-name { font-size: 1.15rem; font-weight: 800; color: #1a73e8; margin-bottom: 4px; }
+    .m-phone-link {
+      display: inline-flex; align-items: center; gap: 4px; color: #202124; text-decoration: none;
+      font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;
+    }
+    .m-info-row { font-size: 0.82rem; color: #5f6368; margin-bottom: 4px; }
+    .m-footer-actions {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 12px;
+      padding-top: 10px; border-top: 1px solid #f1f3f4;
+    }
+    .btn-detail {
+      padding: 6px 12px; background: #e8f0fe; color: #1a73e8; border: none;
+      border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .pc-table-wrapper { display: none; }
+      .mobile-card-list { display: block; }
+      .stat-grid { grid-template-columns: repeat(3, 1fr); }
+      .toolbar-card { flex-direction: column; align-items: stretch; }
+      .search-box { max-width: 100%; }
+      .user-badge-title { font-size: 0.95rem; }
+    }
+
+    /* ==========================================================
+       [상세 모달] 기본 display:none !important (화면 가림 완벽 방지)
+       ========================================================== */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55); z-index: 10000;
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-card {
+      background: #ffffff; width: 100%; max-width: 540px; max-height: 90vh;
+      border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25); position: relative; z-index: 10001;
+    }
+    .modal-header {
+      position: sticky; top: 0; background: #ffffff; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1.5px solid #e8eaed; flex-shrink: 0;
+    }
+    .modal-header-left {
+      display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;
+    }
+    .modal-header-left h3 {
+      margin: 0; font-size: 1.25rem; font-weight: 800; color: #1a73e8;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .modal-header-right {
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .btn-close {
+      background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #5f6368; line-height: 1;
+      padding: 0 6px;
+    }
+    .modal-body {
+      padding: 20px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;
+    }
+
+    .detail-grid { display: grid; grid-template-columns: 90px 1fr; gap: 8px 10px; font-size: 0.88rem; margin-bottom: 16px; }
+    .detail-label { color: #5f6368; font-weight: 600; }
+    .detail-val { color: #202124; font-weight: 500; word-break: break-all; }
+    
+    .modal-photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
+    .modal-photo-card {
+      border: 1px solid #dadce0; border-radius: 10px; overflow: hidden; background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column;
+    }
+    .modal-photo-card img {
+      width: 100%; height: 140px; object-fit: cover; cursor: pointer; background: #f1f3f4; display: block;
+    }
+    .photo-card-footer {
+      padding: 6px; background: #f8f9fa; border-top: 1px solid #e8eaed;
+    }
+    .photo-zoom-btn {
+      display: inline-block; width: 100%; padding: 4px 6px; background: #e8f0fe;
+      color: #1a73e8; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+    }
+    
+    .status-update-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 10px; padding: 14px; margin-top: 14px; }
+    .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
+    .btn-save-status {
+      width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none;
+      border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px;
+    }
+
+    /* 진행 이력 타임라인 */
+    .stage-timeline { display: flex; flex-direction: column; gap: 10px; }
+    .timeline-item {
+      background: #fff; border: 1px solid #e8eaed; border-radius: 8px; padding: 10px 12px;
+    }
+    .timeline-item.timeline-comment { background: #fffbea; border-color: #fce8b2; }
+    .timeline-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin-bottom: 4px;
+    }
+    .timeline-meta { font-size: 0.72rem; color: #9aa0a6; margin-bottom: 4px; }
+    .comment-input-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #dadce0; }
+    .comment-input-box textarea { margin-bottom: 8px; }
+    .comment-input-box button {
+      width: 100%; padding: 10px; background: #34a853; color: #fff; border: none;
+      border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+    }
+    .prod-checkbox-group { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 0; }
+    .prod-item-sm { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .prod-item-sm input { width: auto; }
+    .history-item.clickable { cursor: pointer; }
+    .history-item.clickable:active { background: #f1f3f4; }
+
+    /* 자유 게시판 */
+    .board-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .board-item { background: #fff; border: 1px solid #e8eaed; border-radius: 8px; overflow: hidden; }
+    .board-item-title {
+      padding: 10px 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; font-size: 0.88rem; font-weight: 700; color: #202124;
+    }
+    .board-item-title:active { background: #f1f3f4; }
+    .board-item-meta { font-size: 0.7rem; color: #9aa0a6; font-weight: 500; white-space: nowrap; }
+    .board-item-body { padding: 0 12px 12px 12px; border-top: 1px dashed #e8eaed; padding-top: 10px; }
+    .board-item-actions { display: flex; gap: 8px; }
+    .board-item-actions button {
+      flex: 1; padding: 6px; border: 1px solid #dadce0; background: #f8f9fa; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer; color: #3c4043;
+    }
+    .board-write-btn {
+      width: 100%; padding: 10px; background: #fff; color: #1a73e8; border: 1.5px dashed #aecbfa;
+      border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    }
+    .board-form { background: #f8f9fa; border: 1px solid #e8eaed; border-radius: 8px; padding: 10px; }
+    .board-form input, .board-form textarea { margin-bottom: 8px; }
+    .board-form button {
+      flex: 1; padding: 9px; border: none; border-radius: 7px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      background: #1a73e8; color: #fff;
+    }
+    .board-form button.board-cancel-btn { background: #dadce0; color: #3c4043; }
+    
+    .login-role-guide {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #1a73e8;
+      font-weight: 700;
+      background: #e8f0fe;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      border: 1px solid #aecbfa;
+    }
+    .role-selector-box-card {
+      background: #f8fbff;
+      border: 1.5px solid #aecbfa;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .role-select-box {
+      width: 100% !important;
+      padding: 12px 14px !important;
+      border: 2px solid #1a73e8 !important;
+      border-radius: 9px !important;
+      font-size: 1rem !important;
+      font-weight: 800 !important;
+      color: #1a73e8 !important;
+      background-color: #ffffff !important;
+      box-shadow: 0 2px 6px rgba(26,115,232,0.12) !important;
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* ==========================================================
+       모바일 최적화: 로그인 화면에서는 배경/여백 제거, 로그인창만 표시
+       ========================================================== */
+    body.on-login { background: #ffffff; }
+    body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
+    body.on-login #viewLogin { margin: 0 auto; width: 100%; max-width: 420px; }
+    body.on-login .login-card { border-radius: 0; box-shadow: none; border: none; }
+    @media (min-width: 480px) {
+      body.on-login #viewLogin { margin: 24px auto; }
+      body.on-login .login-card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+    }
+  
+    /* ==========================================================
+       [스마트폰 레이아웃 정밀 최적화 - 최종본 화면 기준]
+       글자 잘림, 밀림, 2줄 줄바꿈, 줌인 현상 원천 해결
+       ========================================================== */
+    html, body {
+      -webkit-text-size-adjust: 100% !important;
+      text-size-adjust: 100% !important;
+      word-break: keep-all !important;
+      overflow-wrap: break-word !important;
+    }
+    input, select, textarea, button {
+      font-size: 16px !important; /* 모바일 입력 시 자동 확대(줌인)로 인한 레이아웃 깨짐 방지 */
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 8px 10px !important;
+      }
+
+      /* [1] 로그인 카드 */
+      #viewLogin {
+        margin: 12px auto 20px auto !important;
+        padding: 0 4px !important;
+      }
+      .login-card {
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+      }
+      .login-header {
+        margin-bottom: 16px !important;
+        padding-bottom: 12px !important;
+      }
+      .login-header h2 {
+        font-size: 1.4rem !important;
+      }
+      .login-header p {
+        font-size: 0.82rem !important;
+      }
+      .login-tab-bar {
+        padding: 4px !important;
+        margin-bottom: 14px !important;
+        gap: 4px !important;
+      }
+      .login-tab-item {
+        padding: 10px 2px !important;
+        font-size: 0.88rem !important;
+        letter-spacing: -0.5px !important;
+        white-space: nowrap !important;
+      }
+      .btn-login-action {
+        padding: 13px !important;
+        font-size: 1rem !important;
+        margin-top: 8px !important;
+      }
+
+      /* [2] 내부 헤더 바 */
+      .inner-header-bar {
+        padding: 9px 12px !important;
+        margin-bottom: 10px !important;
+        gap: 6px !important;
+      }
+      .user-badge-title {
+        font-size: 0.92rem !important;
+        max-width: 140px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      .user-badge-subtitle {
+        font-size: 0.72rem !important;
+      }
+      .inner-header-btns {
+        gap: 5px !important;
+        flex-shrink: 0 !important;
+      }
+      .btn-inner {
+        padding: 6px 9px !important;
+        font-size: 0.76rem !important;
+      }
+
+      /* [3] 현장등록 폼 */
+      .intro-hero {
+        min-height: 95px !important;
+      }
+      .intro-hero-content {
+        padding: 12px !important;
+      }
+      .intro-title {
+        font-size: 1.25rem !important;
+      }
+      .intro-subtitle {
+        font-size: 0.78rem !important;
+      }
+      .form-card {
+        padding: 14px 12px !important;
+        border-radius: 14px !important;
+        margin-bottom: 10px !important;
+      }
+      .row {
+        gap: 8px !important;
+      }
+      label.form-label {
+        font-size: 0.82rem !important;
+        margin-bottom: 4px !important;
+        line-height: 1.3 !important;
+      }
+      .prod-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 5px !important;
+      }
+      .prod-item {
+        padding: 8px 3px !important;
+        font-size: 0.78rem !important;
+        white-space: nowrap !important;
+        justify-content: center !important;
+        letter-spacing: -0.5px !important;
+        gap: 4px !important;
+      }
+      .photo-btn-group {
+        gap: 6px !important;
+      }
+      .photo-btn {
+        padding: 10px 4px !important;
+        font-size: 0.82rem !important;
+      }
+      .photo-preview-grid {
+        gap: 6px !important;
+        padding: 6px !important;
+        min-height: 65px !important;
+      }
+
+      /* [4] 대시보드 통계 카드 6종 */
+      .stat-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+      }
+      .stat-card {
+        padding: 8px 6px 7px 8px !important;
+        border-left-width: 3px !important;
+        border-radius: 9px !important;
+      }
+      .stat-label {
+        font-size: 0.72rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        letter-spacing: -0.5px !important;
+      }
+      .stat-value {
+        font-size: 1.25rem !important;
+        margin-top: 2px !important;
+        line-height: 1.2 !important;
+      }
+
+      /* [5] 필터 칩 툴바 */
+      .toolbar-card {
+        padding: 10px 12px !important;
+        margin-bottom: 10px !important;
+        gap: 8px !important;
+        border-radius: 12px !important;
+      }
+      .status-filters {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 5px !important;
+        padding-bottom: 4px !important;
+        scrollbar-width: none !important;
+        width: 100% !important;
+      }
+      .status-filters::-webkit-scrollbar {
+        display: none !important;
+      }
+      .filter-chip {
+        flex-shrink: 0 !important;
+        padding: 6px 10px !important;
+        font-size: 0.78rem !important;
+        white-space: nowrap !important;
+        border-radius: 14px !important;
+      }
+      .chip-count {
+        font-size: 0.7rem !important;
+        padding: 1px 5px !important;
+      }
+      .search-box {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .search-box input {
+        padding: 7px 10px !important;
+        font-size: 0.85rem !important;
+      }
+      .search-box button {
+        padding: 7px 12px !important;
+        font-size: 0.82rem !important;
+      }
+
+      /* [6] 모바일 리스트 카드 */
+      .mobile-lead-card {
+        padding: 13px 12px !important;
+        margin-bottom: 9px !important;
+        border-radius: 12px !important;
+      }
+      .m-customer-name {
+        font-size: 1.05rem !important;
+        word-break: break-all !important;
+        margin-bottom: 3px !important;
+      }
+      .m-phone-link {
+        font-size: 0.86rem !important;
+        margin-bottom: 5px !important;
+      }
+      .m-info-row {
+        font-size: 0.78rem !important;
+        margin-bottom: 3px !important;
+        word-break: break-all !important;
+        line-height: 1.35 !important;
+      }
+      .m-footer-actions {
+        margin-top: 8px !important;
+        padding-top: 8px !important;
+        gap: 8px !important;
+      }
+      .m-footer-actions > div {
+        flex: 1 !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 0.72rem !important;
+      }
+      .btn-detail {
+        padding: 6px 11px !important;
+        font-size: 0.76rem !important;
+        flex-shrink: 0 !important;
+      }
+
+      /* [7] 상세 팝업 모달 */
+      .modal-card {
+        max-width: 100% !important;
+        border-radius: 14px !important;
+        max-height: 92vh !important;
+      }
+      .modal-header {
+        padding: 12px 14px !important;
+      }
+      .modal-header-left h3 {
+        font-size: 1.05rem !important;
+        max-width: 170px !important;
+      }
+      .modal-body {
+        padding: 14px 12px !important;
+      }
+      .detail-grid {
+        grid-template-columns: 78px 1fr !important;
+        gap: 6px 8px !important;
+        font-size: 0.82rem !important;
+      }
+      .detail-label {
+        font-size: 0.78rem !important;
+        white-space: nowrap !important;
+      }
+      .detail-val {
+        font-size: 0.82rem !important;
+        word-break: break-all !important;
+        line-height: 1.35 !important;
+      }
+      .modal-photo-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+      }
+      .modal-photo-card img {
+        height: 105px !important;
+      }
+    }
+
   </style>
 </head>
-<body>
+<body ontouchstart="" class="on-login">
 
-<div class="card">
-  <h2>고객 소개 관리</h2>
-  <p class="sub">본인 역할을 선택한 뒤 로그인해 주세요</p>
+  <div class="main-container">
 
-  <div class="tabs">
-    <button type="button" class="tab-btn active">CS근무자</button>
-    <button type="button" class="tab-btn">컨설턴트</button>
-    <button type="button" class="tab-btn">관리자</button>
+    <!-- [화면 1] 통합 로그인 화면 (#viewLogin) -->
+    <div id="viewLogin">
+      <div class="login-card">
+        <div class="login-header">
+          <h2>고객 소개 관리</h2>
+          <p>본인 역할을 선택한 뒤 로그인해 주세요</p>
+        </div>
+
+        <div class="login-tab-bar">
+          <button type="button" class="login-tab-item active" id="tabBtnCS" onclick="setLoginTab('cs')">CS근무자</button>
+          <button type="button" class="login-tab-item" id="tabBtnConsultant" onclick="setLoginTab('consultant')">컨설턴트</button>
+          <button type="button" class="login-tab-item" id="tabBtnAdmin" onclick="setLoginTab('admin')">관리자</button>
+        </div>
+
+        <!-- 1. CS 근무자 로그인 (기본 화면) -->
+        <div id="loginFormCS" style="display:block;">
+          <form onsubmit="event.preventDefault(); submitLogin('cs');">
+            <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">🛡️ 출동/CS 요원 (소개자 이름 + 차량 입력)</div>
+            <div class="form-group">
+              <label class="form-label">소개자 이름 <span class="req">*</span></label>
+              <input type="text" id="csLoginName" placeholder="소개자 이름을 입력하세요" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">담당차량(호기) <span class="req">*</span></label>
+              <select id="csLoginCar">
+                <option value="">선택</option>
+                <option value="26">26호</option>
+                <option value="27">27호</option>
+                <option value="28">28호</option>
+                <option value="127">127호</option>
+                <option value="160">160호</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-login-action" id="btnCSLogin">⚡ 현장 가망고객 등록 시작</button>
+            <div class="login-error-msg" id="csLoginErr"></div>
+          </form>
+        </div>
+
+        <!-- 2. 영업 컨설턴트 로그인 -->
+        <div id="loginFormConsultant" style="display:none;">
+          <form onsubmit="event.preventDefault(); submitLogin('consultant');">
+            <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 영업 컨설턴트 (휴대폰 번호 + 비밀번호)</div>
+            <div class="form-group">
+              <label class="form-label">휴대폰 번호 <span class="req">*</span></label>
+              <input type="tel" id="conLoginPhone" placeholder="010-0000-0000 (숫자만 입력 가능)" autocomplete="tel">
+            </div>
+            <div class="form-group">
+              <label class="form-label">비밀번호 <span class="req">*</span></label>
+              <input type="password" id="conLoginPwd" placeholder="영업일보 포털 비밀번호 입력" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-login-action" id="btnConLogin">내 소개내역 조회하기</button>
+            <div class="login-error-msg" id="conLoginErr"></div>
+            <p style="font-size:0.75rem; color:#5f6368; margin-top:10px; text-align:center;">
+              * 북서울지사 영업일보 포털에 등록된 전화번호와 비밀번호로 인증됩니다.
+            </p>
+          </form>
+        </div>
+
+        <!-- 3. 지사 관리자 로그인 -->
+        <div id="loginFormAdmin" style="display:none;">
+          <form onsubmit="event.preventDefault(); submitLogin('admin');">
+            <div style="background:#fce8e6; color:#c5221f; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #fad2cf;">👑 지사 관리자 (관리자 전용 비밀번호)</div>
+            <div class="form-group">
+              <label class="form-label">관리자 비밀번호 <span class="req">*</span></label>
+              <input type="password" id="adminLoginPwd" placeholder="관리자 전용 비밀번호 입력" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-login-action" id="btnAdminLogin">관리자 전체 조회 접속</button>
+            <div class="login-error-msg" id="adminLoginErr"></div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- [화면 2] 현장 등록 입력 화면 (CS 근무자용) -->
+    <div id="viewRegister">
+      <div class="inner-header-bar">
+        <div class="user-badge-group">
+          <span class="user-badge-title" id="regUserTitle">🛡️ CS/출동 요원</span>
+          <span class="user-badge-subtitle" id="regUserSub">현장등록 모드</span>
+        </div>
+        <div class="inner-header-btns">
+          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn" onclick="toggleMainView()" style="display:none;">📊 대시보드</button>
+          <button type="button" class="btn-inner btn-logout" onclick="handleLogout()">로그아웃</button>
+        </div>
+      </div>
+
+      <div class="intro-card">
+        <div class="intro-hero">
+          <div class="intro-hero-gradient"></div>
+          <div class="intro-hero-content">
+            <div class="intro-badge">북서울</div>
+            <h1 class="intro-title">고객소개 현장등록</h1>
+            <p class="intro-subtitle">"당신의 관심과 소개가 우리 지사에 큰 힘이 됩니다."</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <form id="leadForm" onsubmit="handleLeadSubmit(event)">
+          <div class="row">
+            <div class="form-group">
+              <label class="form-label">담당차량(호기)<span class="req">*</span></label>
+              <select id="carNumber" required onchange="onCarChange()">
+                <option value="">선택</option>
+                <option value="26">26호</option>
+                <option value="27">27호</option>
+                <option value="28">28호</option>
+                <option value="127">127호</option>
+                <option value="160">160호</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">소개자<span class="req">*</span></label>
+              <input type="text" id="agentName" placeholder="소개자 이름" required oninput="saveUserPref('s1_agent_name', this.value); loadRecentHistory();">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">담당 컨설턴트 <span class="opt">(차량 선택 시 자동지정 / 수동 변경 가능)</span></label>
+            <select id="assignedRep" class="rep-select" required>
+              <option value="">컨설턴트 선택</option>
+              <option value="정문재">정문재</option>
+              <option value="이수열">이수열</option>
+              <option value="최영국">최영국</option>
+              <option value="임영민">임영민</option>
+              <option value="박광춘">박광춘</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label class="form-label" style="margin-bottom:6px;">고객명 / 상호<span class="req">*</span></label>
+              <button type="button" onclick="openNaverPlaceSearchByName_('customerName')" title="상호명으로 지도 검색" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer;">🔍</button>
+            </div>
+            <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label class="form-label">대표/담당자</label>
+              <input type="text" id="contactPerson" placeholder="대표님">
+            </div>
+            <div class="form-group">
+              <label class="form-label">연락처<span class="req">*</span></label>
+              <input type="tel" id="contactPhone" placeholder="010-0000-0000" required oninput="formatPhoneInput(this)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label class="form-label" style="margin-bottom:6px;">사업장 주소 / 위치</label>
+              <button type="button" onclick="openDaumPostcode_('address')" title="주소 검색" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#3c4043; background:#f1f3f4; border:1px solid #dadce0; border-radius:6px; cursor:pointer;">🔍</button>
+            </div>
+            <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" style="width:100%;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">업종</label>
+            <input type="text" id="businessType" placeholder="식당, 카페, 의류, 학원 등">
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label class="form-label">현재 사용중인 회사<span class="req">*</span></label>
+              <select id="currentCompany" required onchange="onCompanyChange()">
+                <option value="미사용">미사용</option>
+                <option value="SK 쉴더스">SK 쉴더스</option>
+                <option value="KT 텔레캅">KT 텔레캅</option>
+                <option value="기타 회사">기타 회사</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">현 서비스료(원) <span class="opt">(선택사항)</span></label>
+              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled style="background-color: #f1f3f4;" oninput="formatCurrency(this)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">관심/추천 상품 (다중 선택 가능)<span class="req">*</span></label>
+            <div class="prod-grid" id="productGrid">
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="알람"> 알람</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="영상렌탈"> 영상렌탈</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="블루스캔"> 블루스캔</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="정보보안"> 정보보안</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="영상매각"> 영상매각</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="금고"> 금고</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="AED"> AED</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="AI도어캠"> AI도어캠</label>
+              <label class="prod-item" onclick="toggleCheck(this)"><input type="checkbox" name="prod" value="기타"> 기타</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">현장 설명<span class="req">*</span></label>
+            <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 고객 상담 희망 내용 등을 상세히 입력해주세요 (필수 입력)" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">현장 사진 등록 <span class="opt">(최대 4장)</span></label>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFileSelect(event)">
+            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none;" onchange="handleFileSelect(event)">
+
+            <div class="photo-btn-group">
+              <button type="button" class="photo-btn" onclick="document.getElementById('cameraInput').click()">📷 직접 촬영</button>
+              <button type="button" class="photo-btn" onclick="document.getElementById('galleryInput').click()">🖼️ 갤러리 선택</button>
+            </div>
+            
+            <div class="photo-status">
+              <span>📷 등록 대기 사진</span>
+              <span id="photoCountText" style="font-weight:700; color:#1a73e8;">0 / 4장</span>
+            </div>
+            <div class="photo-preview-grid" id="previewGrid">
+              <div class="photo-empty-msg">선택된 사진이 없습니다. (위 버튼을 눌러 촬영하거나 선택하세요)</div>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="submit-btn">⚡ 실시간 접수 등록</button>
+        </form>
+      </div>
+
+      <div class="history-card">
+        <div class="history-header">
+          <span class="history-title">📌 내 소개 최근 접수 현황</span>
+          <span id="carLabel" style="font-size: 0.78rem; color: #5f6368;">소개자 이름 입력 시 조회</span>
+        </div>
+        <div id="historyList">
+          <p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">담당 차량을 선택하면 최근 접수 내역이 표시됩니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- [화면 3] 소개내역 조회 대시보드 (#viewDashboard) -->
+    <div id="viewDashboard">
+      <div class="inner-header-bar">
+        <div class="user-badge-group">
+          <span class="user-badge-title">📊 소개영업 대시보드</span>
+          <span class="user-badge-subtitle" id="dashUserSub">접속 사용자</span>
+        </div>
+        <div class="inner-header-btns">
+          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" onclick="toggleMainView()">➕ 현장등록</button>
+          <button type="button" class="btn-inner btn-logout" onclick="handleLogout()">로그아웃</button>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card total" onclick="setFilterByCard('전체')" title="전체 목록 조회">
+          <div class="stat-label">총 소개건수</div>
+          <div class="stat-value" id="cntTotal">0</div>
+        </div>
+        <div class="stat-card wait" onclick="setFilterByCard('접수대기')" title="접수대기 건만 필터링">
+          <div class="stat-label">접수대기</div>
+          <div class="stat-value" id="cntWait">0</div>
+        </div>
+        <div class="stat-card ing" onclick="setFilterByCard('상담진행')" title="상담진행 건만 필터링">
+          <div class="stat-label">상담진행</div>
+          <div class="stat-value" id="cntIng">0</div>
+        </div>
+        <div class="stat-card ing" onclick="setFilterByCard('견적제출')" title="견적제출 건만 필터링" style="border-left-color: #9c27b0;">
+          <div class="stat-label">견적제출</div>
+          <div class="stat-value" id="cntQuote">0</div>
+        </div>
+        <div class="stat-card done" onclick="setFilterByCard('계약완료')" title="계약완료 건만 필터링">
+          <div class="stat-label">계약완료</div>
+          <div class="stat-value" id="cntDone">0</div>
+        </div>
+        <div class="stat-card cancel" onclick="setFilterByCard('취소/보류')" title="취소/보류 건만 필터링">
+          <div class="stat-label">취소/보류</div>
+          <div class="stat-value" id="cntCancel">0</div>
+        </div>
+      </div>
+
+      <div class="toolbar-card">
+        <div class="status-filters" id="statusFilterBar">
+          <button type="button" class="filter-chip active" data-status="전체" onclick="setFilter('전체', this)">전체 <span class="chip-count" id="cCntTotal">0</span></button>
+          <button type="button" class="filter-chip" data-status="접수대기" onclick="setFilter('접수대기', this)">접수대기 <span class="chip-count" id="cCntWait">0</span></button>
+          <button type="button" class="filter-chip" data-status="상담진행" onclick="setFilter('상담진행', this)">상담진행 <span class="chip-count" id="cCntIng">0</span></button>
+          <button type="button" class="filter-chip" data-status="견적제출" onclick="setFilter('견적제출', this)">견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
+          <button type="button" class="filter-chip" data-status="계약완료" onclick="setFilter('계약완료', this)">계약완료 <span class="chip-count" id="cCntDone">0</span></button>
+          <button type="button" class="filter-chip" data-status="취소/보류" onclick="setFilter('취소/보류', this)">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
+        </div>
+        <div class="search-box">
+          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소 검색" onkeyup="if(event.key==='Enter') loadDashboardLeads()">
+          <button type="button" class="btn-detail" onclick="loadDashboardLeads()">검색</button>
+        </div>
+      </div>
+
+      <div class="pc-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>접수일시</th>
+              <th>차량/소개자</th>
+              <th>담당컨설턴트</th>
+              <th>고객명/상호</th>
+              <th>연락처</th>
+              <th>사업장 주소</th>
+              <th>현재사용회사/료</th>
+              <th>관심상품</th>
+              <th>사진</th>
+              <th>진행상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="pcTableBody">
+            <tr><td colspan="11" style="text-align:center; padding:30px; color:#5f6368;">데이터 로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mobile-card-list" id="mobileCardList">
+        <p style="text-align:center; padding:30px; color:#5f6368;">데이터 로딩 중...</p>
+      </div>
+    </div>
+
   </div>
 
-  <div class="banner">🛡️ 출동/CS 요원 (소개자 이름 + 차량 입력)</div>
+  <!-- [상세 모달] -->
+  <div class="modal-overlay" id="detailModal" style="display:none !important;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h3 id="mTitle">고객 상세 정보</h3>
+        </div>
+        <div class="modal-header-right">
+          <span class="badge" id="mHeaderStatusBadge">접수대기</span>
+          <button type="button" class="btn-close" onclick="closeDetailModal()">×</button>
+        </div>
+      </div>
 
-  <form id="leadForm">
-    <label>소개자 이름 <span>*</span></label>
-    <input type="text" id="userName" placeholder="이름을 입력하세요" required>
+      <div class="modal-body">
+        <div class="detail-grid">
+          <div class="detail-label">접수번호</div><div class="detail-val" id="mLeadId"></div>
+          <div class="detail-label">접수일시</div><div class="detail-val" id="mDate" style="font-weight:700; color:#1a73e8;"></div>
+          <div class="detail-label">소개출동차량</div><div class="detail-val" id="mCarAgent"></div>
+          <div class="detail-label">담당컨설턴트</div><div class="detail-val" id="mAssignedRep" style="font-weight:700; color:#1a73e8;"></div>
+          <div class="detail-label">고객명/상호</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
+          <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
+          <div class="detail-label">연락처</div><div class="detail-val" id="mContactPhone"></div>
+          <div class="detail-label">사업장 주소</div><div class="detail-val"><span id="mAddress"></span> <button type="button" onclick="openAddressOnMap_(document.getElementById('mAddress').innerText)" style="margin-left:6px; padding:3px 9px; font-size:0.75rem; font-weight:700; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer; white-space:nowrap;">🗺 지도보기</button></div>
+          <div class="detail-label">업종</div><div class="detail-val" id="mBusinessType"></div>
+          <div class="detail-label">현재사용/료</div><div class="detail-val" id="mCurrentCompany"></div>
+          <div class="detail-label">관심상품</div><div class="detail-val" id="mProduct"></div>
+          <div class="detail-label">현장설명</div><div class="detail-val" id="mFieldDesc" style="background:#f8f9fa; padding:8px; border-radius:6px; white-space:pre-wrap;"></div>
+          <div class="detail-label">현장사진</div>
+          <div class="detail-val">
+            <div class="modal-photo-grid" id="mPhotoGrid"></div>
+          </div>
+        </div>
 
-    <label>담당차량(호기) <span>*</span></label>
-    <select id="vehicleNo" required>
-      <option value="">차량을 선택하세요</option>
-      <option value="27호">27호</option>
-      <option value="28호">28호</option>
-      <option value="29호">29호</option>
-      <option value="30호">30호</option>
-    </select>
+        <div class="status-update-box">
+          <h4>📜 진행 이력</h4>
+          <div id="mStageTimeline"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
+        </div>
 
-    <button type="submit" id="submitBtn" class="submit-btn">⚡ 현장 가망고객 등록 시작</button>
-  </form>
-</div>
+        <div class="status-update-box">
+          <h4>⚡ 영업 진행상태 업데이트</h4>
+          <div class="form-group">
+            <label class="form-label">다음 진행상태 선택</label>
+            <select id="uStatus" onchange="renderStageFields(this.value)">
+              <option value="접수대기">1. 접수대기</option>
+              <option value="접수확인">2. 접수확인</option>
+              <option value="고객면담">3. 고객면담</option>
+              <option value="추가면담">4. 추가면담</option>
+              <option value="견적제출">5. 견적제출</option>
+              <option value="견적상담">6. 견적상담</option>
+              <option value="계약완료">7. 계약완료</option>
+              <option value="계약실패">8. 계약실패</option>
+              <option value="계약보류">9. 계약보류</option>
+            </select>
+          </div>
+          <div id="stageFieldsContainer"></div>
+          <button type="button" class="btn-save-status" id="btnSaveStatus" onclick="saveStatusUpdate()">상태 저장하기</button>
+        </div>
 
-<script>
-  // [STEP 3]에서 복사한 웹 앱 URL을 아래 따옴표 사이에 넣으세요.
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbxYLnfnamK2EdjPqQtnQ4EMoim_LXtZb4uGdWoZMEkJdFlwbyHocHUUca6bAqCSJpDJWw/exec";
+        <div class="status-update-box">
+          <h4>💬 게시판 (누구나 자유롭게 의견 남기기)</h4>
+          <div id="mBoard"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
+        </div>
 
-  document.getElementById("leadForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+        <div class="status-update-box" id="mAdminBox" style="display:none; background:#fff8f6; border-color:#f7c9c2;">
+          <h4 style="color:#c5221f;">🛠 관리자 전용 - 안건 관리</h4>
+          <div id="mAdminEditForm"></div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button type="button" class="btn-save-status" style="background:#5f6368;" onclick="toggleAdminEditLead()">안건 정보 수정</button>
+            <button type="button" class="btn-save-status" style="background:#c5221f;" onclick="confirmDeleteLead()">안건 삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    const btn = document.getElementById("submitBtn");
-    btn.disabled = true;
-    btn.innerText = "저장 중입니다...";
+  <!-- [소개자용 상세 모달] -->
+  <div class="modal-overlay" id="referrerDetailModal" style="display:none !important;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <h3 id="refMTitle">접수 상세</h3>
+        </div>
+        <div class="modal-header-right">
+          <span class="badge" id="refMStatusBadge">접수대기</span>
+          <button type="button" class="btn-close" onclick="closeReferrerDetailModal()">×</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="status-update-box">
+          <h4>📜 진행 이력</h4>
+          <div id="refStageTimeline"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
+        </div>
+        <div class="status-update-box">
+          <h4>💬 게시판 (누구나 자유롭게 의견 남기기)</h4>
+          <div id="refBoard"><p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    const payload = {
-      role: "CS근무자",
-      name: document.getElementById("userName").value.trim(),
-      vehicleNo: document.getElementById("vehicleNo").value
+  <script>
+    // ⚠️ 1단계에서 배포한 Apps Script 웹 앱 URL을 여기에 반드시 붙여넣으세요.
+    const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxYLnfnamK2EdjPqQtnQ4EMoim_LXtZb4uGdWoZMEkJdFlwbyHocHUUca6bAqCSJpDJWw/exec";
+
+    // ==========================================================
+    // [핵심] 구글 전용 통신(google.script.run)을 대체하는 범용 fetch 통신 브릿지
+    // ==========================================================
+    const google = {
+      script: {
+        run: {
+          _success: null,
+          _failure: null,
+          withSuccessHandler: function(fn) { this._success = fn; return this; },
+          withFailureHandler: function(fn) { this._failure = fn; return this; },
+          _call: async function(action, params) {
+            const successHandler = this._success;
+            const failureHandler = this._failure;
+            this._success = null;
+            this._failure = null;
+
+            try {
+              const res = await fetch(GAS_WEBAPP_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: action, params: params })
+              });
+              const data = await res.json();
+              if (successHandler) successHandler(data);
+            } catch (err) {
+              console.error(action + " 호출 에러:", err);
+              if (failureHandler) failureHandler(err);
+            }
+          },
+          verifyUserLogin: function(type, phone, pwd) {
+            return this._call('verifyUserLogin', { type: type, phone: phone, pwd: pwd });
+          },
+          submitLead: function(payload) {
+            return this._call('submitLead', { payload: payload });
+          },
+          getRecentLeadsByAgent: function(agent) {
+            return this._call('getRecentLeadsByAgent', { agent: agent });
+          },
+          getLeadsList: function(role, userName, status, kw) {
+            return this._call('getLeadsList', { role: role, userName: userName, status: status, kw: kw });
+          },
+          getLeadStageHistory: function(leadId) {
+            return this._call('getLeadStageHistory', { leadId: leadId });
+          },
+          getPhotoDataUrl: function(fid) {
+            return this._call('getPhotoDataUrl', { fid: fid });
+          },
+          advanceLeadStage: function(leadId, status, fields, userName) {
+            return this._call('advanceLeadStage', { leadId: leadId, status: status, fields: fields, userName: userName });
+          },
+          getBoardPosts: function(leadId) {
+            return this._call('getBoardPosts', { leadId: leadId });
+          },
+          createBoardPost: function(leadId, title, content, userName, role) {
+            return this._call('createBoardPost', { leadId: leadId, title: title, content: content, userName: userName, role: role });
+          },
+          updateBoardPost: function(postId, title, content, userName, role) {
+            return this._call('updateBoardPost', { postId: postId, title: title, content: content, userName: userName, role: role });
+          },
+          deleteBoardPost: function(postId, userName, role) {
+            return this._call('deleteBoardPost', { postId: postId, userName: userName, role: role });
+          },
+          adminUpdateLead: function(leadId, fields, role) {
+            return this._call('adminUpdateLead', { leadId: leadId, fields: fields, role: role });
+          },
+          adminDeleteLead: function(leadId, role) {
+            return this._call('adminDeleteLead', { leadId: leadId, role: role });
+          }
+        }
+      }
     };
 
-    try {
-      const response = await fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "text/plain;charset=utf-8" }
+    // ==========================================================
+    // 전화번호 정규화 및 실시간 하이픈 자동 포맷팅 헬퍼
+    // ==========================================================
+    function formatPhone(phone) {
+      if (!phone) return '';
+      let s = String(phone).replace(/[^0-9]/g, '');
+      if (!s) return String(phone);
+      if (s.length === 10 && s.startsWith('1')) s = '0' + s;
+      if (s.length === 11 && s.startsWith('010')) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+      if (s.length === 10) {
+        if (s.startsWith('02')) return s.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
+        return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+      }
+      if (s.length === 9 && s.startsWith('02')) return s.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
+      return s.startsWith('0') ? s : '0' + s;
+    }
+
+    function formatPhoneInput(el) {
+      let val = el.value.replace(/[^0-9]/g, '');
+      if (val.length === 10 && val.startsWith('1')) val = '0' + val;
+      if (val.length > 3 && val.length <= 7) {
+        val = val.replace(/(\d{3})(\d{1,4})/, '$1-$2');
+      } else if (val.length > 7 && val.length <= 11) {
+        if (val.startsWith('02')) {
+          if (val.length <= 9) val = val.replace(/(\d{2})(\d{3})(\d{1,4})/, '$1-$2-$3');
+          else val = val.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
+        } else {
+          if (val.length === 10) val = val.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+          else val = val.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
+        }
+      }
+      el.value = val;
+    }
+
+    // ==========================================================
+    // 안전 스토리지 래퍼
+    // ==========================================================
+    const inMemoryStorage = {};
+
+    function safeSessionGet(key) {
+      try { return sessionStorage.getItem(key); } catch (e) { return inMemoryStorage[key] || null; }
+    }
+    function safeSessionSet(key, val) {
+      try { sessionStorage.setItem(key, val); } catch (e) { inMemoryStorage[key] = val; }
+    }
+    function safeSessionRemove(key) {
+      try { sessionStorage.removeItem(key); } catch (e) { delete inMemoryStorage[key]; }
+    }
+
+    function saveUserPref(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) { inMemoryStorage['local_' + key] = value; }
+    }
+    function getUserPref(key) {
+      try { return localStorage.getItem(key) || inMemoryStorage['local_' + key] || ''; } catch (e) { return inMemoryStorage['local_' + key] || ''; }
+    }
+
+    // ==========================================================
+    // 로그인 탭 전환 함수
+    // ==========================================================
+    function setLoginTab(tab) {
+      if (!tab) tab = 'cs';
+
+      const roleSelect = document.getElementById('loginRoleSelect');
+      if (roleSelect && roleSelect.value !== tab) {
+        roleSelect.value = tab;
+      }
+
+      const btnCS = document.getElementById('tabBtnCS');
+      const btnCon = document.getElementById('tabBtnConsultant');
+      const btnAdm = document.getElementById('tabBtnAdmin');
+
+      if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
+      if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
+      if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
+
+      const formCS = document.getElementById('loginFormCS');
+      const formCon = document.getElementById('loginFormConsultant');
+      const formAdm = document.getElementById('loginFormAdmin');
+
+      if (formCS) formCS.style.display = tab === 'cs' ? 'block' : 'none';
+      if (formCon) formCon.style.display = tab === 'consultant' ? 'block' : 'none';
+      if (formAdm) formAdm.style.display = tab === 'admin' ? 'block' : 'none';
+
+      hideAllLoginErrors();
+    }
+
+    function hideAllLoginErrors() {
+      const e1 = document.getElementById('csLoginErr');
+      const e2 = document.getElementById('conLoginErr');
+      const e3 = document.getElementById('adminLoginErr');
+      if (e1) e1.style.display = 'none';
+      if (e2) e2.style.display = 'none';
+      if (e3) e3.style.display = 'none';
+    }
+
+    function showLoginError(id, msg) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+      try { alert(msg); } catch (e) {}
+    }
+
+    // ==========================================================
+    // 기본 상태 변수
+    // ==========================================================
+    const CAR_REP_MAP = {
+      '26': '정문재',
+      '27': '이수열',
+      '28': '최영국',
+      '127': '임영민',
+      '160': '박광춘'
+    };
+
+    let currentRole = '';
+    let currentUserName = '';
+    let currentStatusFilter = '전체';
+    let currentLeadsData = [];
+    let activeLeadId = '';
+    let activeLeadItem = null;
+    let uploadedPhotos = [];
+
+    // ==========================================================
+    // 로그인 실행 로직
+    // ==========================================================
+    function submitLogin(type) {
+      hideAllLoginErrors();
+
+      if (type === 'cs') {
+        const nameInput = document.getElementById('csLoginName');
+        const carSelect = document.getElementById('csLoginCar');
+        const name = nameInput ? nameInput.value.trim() : '';
+        const car = carSelect ? carSelect.value : '';
+
+        if (!name) {
+          showLoginError('csLoginErr', '소개자 이름을 입력해주세요.');
+          if (nameInput) nameInput.focus();
+          return;
+        }
+        if (!car) {
+          showLoginError('csLoginErr', '담당 차량(호기)을 선택해주세요.');
+          if (carSelect) carSelect.focus();
+          return;
+        }
+
+        saveUserPref('s1_agent_name', name);
+        saveUserPref('s1_car_no', car);
+
+        const agentNameEl = document.getElementById('agentName');
+        const carNumberEl = document.getElementById('carNumber');
+        if (agentNameEl) agentNameEl.value = name;
+        if (carNumberEl) carNumberEl.value = car;
+
+        currentRole = 'cs';
+        currentUserName = name + ' (' + car + '호)';
+        safeSessionSet('s1_auth_role', currentRole);
+        safeSessionSet('s1_auth_user', currentUserName);
+
+        showScreen('register');
+
+      } else if (type === 'consultant') {
+        const phoneInput = document.getElementById('conLoginPhone');
+        const pwdInput = document.getElementById('conLoginPwd');
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+        const pwd = pwdInput ? pwdInput.value : '';
+
+        if (!phone) {
+          showLoginError('conLoginErr', '휴대폰 번호를 입력해주세요.');
+          if (phoneInput) phoneInput.focus();
+          return;
+        }
+        if (!pwd) {
+          showLoginError('conLoginErr', '비밀번호를 입력해주세요.');
+          if (pwdInput) pwdInput.focus();
+          return;
+        }
+
+        const btn = document.getElementById('btnConLogin');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = '인증 확인 중...';
+        }
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = '내 소개내역 조회하기';
+            }
+            if (res && res.success) {
+              currentRole = res.role || 'consultant';
+              currentUserName = res.userName;
+              safeSessionSet('s1_auth_role', currentRole);
+              safeSessionSet('s1_auth_user', currentUserName);
+              showScreen('dashboard');
+            } else {
+              showLoginError('conLoginErr', '로그인 실패: ' + (res ? res.message : '알 수 없는 오류'));
+            }
+          })
+          .withFailureHandler(function(err) {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = '내 소개내역 조회하기';
+            }
+            showLoginError('conLoginErr', '인증 통신 오류: ' + (err ? (err.message || err) : '서버 응답 없음'));
+          })
+          .verifyUserLogin('consultant', phone, pwd);
+
+      } else if (type === 'admin') {
+        const pwdInput = document.getElementById('adminLoginPwd');
+        const pwd = pwdInput ? pwdInput.value : '';
+
+        if (!pwd) {
+          showLoginError('adminLoginErr', '관리자 비밀번호를 입력해주세요.');
+          if (pwdInput) pwdInput.focus();
+          return;
+        }
+
+        const btn = document.getElementById('btnAdminLogin');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerText = '확인 중...';
+        }
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = '관리자 전체 조회 접속';
+            }
+            if (res && res.success) {
+              currentRole = 'admin';
+              currentUserName = res.userName || '관리자';
+              safeSessionSet('s1_auth_role', currentRole);
+              safeSessionSet('s1_auth_user', currentUserName);
+              showScreen('dashboard');
+            } else {
+              showLoginError('adminLoginErr', res ? res.message : '비밀번호가 일치하지 않습니다.');
+            }
+          })
+          .withFailureHandler(function(err) {
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = '관리자 전체 조회 접속';
+            }
+            showLoginError('adminLoginErr', '통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+          })
+          .verifyUserLogin('admin', '', pwd);
+      }
+    }
+
+    // ==========================================================
+    // 화면 전환 라우터
+    // ==========================================================
+    function showScreen(screenId) {
+      closeDetailModal();
+      document.body.classList.toggle('on-login', screenId === 'login');
+
+      const vLogin = document.getElementById('viewLogin');
+      const vReg = document.getElementById('viewRegister');
+      const vDash = document.getElementById('viewDashboard');
+
+      if (vLogin) vLogin.style.display = screenId === 'login' ? 'block' : 'none';
+      if (vReg) vReg.style.display = screenId === 'register' ? 'block' : 'none';
+      if (vDash) vDash.style.display = screenId === 'dashboard' ? 'block' : 'none';
+
+      if (screenId === 'register') {
+        const regTitle = document.getElementById('regUserTitle');
+        const regSub = document.getElementById('regUserSub');
+        const regSwitch = document.getElementById('regSwitchBtn');
+
+        if (currentRole === 'admin') {
+          if (regTitle) regTitle.innerText = '👑 관리자(지사장)';
+          if (regSub) regSub.innerText = '현장등록 모드';
+          if (regSwitch) regSwitch.style.display = 'inline-block';
+        } else if (currentRole === 'consultant') {
+          if (regTitle) regTitle.innerText = '👤 ' + currentUserName + ' 컨설턴트';
+          if (regSub) regSub.innerText = '현장등록 모드';
+          if (regSwitch) regSwitch.style.display = 'inline-block';
+        } else {
+          if (regTitle) regTitle.innerText = '🛡️ ' + currentUserName;
+          if (regSub) regSub.innerText = '출동/CS 등록 모드';
+          if (regSwitch) regSwitch.style.display = 'none';
+        }
+        
+        onCarChange();
+        loadRecentHistory();
+      } else if (screenId === 'dashboard') {
+        const dashSub = document.getElementById('dashUserSub');
+        if (dashSub) {
+          if (currentRole === 'admin') {
+            dashSub.innerText = '👑 관리자(' + currentUserName + ') 로그인 중';
+          } else {
+            dashSub.innerText = '👤 ' + currentUserName + ' 컨설턴트 로그인 중';
+          }
+        }
+        loadDashboardLeads();
+      }
+    }
+
+    function toggleMainView() {
+      const regVisible = document.getElementById('viewRegister') && document.getElementById('viewRegister').style.display === 'block';
+      showScreen(regVisible ? 'dashboard' : 'register');
+    }
+
+    function handleLogout() {
+      safeSessionRemove('s1_auth_role');
+      safeSessionRemove('s1_auth_user');
+      currentRole = '';
+      currentUserName = '';
+      showScreen('login');
+      setLoginTab('cs');
+    }
+
+    // ==========================================================
+    // 앱 초기화
+    // ==========================================================
+    function initApp() {
+      try {
+        closeDetailModal();
+
+        const savedRole = safeSessionGet('s1_auth_role');
+        const savedUser = safeSessionGet('s1_auth_user');
+
+        if (savedRole && savedUser) {
+          currentRole = savedRole;
+          currentUserName = savedUser;
+          if (currentRole === 'cs') {
+            showScreen('register');
+          } else {
+            showScreen('dashboard');
+          }
+        } else {
+          showScreen('login');
+          setLoginTab('cs');
+        }
+
+        const savedAgent = getUserPref('s1_agent_name');
+        const savedCar = getUserPref('s1_car_no');
+        if (savedAgent) {
+          const el1 = document.getElementById('csLoginName');
+          const el2 = document.getElementById('agentName');
+          if (el1) el1.value = savedAgent;
+          if (el2) el2.value = savedAgent;
+        }
+        if (savedCar) {
+          const el1 = document.getElementById('csLoginCar');
+          const el2 = document.getElementById('carNumber');
+          if (el1) el1.value = savedCar;
+          if (el2) el2.value = savedCar;
+        }
+      } catch (err) {
+        console.error('initApp 에러:', err);
+        showScreen('login');
+        setLoginTab('cs');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+
+    // ==========================================================
+    // 지도/주소 검색 연동
+    // ==========================================================
+    function openAddressOnMap_(address) {
+      const addr = String(address || '').trim();
+      if (!addr || addr === '-') { alert('등록된 주소가 없습니다.'); return; }
+      window.open('https://map.naver.com/p/search/' + encodeURIComponent(addr), '_blank');
+    }
+
+    function openDaumPostcode_(targetInputId) {
+      if (typeof daum === 'undefined' || !daum.Postcode) {
+        const script = document.createElement('script');
+        script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+        script.onload = function() { launchDaumPostcode_(targetInputId); };
+        document.body.appendChild(script);
+      } else {
+        launchDaumPostcode_(targetInputId);
+      }
+    }
+
+    function launchDaumPostcode_(targetInputId) {
+      new daum.Postcode({
+        oncomplete: function(data) {
+          const roadAddr = data.roadAddress || data.jibunAddress || data.address;
+          const extra = [];
+          if (data.bname) extra.push(data.bname);
+          if (data.buildingName) extra.push(data.buildingName);
+          const fullAddr = roadAddr + (extra.length ? ' (' + extra.join(', ') + ')' : '');
+          const el = document.getElementById(targetInputId);
+          if (el) el.value = fullAddr;
+        }
+      }).open();
+    }
+
+    function openNaverPlaceSearchByName_(nameInputId) {
+      const nameEl = document.getElementById(nameInputId);
+      const keyword = nameEl ? nameEl.value.trim() : '';
+      if (!keyword) { alert('먼저 고객명/상호를 입력해주세요.'); return; }
+      window.open('https://map.naver.com/p/search/' + encodeURIComponent(keyword), '_blank');
+    }
+
+    // ==========================================================
+    // 날짜 표기 및 대시보드 로직
+    // ==========================================================
+    function formatKoreanDate(dateInput) {
+      if (!dateInput) return '';
+      const s = String(dateInput).trim();
+      if (/^\d{2}\.\d{1,2}\.\d{1,2}\s*\([일월화수목금토]\)\s*\d{2}:\d{2}$/.test(s)) {
+        return s;
+      }
+
+      const d = new Date(dateInput);
+      if (isNaN(d.getTime())) {
+        const parts = s.match(/(\d{2,4})[^\d](\d{1,2})[^\d](\d{1,2})(?:[^\d]+(\\d{1,2})[^\d](\d{1,2}))?/);
+        if (parts) {
+          const yNum = parseInt(parts[1], 10);
+          const yy = yNum < 100 ? yNum : yNum % 100;
+          const m = parseInt(parts[2], 10);
+          const day = parseInt(parts[3], 10);
+          const hh = parts[4] !== undefined ? ('0' + parts[4]).slice(-2) : '00';
+          const mm = parts[5] !== undefined ? ('0' + parts[5]).slice(-2) : '00';
+          const fullY = yNum < 100 ? 2000 + yNum : yNum;
+          const tempD = new Date(fullY, m - 1, day);
+          const days = ['일', '월', '화', '수', '목', '금', '토'];
+          const dayName = days[tempD.getDay()];
+          return yy + '.' + m + '.' + day + ' (' + dayName + ') ' + hh + ':' + mm;
+        }
+        return s;
+      }
+
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      const dayName = days[d.getDay()];
+      const yy = String(d.getFullYear()).slice(-2);
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      const hh = ('0' + d.getHours()).slice(-2);
+      const mm = ('0' + d.getMinutes()).slice(-2);
+      return yy + '.' + m + '.' + day + ' (' + dayName + ') ' + hh + ':' + mm;
+    }
+
+    function splitDateTimeTwoLines_(krDateStr) {
+      const s = String(krDateStr || '').trim();
+      const m = s.match(/^(.*?)(\d{1,2}:\d{2})$/);
+      if (m) {
+        return { datePart: m[1].trim(), timePart: m[2].trim() };
+      }
+      return { datePart: s, timePart: '' };
+    }
+
+    let allLeadsCache = null;
+    let allLeadsCounts = null;
+    let leadsCacheLoading = false;
+
+    function isIngGroup_(status) {
+      return (status === '상담진행' || status === '영업배정' || status === '접수확인' || status === '고객면담' || status === '추가면담');
+    }
+    function isQuoteGroup_(status) {
+      return (status === '견적제출' || status === '견적상담');
+    }
+    function isCancelGroup_(status) {
+      return (status === '취소/보류' || status === '보류' || status === '계약실패' || status === '계약보류');
+    }
+
+    function applyLocalFilter_(list, statusFilter, keyword) {
+      const kw = keyword ? keyword.toLowerCase().trim() : '';
+      return (list || []).filter(function(item) {
+        const status = item.status || '접수대기';
+        if (statusFilter && statusFilter !== '전체') {
+          if (statusFilter === '상담진행' && !isIngGroup_(status)) return false;
+          else if (statusFilter === '견적제출' && !isQuoteGroup_(status)) return false;
+          else if (statusFilter === '취소/보류' && !isCancelGroup_(status)) return false;
+          else if (statusFilter !== '상담진행' && statusFilter !== '견적제출' && statusFilter !== '취소/보류' && status !== statusFilter) return false;
+        }
+        if (kw) {
+          const fullText = [item.leadId, item.carNumber, item.agentName, item.customerName, item.contactPerson,
+            item.contactPhone, item.address, item.businessType, item.product, item.fieldDescription]
+            .join(' ').toLowerCase();
+          if (fullText.indexOf(kw) === -1) return false;
+        }
+        return true;
+      });
+    }
+
+    function computeLocalCounts_(list) {
+      const counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
+      (list || []).forEach(function(item) {
+        const status = item.status || '접수대기';
+        counts.total++;
+        if (status === '접수대기') counts.wait++;
+        else if (isIngGroup_(status)) counts.ing++;
+        else if (isQuoteGroup_(status)) counts.quote++;
+        else if (status === '계약완료') counts.done++;
+        else if (isCancelGroup_(status)) counts.cancel++;
+      });
+      return counts;
+    }
+
+    function setFilter(status, el) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      if (el) {
+        el.classList.add('active');
+      } else {
+        const match = document.querySelector(`.filter-chip[data-status="${status}"]`);
+        if (match) match.classList.add('active');
+      }
+      loadDashboardLeads();
+    }
+
+    function setFilterByCard(status) {
+      setFilter(status, null);
+    }
+
+    function refreshLeadsFromServer(afterLoad) {
+      leadsCacheLoading = true;
+      const kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value : '';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          leadsCacheLoading = false;
+          if (res && res.success) {
+            allLeadsCache = res.list || [];
+            allLeadsCounts = res.counts;
+            const filtered = applyLocalFilter_(allLeadsCache, currentStatusFilter, kw);
+            currentLeadsData = filtered;
+            renderStats(currentStatusFilter === '전체' && !kw ? allLeadsCounts : computeLocalCounts_(allLeadsCache));
+            renderViews(filtered);
+            if (typeof afterLoad === 'function') afterLoad();
+          } else {
+            alert('데이터 조회 실패: ' + (res ? res.message : '응답 없음'));
+          }
+        })
+        .withFailureHandler(function(err) {
+          leadsCacheLoading = false;
+          alert('목록 조회 통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+        })
+        .getLeadsList(currentRole, currentUserName, '전체', '');
+    }
+
+    function loadDashboardLeads() {
+      const kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value : '';
+      if (!allLeadsCache) {
+        refreshLeadsFromServer();
+        return;
+      }
+      const filtered = applyLocalFilter_(allLeadsCache, currentStatusFilter, kw);
+      currentLeadsData = filtered;
+      renderStats(computeLocalCounts_(allLeadsCache));
+      renderViews(filtered);
+    }
+
+    function renderStats(counts) {
+      const c = counts || { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val || 0; };
+
+      setVal('cntTotal', c.total);
+      setVal('cntWait', c.wait);
+      setVal('cntIng', c.ing);
+      setVal('cntQuote', c.quote);
+      setVal('cntDone', c.done);
+      setVal('cntCancel', c.cancel);
+
+      setVal('cCntTotal', c.total);
+      setVal('cCntWait', c.wait);
+      setVal('cCntIng', c.ing);
+      setVal('cCntQuote', c.quote);
+      setVal('cCntDone', c.done);
+      setVal('cCntCancel', c.cancel);
+    }
+
+    function getBadgeClass(status) {
+      if (status === '계약완료') return 'badge-done';
+      if (status === '계약실패') return 'badge-fail';
+      if (status === '계약보류') return 'badge-hold';
+      if (status === '취소/보류' || status === '보류') return 'badge-cancel';
+      if (status === '고객면담' || status === '추가면담') return 'badge-meet';
+      if (status === '견적제출' || status === '견적상담') return 'badge-quote';
+      if (status === '접수확인' || status === '상담진행' || status === '영업배정') return 'badge-ing';
+      return 'badge-wait';
+    }
+
+    function openPhotoDataUrl(dataUrl) {
+      const w = window.open('', '_blank');
+      if (!w) return;
+      w.document.open();
+      w.document.write('<!DOCTYPE html><html><head><title>사진 크게보기</title><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="' + dataUrl + '" style="max-width:100%;max-height:100vh;"></body></html>');
+      w.document.close();
+    }
+
+    function extractDriveFileId(url) {
+      if (!url) return '';
+      let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+      match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+      match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) return match[1];
+      return '';
+    }
+
+    function renderViews(list) {
+      const pcTbody = document.getElementById('pcTableBody');
+      const mList = document.getElementById('mobileCardList');
+
+      if (!list || list.length === 0) {
+        if (pcTbody) pcTbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:40px; color:#5f6368;">해당 조건의 소개 내역이 없습니다.</td></tr>';
+        if (mList) mList.innerHTML = '<p style="text-align:center; padding:40px; color:#5f6368;">해당 조건의 소개 내역이 없습니다.</p>';
+        return;
+      }
+
+      let pcHtml = '';
+      list.forEach((item, idx) => {
+        const photoCount = item.photoUrls ? item.photoUrls.length : 0;
+        const photoIcon = photoCount > 0 ? `<span style="color:#1a73e8; font-weight:700; cursor:pointer;" onclick="openDetailModal(${idx})">📷 ${photoCount}장</span>` : '-';
+        const currentFeeStr = item.currentFee ? ` (${item.currentFee}원)` : '';
+        const krDate = formatKoreanDate(item.date);
+        const dtParts = splitDateTimeTwoLines_(krDate);
+        const phoneFormatted = formatPhone(item.contactPhone);
+
+        pcHtml += `
+          <tr>
+            <td style="font-size:0.8rem; color:#5f6368; white-space:nowrap; line-height:1.5;">${dtParts.datePart}<br>${dtParts.timePart}</td>
+            <td style="white-space:nowrap;"><strong>${item.carNumber}호</strong><br><span style="color:#5f6368; font-size:0.75rem;">${item.agentName}</span></td>
+            <td style="white-space:nowrap; font-weight:700; color:#1a73e8;">${item.assignedRep || '-'}</td>
+            <td class="customer-cell" onclick="openDetailModal(${idx})">${item.customerName}</td>
+            <td style="white-space:nowrap;"><a href="tel:${phoneFormatted}" style="color:#202124; text-decoration:none; font-weight:600;">${phoneFormatted}</a></td>
+            <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.address || '-'}</td>
+            <td style="font-size:0.8rem;">${item.currentCompany}${currentFeeStr}</td>
+            <td style="font-size:0.8rem; color:#1a73e8;">${item.product}</td>
+            <td style="text-align:center;">${photoIcon}</td>
+            <td><span class="badge ${getBadgeClass(item.status)}">${item.status}</span></td>
+            <td><button type="button" class="btn-detail" onclick="openDetailModal(${idx})">상세/관리</button></td>
+          </tr>
+        `;
+      });
+      if (pcTbody) pcTbody.innerHTML = pcHtml;
+
+      let mHtml = '';
+      list.forEach((item, idx) => {
+        const photoCount = item.photoUrls ? item.photoUrls.length : 0;
+        const photoTag = photoCount > 0 ? `<span style="font-size:0.75rem; color:#1a73e8; font-weight:700;">📷 현장사진 ${photoCount}장</span>` : '';
+        const krDate = formatKoreanDate(item.date);
+        const phoneFormatted = formatPhone(item.contactPhone);
+
+        mHtml += `
+          <div class="mobile-lead-card">
+            <div class="m-card-header">
+              <span class="m-car-tag">${item.carNumber}호차 · ${item.agentName}</span>
+              <span class="badge ${getBadgeClass(item.status)}">${item.status}</span>
+            </div>
+            <div class="m-customer-name" onclick="openDetailModal(${idx})">${item.customerName}</div>
+            <a href="tel:${phoneFormatted}" class="m-phone-link">📞 ${phoneFormatted} <span style="font-size:0.75rem; color:#1a73e8;">(통화연결)</span></a>
+            <div class="m-info-row">📍 ${item.address || '주소 정보 없음'}</div>
+            <div class="m-info-row">📦 관심상품: <strong>${item.product}</strong></div>
+            <div class="m-info-row">🏢 현재회사: ${item.currentCompany} ${item.currentFee ? '('+item.currentFee+'원)' : ''}</div>
+            <div class="m-footer-actions">
+              <div>
+                <span style="font-size:0.75rem; color:#5f6368;">${krDate} · 담당: <strong>${item.assignedRep}</strong></span>
+                <div style="margin-top:2px;">${photoTag}</div>
+              </div>
+              <button type="button" class="btn-detail" onclick="openDetailModal(${idx})">상세/상태변경</button>
+            </div>
+          </div>
+        `;
+      });
+      if (mList) mList.innerHTML = mHtml;
+    }
+
+    // ==========================================================
+    // 상세 모달 열기/닫기
+    // ==========================================================
+    function openDetailModal(idx) {
+      const item = currentLeadsData[idx];
+      if (!item) return;
+
+      activeLeadId = item.leadId;
+      const setT = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text || ''; };
+
+      setT('mTitle', item.customerName);
+
+      const headerStatusBadge = document.getElementById('mHeaderStatusBadge');
+      if (headerStatusBadge) {
+        headerStatusBadge.innerText = item.status || '접수대기';
+        headerStatusBadge.className = 'badge ' + getBadgeClass(item.status);
+      }
+
+      setT('mLeadId', item.leadId);
+      setT('mDate', formatKoreanDate(item.date));
+      setT('mCarAgent', item.carNumber + '호차 (' + item.agentName + ' 요원)');
+      setT('mAssignedRep', item.assignedRep || '-');
+      setT('mCustomerName', item.customerName);
+      setT('mContactPerson', item.contactPerson || '-');
+      
+      const phoneFormatted = formatPhone(item.contactPhone);
+      const phoneEl = document.getElementById('mContactPhone');
+      if (phoneEl) phoneEl.innerHTML = `<a href="tel:${phoneFormatted}" style="color:#1a73e8; font-weight:700;">${phoneFormatted} 📞</a>`;
+      
+      setT('mAddress', item.address || '-');
+      setT('mBusinessType', item.businessType || '-');
+      setT('mCurrentCompany', item.currentCompany + (item.currentFee ? ' (월 ' + item.currentFee + '원)' : ''));
+      setT('mProduct', item.product);
+      setT('mFieldDesc', item.fieldDescription || '작성된 현장 설명이 없습니다.');
+
+      const photoGrid = document.getElementById('mPhotoGrid');
+      if (photoGrid) {
+        photoGrid.innerHTML = '';
+        if (item.photoUrls && item.photoUrls.length > 0) {
+          item.photoUrls.forEach((url, pIdx) => {
+            const fid = extractDriveFileId(url);
+            const card = document.createElement('div');
+            card.className = 'modal-photo-card';
+
+            const img = document.createElement('img');
+            img.alt = '현장사진 ' + (pIdx + 1);
+            img.loading = 'lazy';
+            img.style.background = '#f1f3f4';
+            img.style.minHeight = '90px';
+
+            const footer = document.createElement('div');
+            footer.className = 'photo-card-footer';
+            footer.innerHTML = '<span class="photo-zoom-btn" style="color:#9aa0a6;">사진 불러오는 중...</span>';
+
+            card.appendChild(img);
+            card.appendChild(footer);
+            photoGrid.appendChild(card);
+
+            if (fid) {
+              google.script.run
+                .withSuccessHandler(function(res) {
+                  if (res && res.success) {
+                    img.src = res.dataUrl;
+                    img.onclick = function() { openPhotoDataUrl(res.dataUrl); };
+                    footer.innerHTML = `<a href="javascript:void(0)" class="photo-zoom-btn">🔍 사진 ${pIdx + 1} 크게보기 ↗</a>`;
+                    footer.querySelector('a').onclick = function() { openPhotoDataUrl(res.dataUrl); };
+                  } else {
+                    footer.innerHTML = '<span style="color:#d93025; font-size:0.8rem;">사진을 불러올 수 없습니다.</span>';
+                  }
+                })
+                .withFailureHandler(function() {
+                  footer.innerHTML = '<span style="color:#d93025; font-size:0.8rem;">사진을 불러올 수 없습니다.</span>';
+                })
+                .getPhotoDataUrl(fid);
+            } else {
+              footer.innerHTML = '<span style="color:#d93025; font-size:0.8rem;">사진 정보를 확인할 수 없습니다.</span>';
+            }
+          });
+        } else {
+          photoGrid.innerHTML = '<span style="color:#9aa0a6; font-size:0.85rem; padding:10px 0;">등록된 사진이 없습니다.</span>';
+        }
+      }
+
+      const uStatusEl = document.getElementById('uStatus');
+      if (uStatusEl) uStatusEl.value = item.status || '접수대기';
+
+      currentLeadTimeline = [];
+      renderStageFields(item.status || '접수대기');
+      loadLeadTimelineInto(item.leadId, 'mStageTimeline', function() {
+        const sel = document.getElementById('uStatus');
+        if (sel) renderStageFields(sel.value);
       });
 
-      const result = await response.json();
+      activeLeadItem = item;
+      loadBoardInto(item.leadId, 'mBoard');
 
-      if (result.status === "success") {
-        alert("성공적으로 등록되었습니다!");
-        document.getElementById("userName").value = "";
-        document.getElementById("vehicleNo").value = "";
-      } else {
-        alert("등록 실패: " + result.message);
-      }
-    } catch (error) {
-      alert("네트워크 오류가 발생했습니다.");
-      console.error(error);
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "⚡ 현장 가망고객 등록 시작";
+      const adminBox = document.getElementById('mAdminBox');
+      if (adminBox) adminBox.style.display = (currentRole === 'admin') ? 'block' : 'none';
+      const adminEditForm = document.getElementById('mAdminEditForm');
+      if (adminEditForm) adminEditForm.innerHTML = '';
+
+      const modalBody = document.querySelector('.modal-body');
+      if (modalBody) modalBody.scrollTop = 0;
+      
+      const modal = document.getElementById('detailModal');
+      if (modal) modal.style.display = 'flex';
     }
-  });
-</script>
 
+    const PRODUCT_LIST = ['알람', '영상렌탈', '블루스캔', '정보보안', '영상매각', '금고', 'AED', 'AI도어캠', '기타'];
+    let currentLeadTimeline = [];
+
+    function productCheckboxesHtml_(prefix, selected) {
+      selected = selected || [];
+      return PRODUCT_LIST.map(function(p) {
+        const checked = selected.indexOf(p) !== -1 ? 'checked' : '';
+        return '<label class="prod-item-sm"><input type="checkbox" class="' + prefix + '-prod" value="' + p + '" ' + checked + '> ' + p + '</label>';
+      }).join('');
+    }
+
+    function findLatestStageFields_(stageNames) {
+      if (!currentLeadTimeline) return null;
+      for (let i = currentLeadTimeline.length - 1; i >= 0; i--) {
+        const entry = currentLeadTimeline[i];
+        if (entry.type === 'stage' && stageNames.indexOf(entry.stage) !== -1) {
+          return entry.fields || {};
+        }
+      }
+      return null;
+    }
+
+    function renderStageFields(stage) {
+      const c = document.getElementById('stageFieldsContainer');
+      if (!c) return;
+      let html = '';
+
+      if (stage === '접수확인') {
+        html = '<div class="form-group"><label class="form-label">영업상담메모 <span style="color:#d93025;">* (10자 이상)</span></label><textarea id="sf_memo" rows="3" placeholder="확인 내용을 10자 이상 입력해주세요."></textarea></div>';
+      } else if (stage === '고객면담' || stage === '추가면담') {
+        html = '<div class="form-group"><label class="form-label">면담방법 *</label><select id="sf_method"><option value="직접방문">직접방문</option><option value="전화상담">전화상담</option></select></div>'
+          + '<div class="form-group"><label class="form-label">면담일시 *</label><input type="datetime-local" id="sf_meetingDateTime"></div>'
+          + '<div class="form-group"><label class="form-label">상담내용 <span style="color:#d93025;">* (10자 이상)</span></label><textarea id="sf_content" rows="3" placeholder="면담 내용을 10자 이상 입력해주세요."></textarea></div>';
+      } else if (stage === '견적제출') {
+        html = '<div class="form-group"><label class="form-label">제출 상품 (다중선택) *</label><div class="prod-checkbox-group">' + productCheckboxesHtml_('sf', []) + '</div></div>'
+          + '<div class="form-group"><label class="form-label">견적금액(원) *</label><input type="number" id="sf_amount" placeholder="예: 500000"></div>'
+          + '<div class="form-group"><label class="form-label">예상 계약일정 *</label><input type="date" id="sf_expectedContractDate"></div>'
+          + '<div class="form-group"><label class="form-label">비고 (고객요구사항/견적 보충설명) *</label><textarea id="sf_note" rows="3" placeholder="고객 요구사항이나 견적 보충 설명을 입력해주세요."></textarea></div>';
+      } else if (stage === '견적상담') {
+        const prevFields = findLatestStageFields_(['견적제출', '견적상담']) || {};
+        html = '<div class="form-group"><label class="form-label">상품 (필요시 변경)</label><div class="prod-checkbox-group">' + productCheckboxesHtml_('sf', prevFields.products || []) + '</div></div>'
+          + '<div class="form-group"><label class="form-label">견적금액(원) (필요시 수정)</label><input type="number" id="sf_amount" value="' + (prevFields.amount != null ? prevFields.amount : '') + '"></div>'
+          + '<div class="form-group"><label class="form-label">계약 예정일자 (필요시 수정)</label><input type="date" id="sf_expectedContractDate" value="' + (prevFields.expectedContractDate || '') + '"></div>'
+          + '<div class="form-group"><label class="form-label">상담/변경 내용</label><textarea id="sf_note" rows="3" placeholder="추가 상담 내용, 일정 변경, 상품 변경 사유 등"></textarea></div>';
+      } else if (stage === '계약완료') {
+        html = '<div class="form-group"><label class="form-label">계약성공일자 *</label><input type="date" id="sf_contractDate"></div>'
+          + '<div class="form-group"><label class="form-label">계약 상품 (확정) *</label><div class="prod-checkbox-group">' + productCheckboxesHtml_('sf', []) + '</div></div>'
+          + '<div class="form-group"><label class="form-label">계약금액(원) *</label><input type="number" id="sf_contractAmount" placeholder="예: 500000"></div>'
+          + '<div class="form-group"><label class="form-label">계약번호</label><input type="text" id="sf_contractNo" placeholder="계약번호 (선택)"></div>'
+          + '<div class="form-group"><label class="form-label">추가요구사항</label><textarea id="sf_extraRequest" rows="2" placeholder="고객의 추가 요구사항 등 (선택)"></textarea></div>';
+      } else if (stage === '계약실패') {
+        html = '<div class="form-group"><label class="form-label">실패일자 *</label><input type="date" id="sf_failDate"></div>'
+          + '<div class="form-group"><label class="form-label">실패사유 *</label><textarea id="sf_reason" rows="3" placeholder="실패 사유를 입력해주세요."></textarea></div>';
+      } else if (stage === '계약보류') {
+        html = '<div class="form-group"><label class="form-label">보류기한 *</label><input type="date" id="sf_holdUntil"></div>'
+          + '<div class="form-group"><label class="form-label">보류사유 *</label><textarea id="sf_reason" rows="3" placeholder="보류 사유를 입력해주세요. 기한 도래 시 이전 단계로 자동 복귀됩니다."></textarea></div>';
+      } else {
+        html = '<p style="color:#9aa0a6; font-size:0.85rem;">이 상태로 변경 시 추가 입력 항목이 없습니다.</p>';
+      }
+      c.innerHTML = html;
+    }
+
+    function collectStageFields_(stage) {
+      const val = function(id) { const el = document.getElementById(id); return el ? el.value : ''; };
+      const checkedProducts = function(prefix) {
+        return Array.prototype.slice.call(document.querySelectorAll('.' + prefix + '-prod:checked')).map(function(cb) { return cb.value; });
+      };
+
+      if (stage === '접수확인') return { memo: val('sf_memo') };
+      if (stage === '고객면담' || stage === '추가면담') {
+        return { method: val('sf_method'), meetingDateTime: val('sf_meetingDateTime'), content: val('sf_content') };
+      }
+      if (stage === '견적제출' || stage === '견적상담') {
+        return { products: checkedProducts('sf'), amount: val('sf_amount'), expectedContractDate: val('sf_expectedContractDate'), note: val('sf_note') };
+      }
+      if (stage === '계약완료') {
+        return { contractDate: val('sf_contractDate'), products: checkedProducts('sf'), contractAmount: val('sf_contractAmount'), contractNo: val('sf_contractNo'), extraRequest: val('sf_extraRequest') };
+      }
+      if (stage === '계약실패') return { failDate: val('sf_failDate'), reason: val('sf_reason') };
+      if (stage === '계약보류') return { holdUntil: val('sf_holdUntil'), reason: val('sf_reason') };
+      return {};
+    }
+
+    function validateStageFieldsClient_(stage, fields) {
+      const trim = function(v) { return String(v == null ? '' : v).trim(); };
+      if (stage === '접수확인') {
+        if (trim(fields.memo).length < 10) return '영업상담메모를 10자 이상 입력해주세요.';
+      } else if (stage === '고객면담' || stage === '추가면담') {
+        if (!fields.method) return '면담방법을 선택해주세요.';
+        if (trim(fields.content).length < 10) return '상담내용을 10자 이상 입력해주세요.';
+        if (!fields.meetingDateTime) return '면담일시를 입력해주세요.';
+      } else if (stage === '견적제출') {
+        if (!fields.products || fields.products.length === 0) return '제출 상품을 1개 이상 선택해주세요.';
+        if (fields.amount === '' || fields.amount == null) return '견적금액을 입력해주세요.';
+        if (!fields.expectedContractDate) return '예상 계약일정을 입력해주세요.';
+        if (trim(fields.note).length < 1) return '비고(고객요구사항/견적 보충설명)를 입력해주세요.';
+      } else if (stage === '계약완료') {
+        if (!fields.contractDate) return '계약성공일자를 입력해주세요.';
+        if (!fields.products || fields.products.length === 0) return '계약 상품종류를 선택해주세요.';
+        if (fields.contractAmount === '' || fields.contractAmount == null) return '계약금액을 입력해주세요.';
+      } else if (stage === '계약실패') {
+        if (!fields.failDate) return '실패일자를 입력해주세요.';
+        if (trim(fields.reason).length < 1) return '실패사유를 입력해주세요.';
+      } else if (stage === '계약보류') {
+        if (!fields.holdUntil) return '보류기한을 입력해주세요.';
+        if (trim(fields.reason).length < 1) return '보류사유를 입력해주세요.';
+      }
+      return '';
+    }
+
+    function stageFieldsSummaryHtml_(entry) {
+      const f = entry.fields || {};
+      const stage = entry.stage;
+      const rows = [];
+      if (stage === '접수확인') {
+        rows.push(['메모', f.memo]);
+      } else if (stage === '고객면담' || stage === '추가면담') {
+        rows.push(['면담방법', f.method]);
+        rows.push(['면담일시', f.meetingDateTime]);
+        rows.push(['상담내용', f.content]);
+      } else if (stage === '견적제출' || stage === '견적상담') {
+        rows.push(['상품', (f.products || []).join(', ')]);
+        rows.push(['견적금액', f.amount ? Number(f.amount).toLocaleString() + '원' : '']);
+        rows.push(['예상계약일정', f.expectedContractDate]);
+        rows.push(['내용', f.note]);
+      } else if (stage === '계약완료') {
+        rows.push(['계약일자', f.contractDate]);
+        rows.push(['상품', (f.products || []).join(', ')]);
+        rows.push(['계약금액', f.contractAmount ? Number(f.contractAmount).toLocaleString() + '원' : '']);
+        rows.push(['계약번호', f.contractNo]);
+        rows.push(['추가요구사항', f.extraRequest]);
+      } else if (stage === '계약실패') {
+        rows.push(['실패일자', f.failDate]);
+        rows.push(['실패사유', f.reason]);
+      } else if (stage === '계약보류') {
+        rows.push(['보류기한', f.holdUntil]);
+        rows.push(['보류사유', f.reason]);
+      } else if (f.note) {
+        rows.push(['비고', f.note]);
+      }
+      return rows.filter(function(r) { return r[1]; })
+        .map(function(r) { return '<div style="font-size:0.78rem; color:#5f6368;">· ' + r[0] + ': ' + r[1] + '</div>'; })
+        .join('');
+    }
+
+    function renderStageTimeline(timeline, containerId) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      let html = '';
+      if (!timeline || timeline.length === 0) {
+        html = '<p style="font-size:0.8rem; color:#9aa0a6;">아직 등록된 진행 이력이 없습니다.</p>';
+      } else {
+        html = '<div class="stage-timeline">';
+        timeline.forEach(function(entry) {
+          html += '<div class="timeline-item">'
+            + '<div class="timeline-badge ' + getBadgeClass(entry.stage) + '">' + entry.stage + '</div>'
+            + '<div class="timeline-meta">' + entry.date + ' · ' + (entry.actor || '-') + '</div>'
+            + stageFieldsSummaryHtml_(entry)
+            + '</div>';
+        });
+        html += '</div>';
+      }
+      el.innerHTML = html;
+    }
+
+    function loadLeadTimelineInto(leadId, containerId, onLoaded) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          currentLeadTimeline = (res && res.success) ? res.timeline : [];
+          renderStageTimeline(currentLeadTimeline, containerId);
+          if (onLoaded) onLoaded();
+        })
+        .withFailureHandler(function() {
+          currentLeadTimeline = [];
+          renderStageTimeline([], containerId);
+        })
+        .getLeadStageHistory(leadId);
+    }
+
+    // ==========================================================
+    // 소개건별 자유 게시판
+    // ==========================================================
+    let currentBoardData = [];
+    let currentBoardContainerId = '';
+    let currentBoardLeadId = '';
+    let editingPostId = '';
+
+    function escapeHtml_(s) {
+      if (s == null) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function loadBoardInto(leadId, containerId) {
+      currentBoardLeadId = leadId;
+      currentBoardContainerId = containerId;
+      editingPostId = '';
+      const el = document.getElementById(containerId);
+      if (el) el.innerHTML = '<p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p>';
+      google.script.run
+        .withSuccessHandler(function(res) {
+          currentBoardData = (res && res.success) ? res.posts : [];
+          renderBoard();
+        })
+        .withFailureHandler(function() {
+          currentBoardData = [];
+          renderBoard();
+        })
+        .getBoardPosts(leadId);
+    }
+
+    function canModifyPost_(post) {
+      if (currentRole === 'admin') return true;
+      return post.author === currentUserName;
+    }
+
+    function renderBoard() {
+      const el = document.getElementById(currentBoardContainerId);
+      if (!el) return;
+
+      let html = '<div class="board-list">';
+      if (!currentBoardData || currentBoardData.length === 0) {
+        html += '<p style="font-size:0.8rem; color:#9aa0a6;">등록된 게시글이 없습니다.</p>';
+      } else {
+        currentBoardData.forEach(function(p, idx) {
+          const isOpen = (editingPostId === '__view_' + p.postId);
+          html += '<div class="board-item">'
+            + '<div class="board-item-title" onclick="toggleBoardPost(' + idx + ')">'
+            + '<span>📝 ' + escapeHtml_(p.title) + '</span>'
+            + '<span class="board-item-meta">' + escapeHtml_(p.author) + ' · ' + p.createdAt + (p.updatedAt ? ' (수정됨)' : '') + '</span>'
+            + '</div>';
+          if (isOpen) {
+            html += '<div class="board-item-body">'
+              + '<div style="white-space:pre-wrap; font-size:0.85rem; margin-bottom:8px;">' + escapeHtml_(p.content) + '</div>';
+            if (canModifyPost_(p)) {
+              html += '<div class="board-item-actions">'
+                + '<button type="button" onclick="startEditPost(\'' + p.postId + '\')">수정</button>'
+                + '<button type="button" onclick="confirmDeletePost(\'' + p.postId + '\')">삭제</button>'
+                + '</div>';
+            }
+            html += '</div>';
+          }
+          html += '</div>';
+        });
+      }
+      html += '</div>';
+
+      if (editingPostId && editingPostId.indexOf('__view_') !== 0) {
+        const editingPost = (editingPostId === '__new__') ? null : currentBoardData.find(function(p) { return p.postId === editingPostId; });
+        html += '<div class="board-form">'
+          + '<input type="text" id="boardTitleInput" placeholder="제목" value="' + (editingPost ? escapeHtml_(editingPost.title) : '') + '">'
+          + '<textarea id="boardContentInput" rows="3" placeholder="내용을 입력하세요">' + (editingPost ? escapeHtml_(editingPost.content) : '') + '</textarea>'
+          + '<div style="display:flex; gap:8px;">'
+          + '<button type="button" onclick="saveBoardPost()">' + (editingPost ? '수정 저장' : '등록') + '</button>'
+          + '<button type="button" class="board-cancel-btn" onclick="cancelBoardEdit()">취소</button>'
+          + '</div>'
+          + '</div>';
+      } else {
+        html += '<button type="button" class="board-write-btn" onclick="startNewPost()">✏️ 새 글쓰기</button>';
+      }
+
+      el.innerHTML = html;
+    }
+
+    function toggleBoardPost(idx) {
+      const p = currentBoardData[idx];
+      if (!p) return;
+      const key = '__view_' + p.postId;
+      editingPostId = (editingPostId === key) ? '' : key;
+      renderBoard();
+    }
+
+    function startNewPost() {
+      editingPostId = '__new__';
+      renderBoard();
+    }
+
+    function startEditPost(postId) {
+      editingPostId = postId;
+      renderBoard();
+    }
+
+    function cancelBoardEdit() {
+      editingPostId = '';
+      renderBoard();
+    }
+
+    function saveBoardPost() {
+      const title = document.getElementById('boardTitleInput') ? document.getElementById('boardTitleInput').value.trim() : '';
+      const content = document.getElementById('boardContentInput') ? document.getElementById('boardContentInput').value.trim() : '';
+      if (!title) { alert('제목을 입력해주세요.'); return; }
+      if (!content) { alert('내용을 입력해주세요.'); return; }
+
+      if (editingPostId === '__new__') {
+        const tempId = '__temp_' + Date.now();
+        const now = new Date();
+        const tempCreatedAt = formatKoreanDate(now);
+        const tempPost = {
+          postId: tempId,
+          title: title,
+          content: content,
+          author: currentUserName,
+          authorRole: currentRole,
+          createdAt: tempCreatedAt,
+          updatedAt: '',
+          _pending: true
+        };
+        currentBoardData = [tempPost].concat(currentBoardData || []);
+        editingPostId = '';
+        renderBoard();
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success) {
+              loadBoardInto(currentBoardLeadId, currentBoardContainerId);
+            } else {
+              currentBoardData = (currentBoardData || []).filter(function(p) { return p.postId !== tempId; });
+              renderBoard();
+              alert('등록 실패: ' + (res ? res.message : ''));
+            }
+          })
+          .withFailureHandler(function(err) {
+            currentBoardData = (currentBoardData || []).filter(function(p) { return p.postId !== tempId; });
+            renderBoard();
+            alert('통신 오류: ' + (err ? (err.message || err) : ''));
+          })
+          .createBoardPost(currentBoardLeadId, title, content, currentUserName, currentRole);
+      } else {
+        const postId = editingPostId;
+        const idx = (currentBoardData || []).findIndex(function(p) { return p.postId === postId; });
+        const prevSnapshot = idx !== -1 ? Object.assign({}, currentBoardData[idx]) : null;
+        if (idx !== -1) {
+          currentBoardData[idx] = Object.assign({}, currentBoardData[idx], { title: title, content: content, updatedAt: formatKoreanDate(new Date()) });
+        }
+        editingPostId = '';
+        renderBoard();
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res && res.success) {
+              loadBoardInto(currentBoardLeadId, currentBoardContainerId);
+            } else {
+              if (idx !== -1 && prevSnapshot) { currentBoardData[idx] = prevSnapshot; renderBoard(); }
+              alert('수정 실패: ' + (res ? res.message : ''));
+            }
+          })
+          .withFailureHandler(function(err) {
+            if (idx !== -1 && prevSnapshot) { currentBoardData[idx] = prevSnapshot; renderBoard(); }
+            alert('통신 오류: ' + (err ? (err.message || err) : ''));
+          })
+          .updateBoardPost(postId, title, content, currentUserName, currentRole);
+      }
+    }
+
+    function confirmDeletePost(postId) {
+      if (!confirm('이 게시글을 삭제하시겠습니까?')) return;
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            loadBoardInto(currentBoardLeadId, currentBoardContainerId);
+          } else {
+            alert('삭제 실패: ' + (res ? res.message : ''));
+          }
+        })
+        .withFailureHandler(function(err) { alert('통신 오류: ' + (err ? (err.message || err) : '')); })
+        .deleteBoardPost(postId, currentUserName, currentRole);
+    }
+
+    function toggleAdminEditLead() {
+      const formEl = document.getElementById('mAdminEditForm');
+      if (!formEl) return;
+
+      if (formEl.innerHTML.trim() !== '') {
+        formEl.innerHTML = '';
+        return;
+      }
+
+      const item = activeLeadItem;
+      if (!item) return;
+
+      const esc = function(v) { return escapeHtml_(v == null ? '' : v); };
+      let html = '<div class="form-group">'
+        + '<div style="display:flex; justify-content:space-between; align-items:center;">'
+        + '<label class="form-label" style="margin-bottom:6px;">고객명/상호</label>'
+        + '<button type="button" onclick="openNaverPlaceSearchByName_(\'ae_customerName\')" title="상호명으로 지도 검색" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#03c75a; background:#eafff2; border:1px solid #b8f0cf; border-radius:6px; cursor:pointer;">🔍</button>'
+        + '</div>'
+        + '<input type="text" id="ae_customerName" value="' + esc(item.customerName) + '"></div>'
+        + '<div class="form-group"><label class="form-label">대표/담당자</label>'
+        + '<input type="text" id="ae_contactPerson" value="' + esc(item.contactPerson) + '"></div>'
+        + '<div class="form-group"><label class="form-label">연락처</label>'
+        + '<input type="tel" id="ae_contactPhone" value="' + esc(formatPhone(item.contactPhone)) + '" oninput="formatPhoneInput(this)"></div>'
+        + '<div class="form-group">'
+        + '<div style="display:flex; justify-content:space-between; align-items:center;">'
+        + '<label class="form-label" style="margin-bottom:6px;">사업장주소</label>'
+        + '<button type="button" onclick="openDaumPostcode_(\'ae_address\')" title="주소 검색" style="padding:2px 8px; font-size:0.9rem; line-height:1.6; color:#3c4043; background:#f1f3f4; border:1px solid #dadce0; border-radius:6px; cursor:pointer;">🔍</button>'
+        + '</div>'
+        + '<input type="text" id="ae_address" value="' + esc(item.address) + '" style="width:100%;"></div>'
+        + '<div class="form-group"><label class="form-label">업종</label>'
+        + '<input type="text" id="ae_businessType" value="' + esc(item.businessType) + '"></div>'
+        + '<div class="form-group"><label class="form-label">현재사용회사</label>'
+        + '<input type="text" id="ae_currentCompany" value="' + esc(item.currentCompany) + '"></div>'
+        + '<div class="form-group"><label class="form-label">현서비스료</label>'
+        + '<input type="text" id="ae_currentFee" value="' + esc(item.currentFee) + '"></div>'
+        + '<div class="form-group"><label class="form-label">관심상품</label>'
+        + '<input type="text" id="ae_product" value="' + esc(item.product) + '"></div>'
+        + '<div class="form-group"><label class="form-label">현장설명</label>'
+        + '<textarea id="ae_fieldDescription" rows="3">' + esc(item.fieldDescription) + '</textarea></div>'
+        + '<div class="form-group"><label class="form-label">배정영업담당</label>'
+        + '<input type="text" id="ae_assignedRep" value="' + esc(item.assignedRep) + '"></div>'
+        + '<button type="button" class="btn-save-status" style="background:#1a73e8;" onclick="saveAdminEditLead()">저장</button>';
+
+      formEl.innerHTML = html;
+    }
+
+    function saveAdminEditLead() {
+      if (!activeLeadItem) return;
+      const getV = function(id) { const el = document.getElementById(id); return el ? el.value : ''; };
+      const fields = {
+        customerName: getV('ae_customerName'),
+        contactPerson: getV('ae_contactPerson'),
+        contactPhone: formatPhone(getV('ae_contactPhone')),
+        address: getV('ae_address'),
+        businessType: getV('ae_businessType'),
+        currentCompany: getV('ae_currentCompany'),
+        currentFee: getV('ae_currentFee'),
+        product: getV('ae_product'),
+        fieldDescription: getV('ae_fieldDescription'),
+        assignedRep: getV('ae_assignedRep')
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            alert('안건 정보가 수정되었습니다.');
+            const formEl = document.getElementById('mAdminEditForm');
+            if (formEl) formEl.innerHTML = '';
+            refreshLeadsFromServer();
+            closeDetailModal();
+          } else {
+            alert('수정 실패: ' + (res ? res.message : ''));
+          }
+        })
+        .withFailureHandler(function(err) { alert('통신 오류: ' + (err ? (err.message || err) : '')); })
+        .adminUpdateLead(activeLeadId, fields, currentRole);
+    }
+
+    function confirmDeleteLead() {
+      if (!activeLeadId) return;
+      if (!confirm('이 안건을 완전히 삭제하시겠습니까? 관련 진행이력과 게시글도 함께 삭제되며 되돌릴 수 없습니다.')) return;
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            alert('안건이 삭제되었습니다.');
+            closeDetailModal();
+            refreshLeadsFromServer();
+          } else {
+            alert('삭제 실패: ' + (res ? res.message : ''));
+          }
+        })
+        .withFailureHandler(function(err) { alert('통신 오류: ' + (err ? (err.message || err) : '')); })
+        .adminDeleteLead(activeLeadId, currentRole);
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detailModal');
+      if (modal) modal.style.display = 'none';
+      activeLeadId = '';
+      activeLeadItem = null;
+    }
+
+    function saveStatusUpdate() {
+      if (!activeLeadId) return;
+      const status = document.getElementById('uStatus') ? document.getElementById('uStatus').value : '';
+      const fields = collectStageFields_(status);
+      const errMsg = validateStageFieldsClient_(status, fields);
+      if (errMsg) { alert(errMsg); return; }
+
+      const btn = document.getElementById('btnSaveStatus');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = '저장 중...';
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '상태 저장하기';
+          }
+          if (res && res.success) {
+            const headerBadge = document.getElementById('mHeaderStatusBadge');
+            if (headerBadge) {
+              headerBadge.innerText = status;
+              headerBadge.className = 'badge ' + getBadgeClass(status);
+            }
+            alert('진행상태가 업데이트되었습니다!');
+            closeDetailModal();
+            refreshLeadsFromServer();
+          } else {
+            alert('수정 실패: ' + (res ? res.message : '응답 없음'));
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '상태 저장하기';
+          }
+          alert('수정 통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+        })
+        .advanceLeadStage(activeLeadId, status, fields, currentUserName);
+    }
+
+    // ==========================================================
+    // 현장 등록 폼 보조 로직
+    // ==========================================================
+    function onCarChange() {
+      const carEl = document.getElementById('carNumber');
+      if (!carEl) return;
+      const car = carEl.value;
+      saveUserPref('s1_car_no', car);
+      const repSelect = document.getElementById('assignedRep');
+      if (repSelect && CAR_REP_MAP[car]) {
+        repSelect.value = CAR_REP_MAP[car];
+      }
+    }
+
+    function onCompanyChange() {
+      const compEl = document.getElementById('currentCompany');
+      const feeInput = document.getElementById('currentFee');
+      if (!compEl || !feeInput) return;
+      const company = compEl.value;
+      if (company && company !== '미사용') {
+        feeInput.disabled = false;
+        feeInput.placeholder = '예: 77,000';
+        feeInput.style.backgroundColor = '#ffffff';
+      } else {
+        feeInput.disabled = true;
+        feeInput.value = '';
+        feeInput.placeholder = '미사용 시 입력 불필요';
+        feeInput.style.backgroundColor = '#f1f3f4';
+      }
+    }
+
+    function formatCurrency(input) {
+      let raw = input.value.replace(/[^0-9]/g, '');
+      if (!raw) { input.value = ''; return; }
+      input.value = Number(raw).toLocaleString('ko-KR');
+    }
+
+    function toggleCheck(el) {
+      const cb = el.querySelector('input[type="checkbox"]');
+      if (!cb) return;
+      if (event && event.target && event.target.tagName !== 'INPUT') {
+        cb.checked = !cb.checked;
+      }
+      el.classList.toggle('checked', cb.checked);
+    }
+
+    function handleFileSelect(e) {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+      if (uploadedPhotos.length + files.length > 4) {
+        alert('사진은 최대 4장까지만 등록 가능합니다.');
+      }
+      const remainingSlots = 4 - uploadedPhotos.length;
+      const filesToProcess = files.slice(0, remainingSlots);
+
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = '사진 압축 및 변환 중...';
+      }
+
+      let processedCount = 0;
+      filesToProcess.forEach(file => {
+        compressImage(file, 800, 0.55, function(compressedBase64, approxKb) {
+          uploadedPhotos.push({
+            data: compressedBase64,
+            name: file.name,
+            kb: approxKb
+          });
+          processedCount++;
+          if (processedCount === filesToProcess.length) {
+            if (submitBtn) submitBtn.disabled = false;
+            renderPreview();
+          }
+        });
+      });
+      e.target.value = '';
+    }
+
+    function compressImage(file, maxDimension, quality, callback) {
+      const reader = new FileReader();
+      reader.onerror = function() {
+        alert('사진 파일을 읽는 중 오류가 발생했습니다: ' + file.name);
+      };
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onerror = function() {
+          alert('이미지 처리 실패. 다른 사진을 선택해주세요: ' + file.name);
+        };
+        img.onload = function() {
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > maxDimension) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            }
+          } else {
+            if (height > maxDimension) {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const base64 = canvas.toDataURL('image/jpeg', quality);
+          const kb = Math.round(base64.length * 0.75 / 1024);
+          callback(base64, kb);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removePhoto(idx) {
+      uploadedPhotos.splice(idx, 1);
+      renderPreview();
+    }
+
+    function renderPreview() {
+      const grid = document.getElementById('previewGrid');
+      const countText = document.getElementById('photoCountText');
+      const submitBtn = document.getElementById('submitBtn');
+      if (countText) countText.innerText = `${uploadedPhotos.length} / 4장`;
+
+      if (uploadedPhotos.length === 0) {
+        if (grid) grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다. (위 버튼을 눌러 촬영하거나 선택하세요)</div>';
+        if (submitBtn) submitBtn.innerText = '⚡ 실시간 접수 등록';
+        return;
+      }
+
+      if (submitBtn) submitBtn.innerText = `⚡ 실시간 접수 등록 (사진 ${uploadedPhotos.length}장 포함)`;
+
+      if (grid) {
+        grid.innerHTML = '';
+        uploadedPhotos.forEach((p, idx) => {
+          const slot = document.createElement('div');
+          slot.className = 'photo-slot';
+          slot.innerHTML = `
+            <img src="${p.data}" alt="미리보기 ${idx+1}">
+            <span class="photo-size-tag">${p.kb || 30}KB</span>
+            <button type="button" class="photo-del-btn" onclick="removePhoto(${idx})" title="삭제">×</button>
+          `;
+          grid.appendChild(slot);
+        });
+      }
+    }
+
+    let recentHistoryData = [];
+
+    function loadRecentHistory() {
+      const agentEl = document.getElementById('agentName');
+      if (!agentEl) return;
+      const agent = agentEl.value.trim();
+      const listDiv = document.getElementById('historyList');
+      const carLabel = document.getElementById('carLabel');
+      if (!agent) {
+        if (listDiv) listDiv.innerHTML = '<p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">소개자 이름을 입력해주세요.</p>';
+        if (carLabel) carLabel.innerText = '';
+        return;
+      }
+      if (carLabel) carLabel.innerText = agent + '님 내역';
+      if (listDiv) listDiv.innerHTML = '<p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">내역 조회 중...</p>';
+
+      google.script.run
+        .withSuccessHandler(function(rows) {
+          recentHistoryData = rows || [];
+          if (!listDiv) return;
+          if (!rows || rows.length === 0) {
+            listDiv.innerHTML = '<p style="font-size: 0.8rem; color: #80868b; text-align: center; margin: 8px 0;">최근 등록된 내역이 없습니다.</p>';
+            return;
+          }
+          let html = '';
+          rows.forEach((r, idx) => {
+            const badgeClass = getBadgeClass(r.status);
+            const photoIcon = r.hasPhoto ? ' 📷' : '';
+            const krDate = formatKoreanDate(r.date);
+            html += `
+              <div class="history-item clickable" onclick="openReferrerDetail(${idx})">
+                <div>
+                  <strong>${r.customerName}</strong>${photoIcon} <span style="color:#5f6368; font-size:0.75rem;">(${r.product})</span><br>
+                  <span style="color:#80868b; font-size:0.75rem;">${krDate} · ${r.carNumber}호 · 담당: ${r.assignedRep || '-'}</span>
+                </div>
+                <div>
+                  <span class="badge ${badgeClass}">${r.status}</span>
+                </div>
+              </div>
+            `;
+          });
+          listDiv.innerHTML = html;
+        })
+        .withFailureHandler(function(err) {
+          if (listDiv) listDiv.innerHTML = '<p style="font-size: 0.8rem; color: #d93025; text-align: center; margin: 8px 0;">조회 실패</p>';
+        })
+        .getRecentLeadsByAgent(agent);
+    }
+
+    function openReferrerDetail(idx) {
+      const item = recentHistoryData[idx];
+      if (!item) return;
+
+      const titleEl = document.getElementById('refMTitle');
+      if (titleEl) titleEl.innerText = item.customerName;
+      const badgeEl = document.getElementById('refMStatusBadge');
+      if (badgeEl) {
+        badgeEl.innerText = item.status || '접수대기';
+        badgeEl.className = 'badge ' + getBadgeClass(item.status);
+      }
+
+      const timelineEl = document.getElementById('refStageTimeline');
+      if (timelineEl) timelineEl.innerHTML = '<p style="font-size:0.8rem; color:#9aa0a6;">불러오는 중...</p>';
+
+      const modal = document.getElementById('referrerDetailModal');
+      if (modal) modal.style.display = 'flex';
+
+      loadLeadTimelineInto(item.leadId, 'refStageTimeline');
+      loadBoardInto(item.leadId, 'refBoard');
+    }
+
+    function closeReferrerDetailModal() {
+      const modal = document.getElementById('referrerDetailModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function handleLeadSubmit(e) {
+      e.preventDefault();
+
+      const checkedBoxes = document.querySelectorAll('input[name="prod"]:checked');
+      if (checkedBoxes.length === 0) {
+        alert('관심/추천 상품을 최소 1개 이상 체크해주세요.');
+        return;
+      }
+      const selectedProducts = Array.from(checkedBoxes).map(cb => cb.value);
+
+      const btn = document.getElementById('submitBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = uploadedPhotos.length > 0 ? '사진 업로드 및 등록 중...' : '등록 중...';
+      }
+
+      const carNumber = document.getElementById('carNumber') ? document.getElementById('carNumber').value : '';
+      const agentName = document.getElementById('agentName') ? document.getElementById('agentName').value : '';
+      const assignedRep = document.getElementById('assignedRep') ? document.getElementById('assignedRep').value : '';
+
+      saveUserPref('s1_car_no', carNumber);
+      saveUserPref('s1_agent_name', agentName);
+
+      const rawContactPhone = document.getElementById('contactPhone') ? document.getElementById('contactPhone').value : '';
+      const cleanContactPhone = formatPhone(rawContactPhone);
+
+      const payload = {
+        carNumber: carNumber,
+        agentName: agentName,
+        assignedRep: assignedRep,
+        customerName: document.getElementById('customerName') ? document.getElementById('customerName').value : '',
+        contactPerson: document.getElementById('contactPerson') ? document.getElementById('contactPerson').value : '',
+        contactPhone: cleanContactPhone,
+        address: document.getElementById('address') ? document.getElementById('address').value : '',
+        businessType: document.getElementById('businessType') ? document.getElementById('businessType').value : '',
+        currentCompany: document.getElementById('currentCompany') ? document.getElementById('currentCompany').value : '',
+        currentFee: document.getElementById('currentFee') ? document.getElementById('currentFee').value : '',
+        productTypes: selectedProducts,
+        fieldDescription: document.getElementById('fieldDescription') ? document.getElementById('fieldDescription').value : '',
+        photos: uploadedPhotos
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '⚡ 실시간 접수 등록';
+          }
+
+          if (res && res.success) {
+            let msg = '✅ 고객소개 접수가 완료되었습니다!\n(접수번호: ' + res.leadId + ', 담당: ' + (res.assignedRep || '지정완료') + ')';
+            
+            if (res.photoCount > 0) {
+              msg += '\n📷 사진 ' + res.photoCount + '장 구글 드라이브 저장 완료';
+            } else if (uploadedPhotos.length > 0) {
+              alert('⚠️ [알림]\n고객 정보는 등록되었으나, 드라이브에 사진이 저장되지 못했습니다:\n' + res.photoError);
+            }
+            
+            if (res.photoCount > 0 || uploadedPhotos.length === 0) {
+              alert(msg);
+            }
+
+            const clearVal = (id) => { const el = document.getElementById(id); if (el) el.value = ''; };
+            clearVal('customerName');
+            clearVal('contactPerson');
+            clearVal('contactPhone');
+            clearVal('address');
+            clearVal('businessType');
+            const compEl = document.getElementById('currentCompany');
+            if (compEl) compEl.value = '미사용';
+            onCompanyChange();
+            clearVal('fieldDescription');
+
+            document.querySelectorAll('input[name="prod"]').forEach(cb => {
+              cb.checked = false;
+              if (cb.closest('.prod-item')) cb.closest('.prod-item').classList.remove('checked');
+            });
+
+            uploadedPhotos = [];
+            renderPreview();
+
+            loadRecentHistory();
+          } else {
+            alert('❌ 등록 실패: ' + (res ? res.message : '서버 응답 없음'));
+          }
+        })
+        .withFailureHandler(function(err) {
+          alert('등록 통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '⚡ 실시간 접수 등록';
+          }
+        })
+        .submitLead(payload);
+    }
+  </script>
 </body>
 </html>
