@@ -4,52 +4,10 @@
   <base target="_top">
   <meta charset="utf-8">
   <title>북서울 소개영업 포털</title>
-  <script>
-    // 1. Supabase 클라이언트 초기화 (반드시 최상단에 배치)
-    const SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
-    const SUPABASE_KEY = "복사하신_sb_publishable_키_입력"; // 따옴표 안에 키 입력
-
-    let supabaseClient = null;
-    try {
-      if (window.supabase) {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      }
-    } catch (e) {
-      console.error("Supabase 초기화 오류:", e);
-    }
-
-    // 2. 로그인 탭 전환 함수 (최상단에 두어 ReferenceError 방지)
-    function setLoginTab(tab) {
-      if (!tab) tab = 'cs';
-
-      const btnCS = document.getElementById('tabBtnCS');
-      const btnCon = document.getElementById('tabBtnConsultant');
-      const btnAdm = document.getElementById('tabBtnAdmin');
-
-      if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
-      if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
-      if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
-
-      const formCS = document.getElementById('loginFormCS');
-      const formCon = document.getElementById('loginFormConsultant');
-      const formAdm = document.getElementById('loginFormAdmin');
-
-      if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
-      if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
-      if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
-
-      hideAllLoginErrors();
-    }
-
-    function hideAllLoginErrors() {
-      const e1 = document.getElementById('csLoginErr');
-      const e2 = document.getElementById('conLoginErr');
-      const e3 = document.getElementById('adminLoginErr');
-      if (e1) e1.style.display = 'none';
-      if (e2) e2.style.display = 'none';
-      if (e3) e3.style.display = 'none';
-    }
+  
+  <!-- Supabase 공식 라이브러리 로드 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
   <!-- 모바일 전체화면 독립 앱(PWA Standalone) 메타태그 -->
@@ -86,10 +44,7 @@
     .btn-inner.btn-logout { background: #f8f9fa; color: #5f6368; border-color: #dadce0; }
     .btn-inner.btn-logout:hover { background: #fce8e6; color: #d93025; border-color: #fad2cf; }
 
-    /* ==========================================================
-       [화면 1] 최초 진입 통합 로그인 화면 (#viewLogin)
-       - 기본 화면 (CS 요원 입력 폼 기본 활성화)
-       ========================================================== */
+    /* [화면 1] 최초 진입 통합 로그인 화면 */
     #viewLogin {
       max-width: 440px; margin: 30px auto 40px auto; position: relative; z-index: 100;
     }
@@ -104,7 +59,7 @@
     .login-header h2 { margin: 0; font-size: 1.5rem; color: #1a73e8; font-weight: 800; }
     .login-header p { margin: 6px 0 0 0; font-size: 0.85rem; color: #5f6368; }
 
-    /* 로그인 탭 바 (CS / 컨설턴트 / 관리자) */
+    /* 로그인 탭 바 */
     .login-tab-bar {
       display: flex; background: #eef2f6; border-radius: 12px; padding: 5px; margin-bottom: 20px;
       position: relative; z-index: 102; gap: 4px; border: 1px solid #dadce0;
@@ -123,7 +78,7 @@
     label.form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #3c4043; }
     .req { color: #d93025; margin-left: 2px; }
     .opt { color: #5f6368; font-weight: normal; font-size: 0.75rem; margin-left: 4px; }
-    input[type="text"], input[type="tel"], input[type="password"], select, textarea {
+    input[type="text"], input[type="tel"], input[type="password"], input[type="number"], input[type="date"], input[type="datetime-local"], select, textarea {
       width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 8px;
       font-size: 0.95rem; background-color: #fafbfc; transition: border-color 0.2s;
     }
@@ -146,9 +101,7 @@
       border: 1px solid #fad2cf;
     }
 
-    /* ==========================================================
-       [화면 2] 현장 등록 화면 (#viewRegister)
-       ========================================================== */
+    /* [화면 2] 현장 등록 화면 */
     #viewRegister { display: none; max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
     
     .intro-card {
@@ -226,9 +179,7 @@
     .history-title { font-size: 0.9rem; font-weight: 700; color: #3c4043; }
     .history-item { border-bottom: 1px solid #f1f3f4; padding: 8px 0; font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center; }
 
-    /* ==========================================================
-       [화면 3] 소개내역 조회 대시보드 (#viewDashboard)
-       ========================================================== */
+    /* [화면 3] 대시보드 */
     #viewDashboard { display: none; }
 
     .stat-grid {
@@ -278,7 +229,6 @@
     .badge-hold { background: #eeeeee; color: #5f6368; border: 1px solid #dadce0; }
     .badge-cancel { background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
 
-    /* PC 가로 대시보드 테이블 */
     .pc-table-wrapper {
       background: #fff; border-radius: 12px; overflow-x: auto;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
@@ -293,7 +243,6 @@
     .customer-cell { font-weight: 700; color: #1a73e8; cursor: pointer; white-space: nowrap; }
     .customer-cell:hover { text-decoration: underline; }
 
-    /* 스마트폰 카드 리스트 */
     .mobile-card-list { display: none; }
     .mobile-lead-card {
       background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px;
@@ -325,9 +274,7 @@
       .user-badge-title { font-size: 0.95rem; }
     }
 
-    /* ==========================================================
-       [상세 모달] 기본 display:none !important (화면 가림 완벽 방지)
-       ========================================================== */
+    /* 상세 모달 */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 10000;
@@ -393,17 +340,10 @@
     .timeline-item {
       background: #fff; border: 1px solid #e8eaed; border-radius: 8px; padding: 10px 12px;
     }
-    .timeline-item.timeline-comment { background: #fffbea; border-color: #fce8b2; }
     .timeline-badge {
       display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; margin-bottom: 4px;
     }
     .timeline-meta { font-size: 0.72rem; color: #9aa0a6; margin-bottom: 4px; }
-    .comment-input-box { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #dadce0; }
-    .comment-input-box textarea { margin-bottom: 8px; }
-    .comment-input-box button {
-      width: 100%; padding: 10px; background: #34a853; color: #fff; border: none;
-      border-radius: 8px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
-    }
     .prod-checkbox-group { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 8px 0; }
     .prod-item-sm { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
     .prod-item-sm input { width: auto; }
@@ -436,43 +376,7 @@
       background: #1a73e8; color: #fff;
     }
     .board-form button.board-cancel-btn { background: #dadce0; color: #3c4043; }
-    
-    .login-role-guide {
-      display: inline-block;
-      margin-top: 8px;
-      font-size: 0.9rem;
-      color: #1a73e8;
-      font-weight: 700;
-      background: #e8f0fe;
-      padding: 6px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      border: 1px solid #aecbfa;
-    }
-    .role-selector-box-card {
-      background: #f8fbff;
-      border: 1.5px solid #aecbfa;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-    .role-select-box {
-      width: 100% !important;
-      padding: 12px 14px !important;
-      border: 2px solid #1a73e8 !important;
-      border-radius: 9px !important;
-      font-size: 1rem !important;
-      font-weight: 800 !important;
-      color: #1a73e8 !important;
-      background-color: #ffffff !important;
-      box-shadow: 0 2px 6px rgba(26,115,232,0.12) !important;
-      cursor: pointer;
-      outline: none;
-    }
 
-    /* ==========================================================
-       모바일 최적화: 로그인 화면에서는 배경/여백 제거, 로그인창만 표시
-       ========================================================== */
     body.on-login { background: #ffffff; }
     body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
     body.on-login #viewLogin { margin: 0 auto; width: 100%; max-width: 420px; }
@@ -481,285 +385,6 @@
       body.on-login #viewLogin { margin: 24px auto; }
       body.on-login .login-card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
     }
-  
-    /* ==========================================================
-       [스마트폰 레이아웃 정밀 최적화 - 최종본 화면 기준]
-       글자 잘림, 밀림, 2줄 줄바꿈, 줌인 현상 원천 해결
-       ========================================================== */
-    html, body {
-      -webkit-text-size-adjust: 100% !important;
-      text-size-adjust: 100% !important;
-      word-break: keep-all !important;
-      overflow-wrap: break-word !important;
-    }
-    input, select, textarea, button {
-      font-size: 16px !important; /* 모바일 입력 시 자동 확대(줌인)로 인한 레이아웃 깨짐 방지 */
-    }
-
-    @media (max-width: 768px) {
-      .main-container {
-        padding: 8px 10px !important;
-      }
-
-      /* [1] 로그인 카드 */
-      #viewLogin {
-        margin: 12px auto 20px auto !important;
-        padding: 0 4px !important;
-      }
-      .login-card {
-        padding: 20px 16px !important;
-        border-radius: 16px !important;
-      }
-      .login-header {
-        margin-bottom: 16px !important;
-        padding-bottom: 12px !important;
-      }
-      .login-header h2 {
-        font-size: 1.4rem !important;
-      }
-      .login-header p {
-        font-size: 0.82rem !important;
-      }
-      .login-tab-bar {
-        padding: 4px !important;
-        margin-bottom: 14px !important;
-        gap: 4px !important;
-      }
-      .login-tab-item {
-        padding: 10px 2px !important;
-        font-size: 0.88rem !important;
-        letter-spacing: -0.5px !important;
-        white-space: nowrap !important;
-      }
-      .btn-login-action {
-        padding: 13px !important;
-        font-size: 1rem !important;
-        margin-top: 8px !important;
-      }
-
-      /* [2] 내부 헤더 바 */
-      .inner-header-bar {
-        padding: 9px 12px !important;
-        margin-bottom: 10px !important;
-        gap: 6px !important;
-      }
-      .user-badge-title {
-        font-size: 0.92rem !important;
-        max-width: 140px !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-      }
-      .user-badge-subtitle {
-        font-size: 0.72rem !important;
-      }
-      .inner-header-btns {
-        gap: 5px !important;
-        flex-shrink: 0 !important;
-      }
-      .btn-inner {
-        padding: 6px 9px !important;
-        font-size: 0.76rem !important;
-      }
-
-      /* [3] 현장등록 폼 */
-      .intro-hero {
-        min-height: 95px !important;
-      }
-      .intro-hero-content {
-        padding: 12px !important;
-      }
-      .intro-title {
-        font-size: 1.25rem !important;
-      }
-      .intro-subtitle {
-        font-size: 0.78rem !important;
-      }
-      .form-card {
-        padding: 14px 12px !important;
-        border-radius: 14px !important;
-        margin-bottom: 10px !important;
-      }
-      .row {
-        gap: 8px !important;
-      }
-      label.form-label {
-        font-size: 0.82rem !important;
-        margin-bottom: 4px !important;
-        line-height: 1.3 !important;
-      }
-      .prod-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 5px !important;
-      }
-      .prod-item {
-        padding: 8px 3px !important;
-        font-size: 0.78rem !important;
-        white-space: nowrap !important;
-        justify-content: center !important;
-        letter-spacing: -0.5px !important;
-        gap: 4px !important;
-      }
-      .photo-btn-group {
-        gap: 6px !important;
-      }
-      .photo-btn {
-        padding: 10px 4px !important;
-        font-size: 0.82rem !important;
-      }
-      .photo-preview-grid {
-        gap: 6px !important;
-        padding: 6px !important;
-        min-height: 65px !important;
-      }
-
-      /* [4] 대시보드 통계 카드 6종 */
-      .stat-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 6px !important;
-        margin-bottom: 10px !important;
-      }
-      .stat-card {
-        padding: 8px 6px 7px 8px !important;
-        border-left-width: 3px !important;
-        border-radius: 9px !important;
-      }
-      .stat-label {
-        font-size: 0.72rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        letter-spacing: -0.5px !important;
-      }
-      .stat-value {
-        font-size: 1.25rem !important;
-        margin-top: 2px !important;
-        line-height: 1.2 !important;
-      }
-
-      /* [5] 필터 칩 툴바 */
-      .toolbar-card {
-        padding: 10px 12px !important;
-        margin-bottom: 10px !important;
-        gap: 8px !important;
-        border-radius: 12px !important;
-      }
-      .status-filters {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        gap: 5px !important;
-        padding-bottom: 4px !important;
-        scrollbar-width: none !important;
-        width: 100% !important;
-      }
-      .status-filters::-webkit-scrollbar {
-        display: none !important;
-      }
-      .filter-chip {
-        flex-shrink: 0 !important;
-        padding: 6px 10px !important;
-        font-size: 0.78rem !important;
-        white-space: nowrap !important;
-        border-radius: 14px !important;
-      }
-      .chip-count {
-        font-size: 0.7rem !important;
-        padding: 1px 5px !important;
-      }
-      .search-box {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      .search-box input {
-        padding: 7px 10px !important;
-        font-size: 0.85rem !important;
-      }
-      .search-box button {
-        padding: 7px 12px !important;
-        font-size: 0.82rem !important;
-      }
-
-      /* [6] 모바일 리스트 카드 */
-      .mobile-lead-card {
-        padding: 13px 12px !important;
-        margin-bottom: 9px !important;
-        border-radius: 12px !important;
-      }
-      .m-customer-name {
-        font-size: 1.05rem !important;
-        word-break: break-all !important;
-        margin-bottom: 3px !important;
-      }
-      .m-phone-link {
-        font-size: 0.86rem !important;
-        margin-bottom: 5px !important;
-      }
-      .m-info-row {
-        font-size: 0.78rem !important;
-        margin-bottom: 3px !important;
-        word-break: break-all !important;
-        line-height: 1.35 !important;
-      }
-      .m-footer-actions {
-        margin-top: 8px !important;
-        padding-top: 8px !important;
-        gap: 8px !important;
-      }
-      .m-footer-actions > div {
-        flex: 1 !important;
-        min-width: 0 !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-        font-size: 0.72rem !important;
-      }
-      .btn-detail {
-        padding: 6px 11px !important;
-        font-size: 0.76rem !important;
-        flex-shrink: 0 !important;
-      }
-
-      /* [7] 상세 팝업 모달 */
-      .modal-card {
-        max-width: 100% !important;
-        border-radius: 14px !important;
-        max-height: 92vh !important;
-      }
-      .modal-header {
-        padding: 12px 14px !important;
-      }
-      .modal-header-left h3 {
-        font-size: 1.05rem !important;
-        max-width: 170px !important;
-      }
-      .modal-body {
-        padding: 14px 12px !important;
-      }
-      .detail-grid {
-        grid-template-columns: 78px 1fr !important;
-        gap: 6px 8px !important;
-        font-size: 0.82rem !important;
-      }
-      .detail-label {
-        font-size: 0.78rem !important;
-        white-space: nowrap !important;
-      }
-      .detail-val {
-        font-size: 0.82rem !important;
-        word-break: break-all !important;
-        line-height: 1.35 !important;
-      }
-      .modal-photo-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
-      }
-      .modal-photo-card img {
-        height: 105px !important;
-      }
-    }
-
   </style>
 </head>
 <body ontouchstart="" class="on-login">
@@ -814,13 +439,10 @@
             </div>
             <div class="form-group">
               <label class="form-label">비밀번호 <span class="req">*</span></label>
-              <input type="password" id="conLoginPwd" placeholder="영업일보 포털 비밀번호 입력" autocomplete="current-password">
+              <input type="password" id="conLoginPwd" placeholder="비밀번호 입력" autocomplete="current-password">
             </div>
             <button type="submit" class="btn-login-action" id="btnConLogin">내 소개내역 조회하기</button>
             <div class="login-error-msg" id="conLoginErr"></div>
-            <p style="font-size:0.75rem; color:#5f6368; margin-top:10px; text-align:center;">
-              * 북서울지사 영업일보 포털에 등록된 전화번호와 비밀번호로 인증됩니다.
-            </p>
           </form>
         </div>
 
@@ -1183,411 +805,479 @@
     </div>
   </div>
 
+  <!-- ==========================================================
+       자바스크립트 비즈니스 로직
+       ========================================================== -->
   <script>
-    // ==========================================================
-    // Supabase 클라이언트 초기화
-    // ==========================================================
+    // 1. Supabase 접속 설정
     const SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
     const SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+    } catch (e) {
+      console.error("Supabase 초기화 오류:", e);
+    }
 
-    // ==========================================================
-    // 사내 인증용 고정 정보 (영업 컨설턴트 및 관리자)
-    // ==========================================================
+    // 2. 사내 인증 및 매핑 상수
     const ADMIN_PASSWORD = "sy0928@@";
-    
-    // 영업일보 포털 등록 컨설턴트 목록
+    const CAR_REP_MAP = {
+      '26': '정문재',
+      '27': '이수열',
+      '28': '최영국',
+      '127': '임영민',
+      '160': '박광춘'
+    };
+
     const CONSULTANT_LIST = [
       { name: '최영국', phone: '01031810141', hash: '882a6ac9dce92c4f6b7041e04c1357d3ccde7a5e20125607aad5637ba737f895' },
       { name: '정문재', phone: '01026211211', hash: 'f1ab53eef4526a7031dd157b228c293a97d5a29aa72e84cf450a313bfa42f179' },
       { name: '임영민', phone: '01075164267', hash: '96ec8307a04b1a6e668fa87cf6e1bf550d460b1efe1fc1b471d30562e1261d26' },
       { name: '박광춘', phone: '01045729150', hash: '085e8fe407928609b54db00ad99f2770da171a7981f1fb6940c72c799fe842e7' },
-      { name: '이수열', phone: '01000000000', hash: '' } // 필요시 번호 갱신
+      { name: '이수열', phone: '01000000000', hash: '' }
     ];
 
     async function sha256Hex(text) {
       const msgBuffer = new TextEncoder().encode(text);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // ==========================================================
-    // [Supabase 직통 API 어댑터]
-    // ==========================================================
-    const google = {
-      script: {
-        run: {
-          _success: null,
-          _failure: null,
-          withSuccessHandler: function(fn) { this._success = fn; return this; },
-          withFailureHandler: function(fn) { this._failure = fn; return this; },
-          
-          verifyUserLogin: async function(type, phone, pwd) {
-            const sh = this._success, fh = this._failure;
-            try {
-              if (type === 'admin') {
-                if (pwd === ADMIN_PASSWORD) {
-                  if (sh) sh({ success: true, role: 'admin', userName: '관리자(지사장)' });
-                } else {
-                  if (sh) sh({ success: false, message: '관리자 비밀번호가 일치하지 않습니다.' });
-                }
-                return;
-              }
+    // 3. 로그인 탭 전환 함수
+    function setLoginTab(tab) {
+      if (!tab) tab = 'cs';
+      try {
+        const btnCS = document.getElementById('tabBtnCS');
+        const btnCon = document.getElementById('tabBtnConsultant');
+        const btnAdm = document.getElementById('tabBtnAdmin');
 
-              if (type === 'consultant') {
-                const cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
-                const cleanPwd = String(pwd || '').trim();
-                const hashedPwd = await sha256Hex(cleanPwd);
+        if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
+        if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
+        if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
 
-                if (cleanPwd === ADMIN_PASSWORD) {
-                  if (sh) sh({ success: true, role: 'admin', userName: '관리자(지사장)' });
-                  return;
-                }
+        const formCS = document.getElementById('loginFormCS');
+        const formCon = document.getElementById('loginFormConsultant');
+        const formAdm = document.getElementById('loginFormAdmin');
 
-                const matched = CONSULTANT_LIST.find(u => {
-                  return (u.phone === cleanPhone) ||
-                         (cleanPhone.length >= 8 && u.phone.endsWith(cleanPhone.slice(-8))) ||
-                         (u.phone.length >= 8 && cleanPhone.endsWith(u.phone.slice(-8)));
-                });
+        if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
+        if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
+        if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
 
-                if (!matched) {
-                  if (sh) sh({ success: false, message: '등록되지 않은 영업 컨설턴트 전화번호입니다.' });
-                  return;
-                }
+        hideAllLoginErrors();
+      } catch (err) {
+        console.error("탭 전환 오류:", err);
+      }
+    }
 
-                const isMatch = (matched.hash === hashedPwd) || (matched.hash === cleanPwd) || (cleanPwd === ADMIN_PASSWORD);
-                if (isMatch) {
-                  if (sh) sh({ success: true, role: 'consultant', userName: matched.name });
-                } else {
-                  if (sh) sh({ success: false, message: '비밀번호가 일치하지 않습니다.' });
-                }
-                return;
-              }
-            } catch(e) {
-              if (fh) fh(e);
+    function hideAllLoginErrors() {
+      const e1 = document.getElementById('csLoginErr');
+      const e2 = document.getElementById('conLoginErr');
+      const e3 = document.getElementById('adminLoginErr');
+      if (e1) e1.style.display = 'none';
+      if (e2) e2.style.display = 'none';
+      if (e3) e3.style.display = 'none';
+    }
+
+    function showLoginError(id, msg) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerText = msg;
+        el.style.display = 'block';
+      }
+      try { alert(msg); } catch (e) {}
+    }
+
+    // 4. 전역 통신 어댑터 (Supabase 직통 연결)
+    window.google = window.google || {};
+    window.google.script = window.google.script || {};
+    window.google.script.run = {
+      _success: null,
+      _failure: null,
+      withSuccessHandler: function(fn) { this._success = fn; return this; },
+      withFailureHandler: function(fn) { this._failure = fn; return this; },
+
+      verifyUserLogin: async function(type, phone, pwd) {
+        const sh = this._success, fh = this._failure;
+        try {
+          if (type === 'admin') {
+            if (pwd === ADMIN_PASSWORD) {
+              if (sh) sh({ success: true, role: 'admin', userName: '지사장(관리자)' });
+            } else {
+              if (sh) sh({ success: false, message: '관리자 비밀번호가 일치하지 않습니다.' });
             }
-          },
+            return;
+          }
 
-          submitLead: async function(p) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const now = new Date();
-              const leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
-                String(now.getMonth() + 1).padStart(2, '0') +
-                String(now.getDate()).padStart(2, '0') +
-                String(now.getHours()).padStart(2, '0') +
-                String(now.getMinutes()).padStart(2, '0') +
-                String(now.getSeconds()).padStart(2, '0');
+          if (type === 'consultant') {
+            const cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
+            const cleanPwd = String(pwd || '').trim();
+            const hashedPwd = await sha256Hex(cleanPwd);
 
-              // 1. 사진 스토리지 업로드
-              const photoUrls = [];
-              if (p.photos && p.photos.length > 0) {
-                for (let i = 0; i < p.photos.length; i++) {
-                  const item = p.photos[i];
-                  const blob = await (await fetch(item.data)).blob();
-                  const filePath = `${leadId}_${i + 1}.jpg`;
-                  const { error: uploadError } = await supabase.storage.from('lead-photos').upload(filePath, blob, {
-                    contentType: 'image/jpeg',
-                    upsert: true
-                  });
-                  if (!uploadError) {
-                    const { data: publicData } = supabase.storage.from('lead-photos').getPublicUrl(filePath);
-                    photoUrls.push(publicData.publicUrl);
-                  }
-                }
-              }
-
-              // 2. leads 테이블 레코드 추가
-              const { error: insertError } = await supabase.from('leads').insert([{
-                lead_id: leadId,
-                date: formatKoreanDate(now),
-                car_number: p.carNumber,
-                agent_name: p.agentName,
-                customer_name: p.customerName,
-                contact_person: p.contactPerson || '',
-                contact_phone: p.contactPhone,
-                address: p.address || '',
-                business_type: p.businessType || '',
-                current_company: p.currentCompany || '미사용',
-                current_fee: p.currentFee || '',
-                product: Array.isArray(p.productTypes) ? p.productTypes.join(', ') : '',
-                field_description: p.fieldDescription || '',
-                photo_urls: photoUrls,
-                assigned_rep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
-                status: '접수대기'
-              }]);
-
-              if (insertError) throw insertError;
-
-              if (sh) sh({
-                success: true,
-                leadId: leadId,
-                assignedRep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
-                photoCount: photoUrls.length
-              });
-            } catch(e) {
-              console.error(e);
-              if (fh) fh(e);
+            if (cleanPwd === ADMIN_PASSWORD) {
+              if (sh) sh({ success: true, role: 'admin', userName: '지사장(관리자)' });
+              return;
             }
-          },
 
-          getRecentLeadsByAgent: async function(agent) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { data, error } = await supabase
-                .from('leads')
-                .select('*')
-                .eq('agent_name', agent)
-                .order('created_at', { ascending: false })
-                .limit(20);
+            const matched = CONSULTANT_LIST.find(u => {
+              return (u.phone === cleanPhone) ||
+                     (cleanPhone.length >= 8 && u.phone.endsWith(cleanPhone.slice(-8))) ||
+                     (u.phone.length >= 8 && cleanPhone.endsWith(u.phone.slice(-8)));
+            });
 
-              if (error) throw error;
-              const formatted = (data || []).map(r => ({
-                leadId: r.lead_id,
-                date: r.date || formatKoreanDate(r.created_at),
-                carNumber: r.car_number,
-                agentName: r.agent_name,
-                customerName: r.customer_name,
-                product: r.product,
-                assignedRep: r.assigned_rep,
-                hasPhoto: (r.photo_urls && r.photo_urls.length > 0),
-                status: r.status || '접수대기'
-              }));
-              if (sh) sh(formatted);
-            } catch(e) {
-              if (fh) fh(e);
+            if (!matched) {
+              if (sh) sh({ success: false, message: '등록되지 않은 컨설턴트 전화번호입니다.' });
+              return;
             }
-          },
 
-          getLeadsList: async function(role, userName, statusFilter, kw) {
-            const sh = this._success, fh = this._failure;
-            try {
-              let query = supabase.from('leads').select('*').order('created_at', { ascending: false });
-
-              if (role === 'consultant') {
-                query = query.eq('assigned_rep', userName);
-              }
-
-              const { data, error } = await query;
-              if (error) throw error;
-
-              const counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
-              const list = [];
-
-              (data || []).forEach(r => {
-                const status = r.status || '접수대기';
-                counts.total++;
-                if (status === '접수대기') counts.wait++;
-                else if (isIngGroup_(status)) counts.ing++;
-                else if (isQuoteGroup_(status)) counts.quote++;
-                else if (status === '계약완료') counts.done++;
-                else if (isCancelGroup_(status)) counts.cancel++;
-
-                list.push({
-                  leadId: r.lead_id,
-                  date: r.date || formatKoreanDate(r.created_at),
-                  carNumber: r.car_number,
-                  agentName: r.agent_name,
-                  customerName: r.customer_name,
-                  contactPerson: r.contact_person || '',
-                  contactPhone: r.contact_phone || '',
-                  address: r.address || '',
-                  businessType: r.business_type || '',
-                  currentCompany: r.current_company || '미사용',
-                  currentFee: r.current_fee || '',
-                  product: r.product || '',
-                  fieldDescription: r.field_description || '',
-                  photoUrls: r.photo_urls || [],
-                  assignedRep: r.assigned_rep || '',
-                  status: status,
-                  contractNo: r.contract_no || '',
-                  memo: r.memo || ''
-                });
-              });
-
-              if (sh) sh({ success: true, list: list, counts: counts });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          getLeadStageHistory: async function(leadId) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { data, error } = await supabase
-                .from('lead_stage_history')
-                .select('*')
-                .eq('lead_id', leadId)
-                .order('created_at', { ascending: true });
-
-              if (error) throw error;
-              const timeline = (data || []).map(row => ({
-                type: 'stage',
-                historyId: row.history_id,
-                stage: row.stage,
-                date: formatKoreanDate(row.created_at),
-                actor: row.actor,
-                fields: row.fields || {}
-              }));
-              if (sh) sh({ success: true, timeline: timeline });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          advanceLeadStage: async function(leadId, status, fields, userName) {
-            const sh = this._success, fh = this._failure;
-            try {
-              // 1. 메인 상태 업데이트
-              const updatePayload = { status: status };
-              if (status === '계약완료' && fields.contractNo) {
-                updatePayload.contract_no = fields.contractNo;
-              }
-              const { error: updErr } = await supabase
-                .from('leads')
-                .update(updatePayload)
-                .eq('lead_id', leadId);
-
-              if (updErr) throw updErr;
-
-              // 2. 상태 이력 테이블 추가
-              const histId = 'H-' + Date.now();
-              const { error: histErr } = await supabase
-                .from('lead_stage_history')
-                .insert([{
-                  history_id: histId,
-                  lead_id: leadId,
-                  stage: status,
-                  actor: userName || '',
-                  fields: fields || {}
-                }]);
-
-              if (histErr) throw histErr;
-              if (sh) sh({ success: true });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          getBoardPosts: async function(leadId) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { data, error } = await supabase
-                .from('lead_board')
-                .select('*')
-                .eq('lead_id', leadId)
-                .order('created_at', { ascending: false });
-
-              if (error) throw error;
-              const posts = (data || []).map(r => ({
-                postId: r.post_id,
-                leadId: r.lead_id,
-                title: r.title,
-                content: r.content,
-                author: r.author,
-                authorRole: r.author_role,
-                createdAt: formatKoreanDate(r.created_at),
-                updatedAt: r.updated_at ? formatKoreanDate(r.updated_at) : ''
-              }));
-              if (sh) sh({ success: true, posts: posts });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          createBoardPost: async function(leadId, title, content, userName, role) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const postId = 'B-' + Date.now();
-              const { error } = await supabase
-                .from('lead_board')
-                .insert([{
-                  post_id: postId,
-                  lead_id: leadId,
-                  title: title,
-                  content: content,
-                  author: userName,
-                  author_role: role
-                }]);
-
-              if (error) throw error;
-              if (sh) sh({ success: true });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          updateBoardPost: async function(postId, title, content) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { error } = await supabase
-                .from('lead_board')
-                .update({ title: title, content: content, updated_at: new Date() })
-                .eq('post_id', postId);
-
-              if (error) throw error;
-              if (sh) sh({ success: true });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          deleteBoardPost: async function(postId) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { error } = await supabase.from('lead_board').delete().eq('post_id', postId);
-              if (error) throw error;
-              if (sh) sh({ success: true });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          adminUpdateLead: async function(leadId, fields) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { error } = await supabase
-                .from('leads')
-                .update({
-                  customer_name: fields.customerName,
-                  contact_person: fields.contactPerson,
-                  contact_phone: fields.contactPhone,
-                  address: fields.address,
-                  business_type: fields.businessType,
-                  current_company: fields.currentCompany,
-                  current_fee: fields.currentFee,
-                  product: fields.product,
-                  field_description: fields.fieldDescription,
-                  assigned_rep: fields.assignedRep
-                })
-                .eq('lead_id', leadId);
-
-              if (error) throw error;
-              if (sh) sh({ success: true });
-            } catch(e) {
-              if (fh) fh(e);
-            }
-          },
-
-          adminDeleteLead: async function(leadId) {
-            const sh = this._success, fh = this._failure;
-            try {
-              const { error } = await supabase.from('leads').delete().eq('lead_id', leadId);
-              if (error) throw error;
-              if (sh) sh({ success: true });
-            } catch(e) {
-              if (fh) fh(e);
+            const isMatch = (matched.hash === hashedPwd) || (matched.hash === cleanPwd) || (cleanPwd === ADMIN_PASSWORD);
+            if (isMatch) {
+              if (sh) sh({ success: true, role: 'consultant', userName: matched.name });
+            } else {
+              if (sh) sh({ success: false, message: '비밀번호가 일치하지 않습니다.' });
             }
           }
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      submitLead: async function(p) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const now = new Date();
+          const leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
+
+          const photoUrls = [];
+          if (p.photos && p.photos.length > 0) {
+            for (let i = 0; i < p.photos.length; i++) {
+              const item = p.photos[i];
+              const blob = await (await fetch(item.data)).blob();
+              const filePath = `${leadId}_${i + 1}.jpg`;
+              const { error: uploadError } = await supabase.storage.from('lead-photos').upload(filePath, blob, {
+                contentType: 'image/jpeg',
+                upsert: true
+              });
+              if (!uploadError) {
+                const { data: publicData } = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+                photoUrls.push(publicData.publicUrl);
+              }
+            }
+          }
+
+          const { error: insertError } = await supabase.from('leads').insert([{
+            lead_id: leadId,
+            date: formatKoreanDate(now),
+            car_number: p.carNumber,
+            agent_name: p.agentName,
+            customer_name: p.customerName,
+            contact_person: p.contactPerson || '',
+            contact_phone: p.contactPhone,
+            address: p.address || '',
+            business_type: p.businessType || '',
+            current_company: p.currentCompany || '미사용',
+            current_fee: p.currentFee || '',
+            product: Array.isArray(p.productTypes) ? p.productTypes.join(', ') : '',
+            field_description: p.fieldDescription || '',
+            photo_urls: photoUrls,
+            assigned_rep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
+            status: '접수대기'
+          }]);
+
+          if (insertError) throw insertError;
+
+          if (sh) sh({
+            success: true,
+            leadId: leadId,
+            assignedRep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
+            photoCount: photoUrls.length
+          });
+        } catch (e) {
+          console.error(e);
+          if (fh) fh(e);
+        }
+      },
+
+      getRecentLeadsByAgent: async function(agent) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { data, error } = await supabase
+            .from('leads')
+            .select('*')
+            .eq('agent_name', agent)
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+          if (error) throw error;
+          const formatted = (data || []).map(r => ({
+            leadId: r.lead_id,
+            date: r.date || formatKoreanDate(r.created_at),
+            carNumber: r.car_number,
+            agentName: r.agent_name,
+            customerName: r.customer_name,
+            product: r.product,
+            assignedRep: r.assigned_rep,
+            hasPhoto: (r.photo_urls && r.photo_urls.length > 0),
+            status: r.status || '접수대기'
+          }));
+          if (sh) sh(formatted);
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      getLeadsList: async function(role, userName, statusFilter, kw) {
+        const sh = this._success, fh = this._failure;
+        try {
+          let query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+          if (role === 'consultant') {
+            query = query.eq('assigned_rep', userName);
+          }
+
+          const { data, error } = await query;
+          if (error) throw error;
+
+          const counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
+          const list = [];
+
+          (data || []).forEach(r => {
+            const status = r.status || '접수대기';
+            counts.total++;
+            if (status === '접수대기') counts.wait++;
+            else if (isIngGroup_(status)) counts.ing++;
+            else if (isQuoteGroup_(status)) counts.quote++;
+            else if (status === '계약완료') counts.done++;
+            else if (isCancelGroup_(status)) counts.cancel++;
+
+            list.push({
+              leadId: r.lead_id,
+              date: r.date || formatKoreanDate(r.created_at),
+              carNumber: r.car_number,
+              agentName: r.agent_name,
+              customerName: r.customer_name,
+              contactPerson: r.contact_person || '',
+              contactPhone: r.contact_phone || '',
+              address: r.address || '',
+              businessType: r.business_type || '',
+              currentCompany: r.current_company || '미사용',
+              currentFee: r.current_fee || '',
+              product: r.product || '',
+              fieldDescription: r.field_description || '',
+              photoUrls: r.photo_urls || [],
+              assignedRep: r.assigned_rep || '',
+              status: status,
+              contractNo: r.contract_no || '',
+              memo: r.memo || ''
+            });
+          });
+
+          if (sh) sh({ success: true, list: list, counts: counts });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      getLeadStageHistory: async function(leadId) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { data, error } = await supabase
+            .from('lead_stage_history')
+            .select('*')
+            .eq('lead_id', leadId)
+            .order('created_at', { ascending: true });
+
+          if (error) throw error;
+          const timeline = (data || []).map(row => ({
+            type: 'stage',
+            historyId: row.history_id,
+            stage: row.stage,
+            date: formatKoreanDate(row.created_at),
+            actor: row.actor,
+            fields: row.fields || {}
+          }));
+          if (sh) sh({ success: true, timeline: timeline });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      advanceLeadStage: async function(leadId, status, fields, userName) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const updatePayload = { status: status };
+          if (status === '계약완료' && fields.contractNo) {
+            updatePayload.contract_no = fields.contractNo;
+          }
+          const { error: updErr } = await supabase
+            .from('leads')
+            .update(updatePayload)
+            .eq('lead_id', leadId);
+
+          if (updErr) throw updErr;
+
+          const histId = 'H-' + Date.now();
+          const { error: histErr } = await supabase
+            .from('lead_stage_history')
+            .insert([{
+              history_id: histId,
+              lead_id: leadId,
+              stage: status,
+              actor: userName || '',
+              fields: fields || {}
+            }]);
+
+          if (histErr) throw histErr;
+          if (sh) sh({ success: true });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      getBoardPosts: async function(leadId) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { data, error } = await supabase
+            .from('lead_board')
+            .select('*')
+            .eq('lead_id', leadId)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+          const posts = (data || []).map(r => ({
+            postId: r.post_id,
+            leadId: r.lead_id,
+            title: r.title,
+            content: r.content,
+            author: r.author,
+            authorRole: r.author_role,
+            createdAt: formatKoreanDate(r.created_at),
+            updatedAt: r.updated_at ? formatKoreanDate(r.updated_at) : ''
+          }));
+          if (sh) sh({ success: true, posts: posts });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      createBoardPost: async function(leadId, title, content, userName, role) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const postId = 'B-' + Date.now();
+          const { error } = await supabase
+            .from('lead_board')
+            .insert([{
+              post_id: postId,
+              lead_id: leadId,
+              title: title,
+              content: content,
+              author: userName,
+              author_role: role
+            }]);
+
+          if (error) throw error;
+          if (sh) sh({ success: true });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      updateBoardPost: async function(postId, title, content) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { error } = await supabase
+            .from('lead_board')
+            .update({ title: title, content: content, updated_at: new Date() })
+            .eq('post_id', postId);
+
+          if (error) throw error;
+          if (sh) sh({ success: true });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      deleteBoardPost: async function(postId) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { error } = await supabase.from('lead_board').delete().eq('post_id', postId);
+          if (error) throw error;
+          if (sh) sh({ success: true });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      adminUpdateLead: async function(leadId, fields) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { error } = await supabase
+            .from('leads')
+            .update({
+              customer_name: fields.customerName,
+              contact_person: fields.contactPerson,
+              contact_phone: fields.contactPhone,
+              address: fields.address,
+              business_type: fields.businessType,
+              current_company: fields.currentCompany,
+              current_fee: fields.currentFee,
+              product: fields.product,
+              field_description: fields.fieldDescription,
+              assigned_rep: fields.assignedRep
+            })
+            .eq('lead_id', leadId);
+
+          if (error) throw error;
+          if (sh) sh({ success: true });
+        } catch (e) {
+          if (fh) fh(e);
+        }
+      },
+
+      adminDeleteLead: async function(leadId) {
+        const sh = this._success, fh = this._failure;
+        try {
+          const { error } = await supabase.from('leads').delete().eq('lead_id', leadId);
+          if (error) throw error;
+          if (sh) sh({ success: true });
+        } catch (e) {
+          if (fh) fh(e);
         }
       }
     };
 
-    // ==========================================================
-    // 전화번호 정규화 및 실시간 하이픈 자동 포맷팅 헬퍼
-    // ==========================================================
+    // 5. 세션 및 상태 변수
+    let currentRole = '';
+    let currentUserName = '';
+    let currentStatusFilter = '전체';
+    let currentLeadsData = [];
+    let activeLeadId = '';
+    let activeLeadItem = null;
+    let uploadedPhotos = [];
+
+    const inMemoryStorage = {};
+    function safeSessionGet(key) {
+      try { return sessionStorage.getItem(key); } catch (e) { return inMemoryStorage[key] || null; }
+    }
+    function safeSessionSet(key, val) {
+      try { sessionStorage.setItem(key, val); } catch (e) { inMemoryStorage[key] = val; }
+    }
+    function safeSessionRemove(key) {
+      try { sessionStorage.removeItem(key); } catch (e) { delete inMemoryStorage[key]; }
+    }
+    function saveUserPref(key, value) {
+      try { localStorage.setItem(key, value); } catch (e) { inMemoryStorage['local_' + key] = value; }
+    }
+    function getUserPref(key) {
+      try { return localStorage.getItem(key) || inMemoryStorage['local_' + key] || ''; } catch (e) { return inMemoryStorage['local_' + key] || ''; }
+    }
+
     function formatPhone(phone) {
       if (!phone) return '';
       let s = String(phone).replace(/[^0-9]/g, '');
@@ -1619,109 +1309,10 @@
       el.value = val;
     }
 
-    // ==========================================================
-    // 안전 스토리지 래퍼
-    // ==========================================================
-    const inMemoryStorage = {};
-
-    function safeSessionGet(key) {
-      try { return sessionStorage.getItem(key); } catch (e) { return inMemoryStorage[key] || null; }
-    }
-    function safeSessionSet(key, val) {
-      try { sessionStorage.setItem(key, val); } catch (e) { inMemoryStorage[key] = val; }
-    }
-    function safeSessionRemove(key) {
-      try { sessionStorage.removeItem(key); } catch (e) { delete inMemoryStorage[key]; }
-    }
-
-    function saveUserPref(key, value) {
-      try { localStorage.setItem(key, value); } catch (e) { inMemoryStorage['local_' + key] = value; }
-    }
-    function getUserPref(key) {
-      try { return localStorage.getItem(key) || inMemoryStorage['local_' + key] || ''; } catch (e) { return inMemoryStorage['local_' + key] || ''; }
-    }
-
-    // ==========================================================
-    // 로그인 탭 전환 함수
-    // ==========================================================
-   // ==========================================================
-    // [완벽 방어] 로그인 탭 전환 함수
-    // ==========================================================
-    function setLoginTab(tab) {
-      if (!tab) tab = 'cs';
-
-      try {
-        // 1. 탭 버튼 활성화 처리
-        const btnCS = document.getElementById('tabBtnCS');
-        const btnCon = document.getElementById('tabBtnConsultant');
-        const btnAdm = document.getElementById('tabBtnAdmin');
-
-        if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
-        if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
-        if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
-
-        // 2. 폼 표시 전환 (안전 체크)
-        const formCS = document.getElementById('loginFormCS');
-        const formCon = document.getElementById('loginFormConsultant');
-        const formAdm = document.getElementById('loginFormAdmin');
-
-        if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
-        if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
-        if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
-
-        // 3. 에러 메시지 초기화
-        hideAllLoginErrors();
-      } catch (err) {
-        console.error("탭 전환 중 오류 발생:", err);
-      }
-    }
-
-    function hideAllLoginErrors() {
-      const e1 = document.getElementById('csLoginErr');
-      const e2 = document.getElementById('conLoginErr');
-      const e3 = document.getElementById('adminLoginErr');
-      if (e1) e1.style.display = 'none';
-      if (e2) e2.style.display = 'none';
-      if (e3) e3.style.display = 'none';
-    }
-
-    function showLoginError(id, msg) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.innerText = msg;
-        el.style.display = 'block';
-      }
-      try { alert(msg); } catch (e) {}
-    }
-
-    // ==========================================================
-    // 기본 상태 변수
-    // ==========================================================
-    const CAR_REP_MAP = {
-      '26': '정문재',
-      '27': '이수열',
-      '28': '최영국',
-      '127': '임영민',
-      '160': '박광춘'
-    };
-
-    let currentRole = '';
-    let currentUserName = '';
-    let currentStatusFilter = '전체';
-    let currentLeadsData = [];
-    let activeLeadId = '';
-    let activeLeadItem = null;
-    let uploadedPhotos = [];
-
-    // ==========================================================
-    // [완벽 수정] 로그인 실행 로직 (멈춤 현상 원천 차단)
-    // ==========================================================
-    const ADMIN_PASSWORD_FIXED = 'sy0928@@'; // 지사장 고정 비밀번호
-
+    // 6. 로그인 실행
     function submitLogin(type) {
       hideAllLoginErrors();
 
-      // 1. CS 요원 로그인
       if (type === 'cs') {
         const nameInput = document.getElementById('csLoginName');
         const carSelect = document.getElementById('csLoginCar');
@@ -1754,7 +1345,6 @@
 
         showScreen('register');
 
-      // 2. 컨설턴트 로그인
       } else if (type === 'consultant') {
         const phoneInput = document.getElementById('conLoginPhone');
         const pwdInput = document.getElementById('conLoginPwd');
@@ -1794,16 +1384,15 @@
               showLoginError('conLoginErr', '로그인 실패: ' + (res ? res.message : '일치하는 정보가 없습니다.'));
             }
           })
-          .withFailureHandler(function(err) {
+          .withFailureHandler(function() {
             if (btn) {
               btn.disabled = false;
               btn.innerText = '내 소개내역 조회하기';
             }
-            showLoginError('conLoginErr', '통신 오류: 다시 시도해주세요.');
+            showLoginError('conLoginErr', '인증 중 오류가 발생했습니다.');
           })
           .verifyUserLogin('consultant', phone, pwd);
 
-      // 3. 지사 관리자 로그인 (즉각 인증 처리)
       } else if (type === 'admin') {
         const pwdInput = document.getElementById('adminLoginPwd');
         const pwd = pwdInput ? pwdInput.value : '';
@@ -1820,8 +1409,7 @@
           btn.innerText = '확인 중...';
         }
 
-        // 비밀번호 즉각 대조 (지연/멈춤 원천 방지)
-        if (pwd === ADMIN_PASSWORD_FIXED) {
+        if (pwd === ADMIN_PASSWORD) {
           if (btn) {
             btn.disabled = false;
             btn.innerText = '관리자 전체 조회 접속';
@@ -1830,7 +1418,6 @@
           currentUserName = '지사장(관리자)';
           safeSessionSet('s1_auth_role', currentRole);
           safeSessionSet('s1_auth_user', currentUserName);
-          
           showScreen('dashboard');
         } else {
           if (btn) {
@@ -1842,10 +1429,7 @@
       }
     }
 
-    
-    // ==========================================================
-    // 화면 전환 라우터
-    // ==========================================================
+    // 7. 화면 라우팅
     function showScreen(screenId) {
       closeDetailModal();
       document.body.classList.toggle('on-login', screenId === 'login');
@@ -1906,13 +1490,9 @@
       setLoginTab('cs');
     }
 
-    // ==========================================================
-    // 앱 초기화
-    // ==========================================================
     function initApp() {
       try {
         closeDetailModal();
-
         const savedRole = safeSessionGet('s1_auth_role');
         const savedUser = safeSessionGet('s1_auth_user');
 
@@ -1956,9 +1536,7 @@
       initApp();
     }
 
-    // ==========================================================
-    // 지도/주소 검색 연동
-    // ==========================================================
+    // 지도/주소 검색 헬퍼
     function openAddressOnMap_(address) {
       const addr = String(address || '').trim();
       if (!addr || addr === '-') { alert('등록된 주소가 없습니다.'); return; }
@@ -1997,19 +1575,15 @@
       window.open('https://map.naver.com/p/search/' + encodeURIComponent(keyword), '_blank');
     }
 
-    // ==========================================================
-    // 날짜 표기 및 대시보드 로직
-    // ==========================================================
+    // 날짜 포맷
     function formatKoreanDate(dateInput) {
       if (!dateInput) return '';
       const s = String(dateInput).trim();
       if (/^\d{2}\.\d{1,2}\.\d{1,2}\s*\([일월화수목금토]\)\s*\d{2}:\d{2}$/.test(s)) {
         return s;
       }
-
       const d = new Date(dateInput);
       if (isNaN(d.getTime())) return s;
-
       const days = ['일', '월', '화', '수', '목', '금', '토'];
       const dayName = days[d.getDay()];
       const yy = String(d.getFullYear()).slice(-2);
@@ -2228,9 +1802,6 @@
       if (mList) mList.innerHTML = mHtml;
     }
 
-    // ==========================================================
-    // 상세 모달 열기/닫기
-    // ==========================================================
     function openDetailModal(idx) {
       const item = currentLeadsData[idx];
       if (!item) return;
@@ -2495,9 +2066,7 @@
         .getLeadStageHistory(leadId);
     }
 
-    // ==========================================================
-    // 소개건별 자유 게시판
-    // ==========================================================
+    // 게시판
     let currentBoardData = [];
     let currentBoardContainerId = '';
     let currentBoardLeadId = '';
@@ -2617,9 +2186,7 @@
               alert('등록 실패');
             }
           })
-          .withFailureHandler(function() {
-            alert('통신 오류');
-          })
+          .withFailureHandler(function() { alert('통신 오류'); })
           .createBoardPost(currentBoardLeadId, title, content, currentUserName, currentRole);
       } else {
         const postId = editingPostId;
@@ -2631,9 +2198,7 @@
               alert('수정 실패');
             }
           })
-          .withFailureHandler(function() {
-            alert('통신 오류');
-          })
+          .withFailureHandler(function() { alert('통신 오류'); })
           .updateBoardPost(postId, title, content, currentUserName, currentRole);
       }
     }
@@ -2797,9 +2362,6 @@
         .advanceLeadStage(activeLeadId, status, fields, currentUserName);
     }
 
-    // ==========================================================
-    // 현장 등록 폼 보조 로직
-    // ==========================================================
     function onCarChange() {
       const carEl = document.getElementById('carNumber');
       if (!carEl) return;
@@ -3094,7 +2656,6 @@
 
             uploadedPhotos = [];
             renderPreview();
-
             loadRecentHistory();
           } else {
             alert('❌ 등록 실패');
