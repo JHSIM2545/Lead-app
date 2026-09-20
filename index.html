@@ -4,6 +4,7 @@
   <base target="_top">
   <meta charset="utf-8">
   <title>북서울 소개영업 포털</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
   <!-- 모바일 전체화면 독립 앱(PWA Standalone) 메타태그 -->
@@ -1138,11 +1139,37 @@
   </div>
 
   <script>
-    // ⚠️ 1단계에서 배포한 Apps Script 웹 앱 URL을 여기에 반드시 붙여넣으세요.
-    const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxYLnfnamK2EdjPqQtnQ4EMoim_LXtZb4uGdWoZMEkJdFlwbyHocHUUca6bAqCSJpDJWw/exec";
+    // ==========================================================
+    // Supabase 클라이언트 초기화
+    // ==========================================================
+    const SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // ==========================================================
-    // [핵심] 구글 전용 통신(google.script.run)을 대체하는 범용 fetch 통신 브릿지
+    // 사내 인증용 고정 정보 (영업 컨설턴트 및 관리자)
+    // ==========================================================
+    const ADMIN_PASSWORD = "sy0928@@";
+    
+    // 영업일보 포털 등록 컨설턴트 목록
+    const CONSULTANT_LIST = [
+      { name: '최영국', phone: '01031810141', hash: '882a6ac9dce92c4f6b7041e04c1357d3ccde7a5e20125607aad5637ba737f895' },
+      { name: '정문재', phone: '01026211211', hash: 'f1ab53eef4526a7031dd157b228c293a97d5a29aa72e84cf450a313bfa42f179' },
+      { name: '임영민', phone: '01075164267', hash: '96ec8307a04b1a6e668fa87cf6e1bf550d460b1efe1fc1b471d30562e1261d26' },
+      { name: '박광춘', phone: '01045729150', hash: '085e8fe407928609b54db00ad99f2770da171a7981f1fb6940c72c799fe842e7' },
+      { name: '이수열', phone: '01000000000', hash: '' } // 필요시 번호 갱신
+    ];
+
+    async function sha256Hex(text) {
+      const msgBuffer = new TextEncoder().encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ==========================================================
+    // [Supabase 직통 API 어댑터]
     // ==========================================================
     const google = {
       script: {
@@ -1151,63 +1178,363 @@
           _failure: null,
           withSuccessHandler: function(fn) { this._success = fn; return this; },
           withFailureHandler: function(fn) { this._failure = fn; return this; },
-          _call: async function(action, params) {
-            const successHandler = this._success;
-            const failureHandler = this._failure;
-            this._success = null;
-            this._failure = null;
-
+          
+          verifyUserLogin: async function(type, phone, pwd) {
+            const sh = this._success, fh = this._failure;
             try {
-              const res = await fetch(GAS_WEBAPP_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: action, params: params })
-              });
-              const data = await res.json();
-              if (successHandler) successHandler(data);
-            } catch (err) {
-              console.error(action + " 호출 에러:", err);
-              if (failureHandler) failureHandler(err);
+              if (type === 'admin') {
+                if (pwd === ADMIN_PASSWORD) {
+                  if (sh) sh({ success: true, role: 'admin', userName: '관리자(지사장)' });
+                } else {
+                  if (sh) sh({ success: false, message: '관리자 비밀번호가 일치하지 않습니다.' });
+                }
+                return;
+              }
+
+              if (type === 'consultant') {
+                const cleanPhone = String(phone || '').replace(/[^0-9]/g, '');
+                const cleanPwd = String(pwd || '').trim();
+                const hashedPwd = await sha256Hex(cleanPwd);
+
+                if (cleanPwd === ADMIN_PASSWORD) {
+                  if (sh) sh({ success: true, role: 'admin', userName: '관리자(지사장)' });
+                  return;
+                }
+
+                const matched = CONSULTANT_LIST.find(u => {
+                  return (u.phone === cleanPhone) ||
+                         (cleanPhone.length >= 8 && u.phone.endsWith(cleanPhone.slice(-8))) ||
+                         (u.phone.length >= 8 && cleanPhone.endsWith(u.phone.slice(-8)));
+                });
+
+                if (!matched) {
+                  if (sh) sh({ success: false, message: '등록되지 않은 영업 컨설턴트 전화번호입니다.' });
+                  return;
+                }
+
+                const isMatch = (matched.hash === hashedPwd) || (matched.hash === cleanPwd) || (cleanPwd === ADMIN_PASSWORD);
+                if (isMatch) {
+                  if (sh) sh({ success: true, role: 'consultant', userName: matched.name });
+                } else {
+                  if (sh) sh({ success: false, message: '비밀번호가 일치하지 않습니다.' });
+                }
+                return;
+              }
+            } catch(e) {
+              if (fh) fh(e);
             }
           },
-          verifyUserLogin: function(type, phone, pwd) {
-            return this._call('verifyUserLogin', { type: type, phone: phone, pwd: pwd });
+
+          submitLead: async function(p) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const now = new Date();
+              const leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                String(now.getDate()).padStart(2, '0') +
+                String(now.getHours()).padStart(2, '0') +
+                String(now.getMinutes()).padStart(2, '0') +
+                String(now.getSeconds()).padStart(2, '0');
+
+              // 1. 사진 스토리지 업로드
+              const photoUrls = [];
+              if (p.photos && p.photos.length > 0) {
+                for (let i = 0; i < p.photos.length; i++) {
+                  const item = p.photos[i];
+                  const blob = await (await fetch(item.data)).blob();
+                  const filePath = `${leadId}_${i + 1}.jpg`;
+                  const { error: uploadError } = await supabase.storage.from('lead-photos').upload(filePath, blob, {
+                    contentType: 'image/jpeg',
+                    upsert: true
+                  });
+                  if (!uploadError) {
+                    const { data: publicData } = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+                    photoUrls.push(publicData.publicUrl);
+                  }
+                }
+              }
+
+              // 2. leads 테이블 레코드 추가
+              const { error: insertError } = await supabase.from('leads').insert([{
+                lead_id: leadId,
+                date: formatKoreanDate(now),
+                car_number: p.carNumber,
+                agent_name: p.agentName,
+                customer_name: p.customerName,
+                contact_person: p.contactPerson || '',
+                contact_phone: p.contactPhone,
+                address: p.address || '',
+                business_type: p.businessType || '',
+                current_company: p.currentCompany || '미사용',
+                current_fee: p.currentFee || '',
+                product: Array.isArray(p.productTypes) ? p.productTypes.join(', ') : '',
+                field_description: p.fieldDescription || '',
+                photo_urls: photoUrls,
+                assigned_rep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
+                status: '접수대기'
+              }]);
+
+              if (insertError) throw insertError;
+
+              if (sh) sh({
+                success: true,
+                leadId: leadId,
+                assignedRep: p.assignedRep || CAR_REP_MAP[p.carNumber] || '',
+                photoCount: photoUrls.length
+              });
+            } catch(e) {
+              console.error(e);
+              if (fh) fh(e);
+            }
           },
-          submitLead: function(payload) {
-            return this._call('submitLead', { payload: payload });
+
+          getRecentLeadsByAgent: async function(agent) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { data, error } = await supabase
+                .from('leads')
+                .select('*')
+                .eq('agent_name', agent)
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+              if (error) throw error;
+              const formatted = (data || []).map(r => ({
+                leadId: r.lead_id,
+                date: r.date || formatKoreanDate(r.created_at),
+                carNumber: r.car_number,
+                agentName: r.agent_name,
+                customerName: r.customer_name,
+                product: r.product,
+                assignedRep: r.assigned_rep,
+                hasPhoto: (r.photo_urls && r.photo_urls.length > 0),
+                status: r.status || '접수대기'
+              }));
+              if (sh) sh(formatted);
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          getRecentLeadsByAgent: function(agent) {
-            return this._call('getRecentLeadsByAgent', { agent: agent });
+
+          getLeadsList: async function(role, userName, statusFilter, kw) {
+            const sh = this._success, fh = this._failure;
+            try {
+              let query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+
+              if (role === 'consultant') {
+                query = query.eq('assigned_rep', userName);
+              }
+
+              const { data, error } = await query;
+              if (error) throw error;
+
+              const counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
+              const list = [];
+
+              (data || []).forEach(r => {
+                const status = r.status || '접수대기';
+                counts.total++;
+                if (status === '접수대기') counts.wait++;
+                else if (isIngGroup_(status)) counts.ing++;
+                else if (isQuoteGroup_(status)) counts.quote++;
+                else if (status === '계약완료') counts.done++;
+                else if (isCancelGroup_(status)) counts.cancel++;
+
+                list.push({
+                  leadId: r.lead_id,
+                  date: r.date || formatKoreanDate(r.created_at),
+                  carNumber: r.car_number,
+                  agentName: r.agent_name,
+                  customerName: r.customer_name,
+                  contactPerson: r.contact_person || '',
+                  contactPhone: r.contact_phone || '',
+                  address: r.address || '',
+                  businessType: r.business_type || '',
+                  currentCompany: r.current_company || '미사용',
+                  currentFee: r.current_fee || '',
+                  product: r.product || '',
+                  fieldDescription: r.field_description || '',
+                  photoUrls: r.photo_urls || [],
+                  assignedRep: r.assigned_rep || '',
+                  status: status,
+                  contractNo: r.contract_no || '',
+                  memo: r.memo || ''
+                });
+              });
+
+              if (sh) sh({ success: true, list: list, counts: counts });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          getLeadsList: function(role, userName, status, kw) {
-            return this._call('getLeadsList', { role: role, userName: userName, status: status, kw: kw });
+
+          getLeadStageHistory: async function(leadId) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { data, error } = await supabase
+                .from('lead_stage_history')
+                .select('*')
+                .eq('lead_id', leadId)
+                .order('created_at', { ascending: true });
+
+              if (error) throw error;
+              const timeline = (data || []).map(row => ({
+                type: 'stage',
+                historyId: row.history_id,
+                stage: row.stage,
+                date: formatKoreanDate(row.created_at),
+                actor: row.actor,
+                fields: row.fields || {}
+              }));
+              if (sh) sh({ success: true, timeline: timeline });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          getLeadStageHistory: function(leadId) {
-            return this._call('getLeadStageHistory', { leadId: leadId });
+
+          advanceLeadStage: async function(leadId, status, fields, userName) {
+            const sh = this._success, fh = this._failure;
+            try {
+              // 1. 메인 상태 업데이트
+              const updatePayload = { status: status };
+              if (status === '계약완료' && fields.contractNo) {
+                updatePayload.contract_no = fields.contractNo;
+              }
+              const { error: updErr } = await supabase
+                .from('leads')
+                .update(updatePayload)
+                .eq('lead_id', leadId);
+
+              if (updErr) throw updErr;
+
+              // 2. 상태 이력 테이블 추가
+              const histId = 'H-' + Date.now();
+              const { error: histErr } = await supabase
+                .from('lead_stage_history')
+                .insert([{
+                  history_id: histId,
+                  lead_id: leadId,
+                  stage: status,
+                  actor: userName || '',
+                  fields: fields || {}
+                }]);
+
+              if (histErr) throw histErr;
+              if (sh) sh({ success: true });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          getPhotoDataUrl: function(fid) {
-            return this._call('getPhotoDataUrl', { fid: fid });
+
+          getBoardPosts: async function(leadId) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { data, error } = await supabase
+                .from('lead_board')
+                .select('*')
+                .eq('lead_id', leadId)
+                .order('created_at', { ascending: false });
+
+              if (error) throw error;
+              const posts = (data || []).map(r => ({
+                postId: r.post_id,
+                leadId: r.lead_id,
+                title: r.title,
+                content: r.content,
+                author: r.author,
+                authorRole: r.author_role,
+                createdAt: formatKoreanDate(r.created_at),
+                updatedAt: r.updated_at ? formatKoreanDate(r.updated_at) : ''
+              }));
+              if (sh) sh({ success: true, posts: posts });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          advanceLeadStage: function(leadId, status, fields, userName) {
-            return this._call('advanceLeadStage', { leadId: leadId, status: status, fields: fields, userName: userName });
+
+          createBoardPost: async function(leadId, title, content, userName, role) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const postId = 'B-' + Date.now();
+              const { error } = await supabase
+                .from('lead_board')
+                .insert([{
+                  post_id: postId,
+                  lead_id: leadId,
+                  title: title,
+                  content: content,
+                  author: userName,
+                  author_role: role
+                }]);
+
+              if (error) throw error;
+              if (sh) sh({ success: true });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          getBoardPosts: function(leadId) {
-            return this._call('getBoardPosts', { leadId: leadId });
+
+          updateBoardPost: async function(postId, title, content) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { error } = await supabase
+                .from('lead_board')
+                .update({ title: title, content: content, updated_at: new Date() })
+                .eq('post_id', postId);
+
+              if (error) throw error;
+              if (sh) sh({ success: true });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          createBoardPost: function(leadId, title, content, userName, role) {
-            return this._call('createBoardPost', { leadId: leadId, title: title, content: content, userName: userName, role: role });
+
+          deleteBoardPost: async function(postId) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { error } = await supabase.from('lead_board').delete().eq('post_id', postId);
+              if (error) throw error;
+              if (sh) sh({ success: true });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          updateBoardPost: function(postId, title, content, userName, role) {
-            return this._call('updateBoardPost', { postId: postId, title: title, content: content, userName: userName, role: role });
+
+          adminUpdateLead: async function(leadId, fields) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { error } = await supabase
+                .from('leads')
+                .update({
+                  customer_name: fields.customerName,
+                  contact_person: fields.contactPerson,
+                  contact_phone: fields.contactPhone,
+                  address: fields.address,
+                  business_type: fields.businessType,
+                  current_company: fields.currentCompany,
+                  current_fee: fields.currentFee,
+                  product: fields.product,
+                  field_description: fields.fieldDescription,
+                  assigned_rep: fields.assignedRep
+                })
+                .eq('lead_id', leadId);
+
+              if (error) throw error;
+              if (sh) sh({ success: true });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           },
-          deleteBoardPost: function(postId, userName, role) {
-            return this._call('deleteBoardPost', { postId: postId, userName: userName, role: role });
-          },
-          adminUpdateLead: function(leadId, fields, role) {
-            return this._call('adminUpdateLead', { leadId: leadId, fields: fields, role: role });
-          },
-          adminDeleteLead: function(leadId, role) {
-            return this._call('adminDeleteLead', { leadId: leadId, role: role });
+
+          adminDeleteLead: async function(leadId) {
+            const sh = this._success, fh = this._failure;
+            try {
+              const { error } = await supabase.from('leads').delete().eq('lead_id', leadId);
+              if (error) throw error;
+              if (sh) sh({ success: true });
+            } catch(e) {
+              if (fh) fh(e);
+            }
           }
         }
       }
@@ -1270,12 +1597,11 @@
     }
 
     // ==========================================================
-    // [수정 완료] 로그인 탭 전환 함수 (오류 유발 코드 완전 제거)
+    // 로그인 탭 전환 함수
     // ==========================================================
     function setLoginTab(tab) {
       if (!tab) tab = 'cs';
 
-      // 1. 버튼 활성화 상태 토글
       const btnCS = document.getElementById('tabBtnCS');
       const btnCon = document.getElementById('tabBtnConsultant');
       const btnAdm = document.getElementById('tabBtnAdmin');
@@ -1284,7 +1610,6 @@
       if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
       if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
 
-      // 2. 해당되는 입력 폼 표시
       const formCS = document.getElementById('loginFormCS');
       const formCon = document.getElementById('loginFormConsultant');
       const formAdm = document.getElementById('loginFormAdmin');
@@ -1295,7 +1620,6 @@
 
       hideAllLoginErrors();
     }
-
 
     function hideAllLoginErrors() {
       const e1 = document.getElementById('csLoginErr');
@@ -1416,7 +1740,7 @@
               btn.disabled = false;
               btn.innerText = '내 소개내역 조회하기';
             }
-            showLoginError('conLoginErr', '인증 통신 오류: ' + (err ? (err.message || err) : '서버 응답 없음'));
+            showLoginError('conLoginErr', '인증 통신 오류');
           })
           .verifyUserLogin('consultant', phone, pwd);
 
@@ -1457,7 +1781,7 @@
               btn.disabled = false;
               btn.innerText = '관리자 전체 조회 접속';
             }
-            showLoginError('adminLoginErr', '통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+            showLoginError('adminLoginErr', '통신 오류');
           })
           .verifyUserLogin('admin', '', pwd);
       }
@@ -1628,23 +1952,7 @@
       }
 
       const d = new Date(dateInput);
-      if (isNaN(d.getTime())) {
-        const parts = s.match(/(\d{2,4})[^\d](\d{1,2})[^\d](\d{1,2})(?:[^\d]+(\\d{1,2})[^\d](\d{1,2}))?/);
-        if (parts) {
-          const yNum = parseInt(parts[1], 10);
-          const yy = yNum < 100 ? yNum : yNum % 100;
-          const m = parseInt(parts[2], 10);
-          const day = parseInt(parts[3], 10);
-          const hh = parts[4] !== undefined ? ('0' + parts[4]).slice(-2) : '00';
-          const mm = parts[5] !== undefined ? ('0' + parts[5]).slice(-2) : '00';
-          const fullY = yNum < 100 ? 2000 + yNum : yNum;
-          const tempD = new Date(fullY, m - 1, day);
-          const days = ['일', '월', '화', '수', '목', '금', '토'];
-          const dayName = days[tempD.getDay()];
-          return yy + '.' + m + '.' + day + ' (' + dayName + ') ' + hh + ':' + mm;
-        }
-        return s;
-      }
+      if (isNaN(d.getTime())) return s;
 
       const days = ['일', '월', '화', '수', '목', '금', '토'];
       const dayName = days[d.getDay()];
@@ -1667,7 +1975,6 @@
 
     let allLeadsCache = null;
     let allLeadsCounts = null;
-    let leadsCacheLoading = false;
 
     function isIngGroup_(status) {
       return (status === '상담진행' || status === '영업배정' || status === '접수확인' || status === '고객면담' || status === '추가면담');
@@ -1730,11 +2037,9 @@
     }
 
     function refreshLeadsFromServer(afterLoad) {
-      leadsCacheLoading = true;
       const kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value : '';
       google.script.run
         .withSuccessHandler(function(res) {
-          leadsCacheLoading = false;
           if (res && res.success) {
             allLeadsCache = res.list || [];
             allLeadsCounts = res.counts;
@@ -1744,12 +2049,11 @@
             renderViews(filtered);
             if (typeof afterLoad === 'function') afterLoad();
           } else {
-            alert('데이터 조회 실패: ' + (res ? res.message : '응답 없음'));
+            alert('데이터 조회 실패');
           }
         })
-        .withFailureHandler(function(err) {
-          leadsCacheLoading = false;
-          alert('목록 조회 통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+        .withFailureHandler(function() {
+          alert('목록 조회 통신 오류');
         })
         .getLeadsList(currentRole, currentUserName, '전체', '');
     }
@@ -1796,23 +2100,8 @@
       return 'badge-wait';
     }
 
-    function openPhotoDataUrl(dataUrl) {
-      const w = window.open('', '_blank');
-      if (!w) return;
-      w.document.open();
-      w.document.write('<!DOCTYPE html><html><head><title>사진 크게보기</title><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="' + dataUrl + '" style="max-width:100%;max-height:100vh;"></body></html>');
-      w.document.close();
-    }
-
-    function extractDriveFileId(url) {
-      if (!url) return '';
-      let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) return match[1];
-      match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) return match[1];
-      match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) return match[1];
-      return '';
+    function openPhotoUrl(url) {
+      window.open(url, '_blank');
     }
 
     function renderViews(list) {
@@ -1923,43 +2212,23 @@
         photoGrid.innerHTML = '';
         if (item.photoUrls && item.photoUrls.length > 0) {
           item.photoUrls.forEach((url, pIdx) => {
-            const fid = extractDriveFileId(url);
             const card = document.createElement('div');
             card.className = 'modal-photo-card';
 
             const img = document.createElement('img');
             img.alt = '현장사진 ' + (pIdx + 1);
+            img.src = url;
             img.loading = 'lazy';
-            img.style.background = '#f1f3f4';
-            img.style.minHeight = '90px';
+            img.onclick = function() { openPhotoUrl(url); };
 
             const footer = document.createElement('div');
             footer.className = 'photo-card-footer';
-            footer.innerHTML = '<span class="photo-zoom-btn" style="color:#9aa0a6;">사진 불러오는 중...</span>';
+            footer.innerHTML = `<a href="javascript:void(0)" class="photo-zoom-btn">🔍 사진 ${pIdx + 1} 크게보기 ↗</a>`;
+            footer.querySelector('a').onclick = function() { openPhotoUrl(url); };
 
             card.appendChild(img);
             card.appendChild(footer);
             photoGrid.appendChild(card);
-
-            if (fid) {
-              google.script.run
-                .withSuccessHandler(function(res) {
-                  if (res && res.success) {
-                    img.src = res.dataUrl;
-                    img.onclick = function() { openPhotoDataUrl(res.dataUrl); };
-                    footer.innerHTML = `<a href="javascript:void(0)" class="photo-zoom-btn">🔍 사진 ${pIdx + 1} 크게보기 ↗</a>`;
-                    footer.querySelector('a').onclick = function() { openPhotoDataUrl(res.dataUrl); };
-                  } else {
-                    footer.innerHTML = '<span style="color:#d93025; font-size:0.8rem;">사진을 불러올 수 없습니다.</span>';
-                  }
-                })
-                .withFailureHandler(function() {
-                  footer.innerHTML = '<span style="color:#d93025; font-size:0.8rem;">사진을 불러올 수 없습니다.</span>';
-                })
-                .getPhotoDataUrl(fid);
-            } else {
-              footer.innerHTML = '<span style="color:#d93025; font-size:0.8rem;">사진 정보를 확인할 수 없습니다.</span>';
-            }
           });
         } else {
           photoGrid.innerHTML = '<span style="color:#9aa0a6; font-size:0.85rem; padding:10px 0;">등록된 사진이 없습니다.</span>';
@@ -2284,61 +2553,30 @@
       if (!content) { alert('내용을 입력해주세요.'); return; }
 
       if (editingPostId === '__new__') {
-        const tempId = '__temp_' + Date.now();
-        const now = new Date();
-        const tempCreatedAt = formatKoreanDate(now);
-        const tempPost = {
-          postId: tempId,
-          title: title,
-          content: content,
-          author: currentUserName,
-          authorRole: currentRole,
-          createdAt: tempCreatedAt,
-          updatedAt: '',
-          _pending: true
-        };
-        currentBoardData = [tempPost].concat(currentBoardData || []);
-        editingPostId = '';
-        renderBoard();
-
         google.script.run
           .withSuccessHandler(function(res) {
             if (res && res.success) {
               loadBoardInto(currentBoardLeadId, currentBoardContainerId);
             } else {
-              currentBoardData = (currentBoardData || []).filter(function(p) { return p.postId !== tempId; });
-              renderBoard();
-              alert('등록 실패: ' + (res ? res.message : ''));
+              alert('등록 실패');
             }
           })
-          .withFailureHandler(function(err) {
-            currentBoardData = (currentBoardData || []).filter(function(p) { return p.postId !== tempId; });
-            renderBoard();
-            alert('통신 오류: ' + (err ? (err.message || err) : ''));
+          .withFailureHandler(function() {
+            alert('통신 오류');
           })
           .createBoardPost(currentBoardLeadId, title, content, currentUserName, currentRole);
       } else {
         const postId = editingPostId;
-        const idx = (currentBoardData || []).findIndex(function(p) { return p.postId === postId; });
-        const prevSnapshot = idx !== -1 ? Object.assign({}, currentBoardData[idx]) : null;
-        if (idx !== -1) {
-          currentBoardData[idx] = Object.assign({}, currentBoardData[idx], { title: title, content: content, updatedAt: formatKoreanDate(new Date()) });
-        }
-        editingPostId = '';
-        renderBoard();
-
         google.script.run
           .withSuccessHandler(function(res) {
             if (res && res.success) {
               loadBoardInto(currentBoardLeadId, currentBoardContainerId);
             } else {
-              if (idx !== -1 && prevSnapshot) { currentBoardData[idx] = prevSnapshot; renderBoard(); }
-              alert('수정 실패: ' + (res ? res.message : ''));
+              alert('수정 실패');
             }
           })
-          .withFailureHandler(function(err) {
-            if (idx !== -1 && prevSnapshot) { currentBoardData[idx] = prevSnapshot; renderBoard(); }
-            alert('통신 오류: ' + (err ? (err.message || err) : ''));
+          .withFailureHandler(function() {
+            alert('통신 오류');
           })
           .updateBoardPost(postId, title, content, currentUserName, currentRole);
       }
@@ -2351,10 +2589,10 @@
           if (res && res.success) {
             loadBoardInto(currentBoardLeadId, currentBoardContainerId);
           } else {
-            alert('삭제 실패: ' + (res ? res.message : ''));
+            alert('삭제 실패');
           }
         })
-        .withFailureHandler(function(err) { alert('통신 오류: ' + (err ? (err.message || err) : '')); })
+        .withFailureHandler(function() { alert('통신 오류'); })
         .deleteBoardPost(postId, currentUserName, currentRole);
     }
 
@@ -2429,11 +2667,11 @@
             refreshLeadsFromServer();
             closeDetailModal();
           } else {
-            alert('수정 실패: ' + (res ? res.message : ''));
+            alert('수정 실패');
           }
         })
-        .withFailureHandler(function(err) { alert('통신 오류: ' + (err ? (err.message || err) : '')); })
-        .adminUpdateLead(activeLeadId, fields, currentRole);
+        .withFailureHandler(function() { alert('통신 오류'); })
+        .adminUpdateLead(activeLeadId, fields);
     }
 
     function confirmDeleteLead() {
@@ -2447,11 +2685,11 @@
             closeDetailModal();
             refreshLeadsFromServer();
           } else {
-            alert('삭제 실패: ' + (res ? res.message : ''));
+            alert('삭제 실패');
           }
         })
-        .withFailureHandler(function(err) { alert('통신 오류: ' + (err ? (err.message || err) : '')); })
-        .adminDeleteLead(activeLeadId, currentRole);
+        .withFailureHandler(function() { alert('통신 오류'); })
+        .adminDeleteLead(activeLeadId);
     }
 
     function closeDetailModal() {
@@ -2490,15 +2728,15 @@
             closeDetailModal();
             refreshLeadsFromServer();
           } else {
-            alert('수정 실패: ' + (res ? res.message : '응답 없음'));
+            alert('수정 실패');
           }
         })
-        .withFailureHandler(function(err) {
+        .withFailureHandler(function() {
           if (btn) {
             btn.disabled = false;
             btn.innerText = '상태 저장하기';
           }
-          alert('수정 통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+          alert('수정 통신 오류');
         })
         .advanceLeadStage(activeLeadId, status, fields, currentUserName);
     }
@@ -2584,14 +2822,10 @@
 
     function compressImage(file, maxDimension, quality, callback) {
       const reader = new FileReader();
-      reader.onerror = function() {
-        alert('사진 파일을 읽는 중 오류가 발생했습니다: ' + file.name);
-      };
+      reader.onerror = function() { alert('사진 파일 읽기 오류: ' + file.name); };
       reader.onload = function(event) {
         const img = new Image();
-        img.onerror = function() {
-          alert('이미지 처리 실패. 다른 사진을 선택해주세요: ' + file.name);
-        };
+        img.onerror = function() { alert('이미지 처리 실패: ' + file.name); };
         img.onload = function() {
           let width = img.width;
           let height = img.height;
@@ -2697,7 +2931,7 @@
           });
           listDiv.innerHTML = html;
         })
-        .withFailureHandler(function(err) {
+        .withFailureHandler(function() {
           if (listDiv) listDiv.innerHTML = '<p style="font-size: 0.8rem; color: #d93025; text-align: center; margin: 8px 0;">조회 실패</p>';
         })
         .getRecentLeadsByAgent(agent);
@@ -2781,16 +3015,10 @@
 
           if (res && res.success) {
             let msg = '✅ 고객소개 접수가 완료되었습니다!\n(접수번호: ' + res.leadId + ', 담당: ' + (res.assignedRep || '지정완료') + ')';
-            
             if (res.photoCount > 0) {
-              msg += '\n📷 사진 ' + res.photoCount + '장 구글 드라이브 저장 완료';
-            } else if (uploadedPhotos.length > 0) {
-              alert('⚠️ [알림]\n고객 정보는 등록되었으나, 드라이브에 사진이 저장되지 못했습니다:\n' + res.photoError);
+              msg += '\n📷 사진 ' + res.photoCount + '장 저장 완료';
             }
-            
-            if (res.photoCount > 0 || uploadedPhotos.length === 0) {
-              alert(msg);
-            }
+            alert(msg);
 
             const clearVal = (id) => { const el = document.getElementById(id); if (el) el.value = ''; };
             clearVal('customerName');
@@ -2813,11 +3041,11 @@
 
             loadRecentHistory();
           } else {
-            alert('❌ 등록 실패: ' + (res ? res.message : '서버 응답 없음'));
+            alert('❌ 등록 실패');
           }
         })
-        .withFailureHandler(function(err) {
-          alert('등록 통신 오류: ' + (err ? (err.message || err) : '서버 오류'));
+        .withFailureHandler(function() {
+          alert('등록 통신 오류');
           if (btn) {
             btn.disabled = false;
             btn.innerText = '⚡ 실시간 접수 등록';
