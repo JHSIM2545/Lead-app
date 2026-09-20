@@ -1599,26 +1599,36 @@
     // ==========================================================
     // 로그인 탭 전환 함수
     // ==========================================================
+   // ==========================================================
+    // [완벽 방어] 로그인 탭 전환 함수
+    // ==========================================================
     function setLoginTab(tab) {
       if (!tab) tab = 'cs';
 
-      const btnCS = document.getElementById('tabBtnCS');
-      const btnCon = document.getElementById('tabBtnConsultant');
-      const btnAdm = document.getElementById('tabBtnAdmin');
+      try {
+        // 1. 탭 버튼 활성화 처리
+        const btnCS = document.getElementById('tabBtnCS');
+        const btnCon = document.getElementById('tabBtnConsultant');
+        const btnAdm = document.getElementById('tabBtnAdmin');
 
-      if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
-      if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
-      if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
+        if (btnCS) btnCS.classList.toggle('active', tab === 'cs');
+        if (btnCon) btnCon.classList.toggle('active', tab === 'consultant');
+        if (btnAdm) btnAdm.classList.toggle('active', tab === 'admin');
 
-      const formCS = document.getElementById('loginFormCS');
-      const formCon = document.getElementById('loginFormConsultant');
-      const formAdm = document.getElementById('loginFormAdmin');
+        // 2. 폼 표시 전환 (안전 체크)
+        const formCS = document.getElementById('loginFormCS');
+        const formCon = document.getElementById('loginFormConsultant');
+        const formAdm = document.getElementById('loginFormAdmin');
 
-      if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
-      if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
-      if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
+        if (formCS) formCS.style.display = (tab === 'cs' ? 'block' : 'none');
+        if (formCon) formCon.style.display = (tab === 'consultant' ? 'block' : 'none');
+        if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
 
-      hideAllLoginErrors();
+        // 3. 에러 메시지 초기화
+        hideAllLoginErrors();
+      } catch (err) {
+        console.error("탭 전환 중 오류 발생:", err);
+      }
     }
 
     function hideAllLoginErrors() {
