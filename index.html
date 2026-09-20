@@ -26,9 +26,8 @@
       background: #ffffff; padding: 12px 16px; border-radius: 14px; margin-bottom: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
     }
-    .user-badge-group { display: flex; flex-direction: column; gap: 2px; }
-    .user-badge-title { font-size: 1.05rem; font-weight: 800; color: #202124; }
-    .user-badge-subtitle { font-size: 0.82rem; font-weight: 600; color: #1a73e8; }
+    .user-badge-group { display: flex; align-items: center; gap: 8px; }
+    .user-badge-title { font-size: 1.1rem; font-weight: 800; color: #202124; }
     .inner-header-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .btn-inner {
       padding: 8px 13px; border-radius: 8px; font-size: 0.82rem; font-weight: 700;
@@ -291,21 +290,28 @@
     .board-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 16px; }
     .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1.5px solid #edf2f7; padding-bottom: 8px; }
     .board-header h4 { margin: 0; font-size: 0.96rem; color: #202124; display: flex; align-items: center; gap: 6px; }
-    .board-list { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; padding-right: 4px; }
+    .board-list { display: flex; flex-direction: column; gap: 10px; max-height: 280px; overflow-y: auto; margin-bottom: 14px; padding-right: 4px; }
     .board-card {
-      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px;
       position: relative; transition: all 0.15s ease;
     }
-    .board-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .board-author { font-size: 0.82rem; font-weight: 700; color: #1e293b; }
-    .board-role-badge { font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; background: #e2e8f0; color: #475569; font-weight: 600; margin-left: 4px; }
-    .board-date { font-size: 0.72rem; color: #94a3b8; }
-    .board-content { font-size: 0.85rem; color: #334155; line-height: 1.45; white-space: pre-wrap; word-break: break-all; }
+    .board-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .board-title-snippet { font-size: 0.92rem; font-weight: 800; color: #0f172a; line-height: 1.3; }
+    .board-card-meta { display: flex; align-items: center; gap: 6px; font-size: 0.74rem; color: #64748b; margin-bottom: 6px; }
+    .board-role-tag { padding: 1px 6px; border-radius: 4px; background: #e2e8f0; color: #334155; font-weight: 600; }
+    .board-content { font-size: 0.85rem; color: #334155; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
     .board-del-btn { background: none; border: none; color: #ef4444; font-size: 0.74rem; cursor: pointer; padding: 0 4px; font-weight: 600; }
     
-    .board-input-box { display: flex; flex-direction: column; gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 8px; }
-    .board-input-box textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; background: #fff; resize: vertical; min-height: 60px; outline: none; }
-    .board-submit-btn { align-self: flex-end; padding: 7px 16px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+    /* 첨부파일 렌더링 영역 */
+    .board-attachment { margin-top: 8px; padding-top: 6px; border-top: 1px dashed #cbd5e1; }
+    .board-attachment a { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; color: #1a73e8; text-decoration: none; font-weight: 700; background: #e8f0fe; padding: 4px 8px; border-radius: 6px; }
+    .board-attachment-img { max-width: 100%; max-height: 160px; border-radius: 6px; margin-top: 6px; display: block; cursor: pointer; border: 1px solid #e2e8f0; }
+
+    .board-input-box { display: flex; flex-direction: column; gap: 8px; background: #f1f5f9; padding: 12px; border-radius: 10px; }
+    .board-input-box textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; font-size: 0.88rem; background: #fff; resize: vertical; min-height: 65px; outline: none; }
+    .board-input-footer { display: flex; justify-content: space-between; align-items: center; }
+    .btn-attach-file { padding: 6px 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .board-submit-btn { padding: 8px 18px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
 
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
@@ -442,12 +448,11 @@
     <div id="viewRegister">
       <div class="inner-header-bar">
         <div class="user-badge-group">
-          <span class="user-badge-title" id="regUserTitle">🛡️ 북서울지사</span>
-          <span class="user-badge-subtitle" id="regUserSub">고객소개 등록</span>
+          <span class="user-badge-title" id="regUserTitle">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns">
           <button type="button" class="btn-inner btn-pwd" id="regPwdBtn">🔑 비밀번호 변경</button>
-          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn">📋 내 안건 목록</button>
+          <button type="button" class="btn-inner btn-switch" id="regSwitchBtn">📋 안건 목록</button>
           <button type="button" class="btn-inner btn-logout" id="regLogoutBtn">로그아웃</button>
         </div>
       </div>
@@ -584,8 +589,7 @@
     <div id="viewDashboard">
       <div class="inner-header-bar">
         <div class="user-badge-group">
-          <span class="user-badge-title" id="dashViewTitle">📊 소개영업 안건 목록</span>
-          <span class="user-badge-subtitle" id="dashUserSub">접속 사용자</span>
+          <span class="user-badge-title" id="dashUserTitle">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns">
           <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>
@@ -756,11 +760,10 @@
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
 
-        <!-- 안건별 전용 실시간 게시판 -->
+        <!-- ★ [안건별 전용 게시판] 첫 소절 타이틀 표시 & 파일 첨부 기능 탑재 -->
         <div class="board-box">
           <div class="board-header">
-            <h4>💬 안건 피드백 및 의견 공유 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
-            <span style="font-size:0.75rem; color:#64748b;">누구나 자유롭게 의견 작성 가능</span>
+            <h4>💬 안건 의견 및 피드백 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
           </div>
 
           <!-- 댓글 목록 -->
@@ -770,8 +773,19 @@
 
           <!-- 의견 작성 입력창 -->
           <div class="board-input-box">
-            <textarea id="boardContentInput" placeholder="이 안건에 대해 공유할 내용이나 전달사항을 입력해주세요..."></textarea>
-            <button type="button" class="board-submit-btn" id="btnSubmitBoardPost">의견 등록</button>
+            <textarea id="boardContentInput" placeholder="의견 및 피드백 내용을 자유롭게 입력해주세요..."></textarea>
+            
+            <!-- 파일 첨부 상태 표시 -->
+            <input type="file" id="boardFileInput" style="display:none;">
+            <div id="boardFileStatus" style="display:none; font-size:0.76rem; color:#1a73e8; font-weight:600; display:flex; align-items:center; gap:6px;">
+              <span id="boardFileNameText"></span>
+              <button type="button" id="btnRemoveBoardFile" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold;">×</button>
+            </div>
+
+            <div class="board-input-footer">
+              <button type="button" class="btn-attach-file" id="btnAttachBoardFile">📎 사진/파일 첨부</button>
+              <button type="button" class="board-submit-btn" id="btnSubmitBoardPost">의견 등록</button>
+            </div>
           </div>
         </div>
 
@@ -892,7 +906,7 @@
       }
 
       // ==========================================================
-      // [4] 전역 상태 및 화면 전환
+      // [4] 전역 상태 및 화면 전환 (상단 타이틀: 오직 사용자 이름만 표기)
       // ==========================================================
       var currentRole = ''; // 'admin' | '컨설턴트' | 'CS근무자' | 'CS관리자' | '기술사원'
       var currentUserName = '';
@@ -901,6 +915,7 @@
       var currentLeadsData = [];
       var activeLeadItem = null;
       var uploadedPhotos = [];
+      var selectedBoardFile = null;
 
       function showScreen(screenId) {
         closeDetailModal();
@@ -916,45 +931,27 @@
         if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
         if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
 
+        // 비밀번호 변경 버튼
         var regPwdBtn = document.getElementById('regPwdBtn');
         var dashPwdBtn = document.getElementById('dashPwdBtn');
         var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
         if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
         if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
 
+        // ★ [핵심] 상단 타이틀에는 불필요한 보조문구를 제거하고 오직 사용자 이름만 표기
+        var displayName = (currentRole === 'admin') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
+        var regUserTitle = document.getElementById('regUserTitle');
+        var dashUserTitle = document.getElementById('dashUserTitle');
+        if (regUserTitle) regUserTitle.innerText = displayName;
+        if (dashUserTitle) dashUserTitle.innerText = displayName;
+
         if (screenId === 'register') {
-          var regTitle = document.getElementById('regUserTitle');
-          var regSub = document.getElementById('regUserSub');
           var regSwitch = document.getElementById('regSwitchBtn');
-
-          if (currentRole === 'admin') {
-            if (regTitle) regTitle.innerText = '👑 관리자(지사장)';
-            if (regSub) regSub.innerText = '현장등록 모드';
-            if (regSwitch) regSwitch.innerText = '📊 전체 대시보드';
-          } else {
-            if (regTitle) regTitle.innerText = '👤 ' + currentUserName + ' (' + currentRole + ')';
-            if (regSub) regSub.innerText = '신규 가망고객 소개등록';
-            if (regSwitch) regSwitch.innerText = (currentRole === '컨설턴트') ? '💼 배당 안건 목록' : '📋 내 소개 안건 목록';
-          }
+          if (regSwitch) regSwitch.innerText = '📋 안건 목록';
           loadRecentHistory();
-
         } else if (screenId === 'dashboard') {
-          var dashTitle = document.getElementById('dashViewTitle');
-          var dashSub = document.getElementById('dashUserSub');
           var dashSwitch = document.getElementById('dashSwitchBtn');
-
-          if (currentRole === 'admin') {
-            if (dashTitle) dashTitle.innerText = '📊 소개영업 전체 대시보드';
-            if (dashSub) dashSub.innerText = '👑 지사 관리자 (전체 안건 열람/관리)';
-          } else if (currentRole === '컨설턴트') {
-            if (dashTitle) dashTitle.innerText = '💼 내 배당 안건 관리 대시보드';
-            if (dashSub) dashSub.innerText = '👤 ' + currentUserName + ' 컨설턴트 (나에게 배당된 안건)';
-          } else {
-            if (dashTitle) dashTitle.innerText = '📋 내가 소개한 가망고객 목록';
-            if (dashSub) dashSub.innerText = '🛡️ ' + currentUserName + ' (' + currentRole + ') - 내가 등록한 안건';
-          }
           if (dashSwitch) dashSwitch.innerText = '➕ 새 안건 등록';
-
           loadDashboardLeads();
         }
       }
@@ -1101,7 +1098,7 @@
       }
 
       // ==========================================================
-      // [6] DB 조회 및 권한별 목록 표시
+      // [6] DB 조회 및 목록 표시
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -1218,7 +1215,7 @@
       }
 
       // ==========================================================
-      // [7] 안건별 전용 게시판 로직 (누구나 이용 가능)
+      // [7] 안건별 전용 게시판 로직 (첫 소절 타이틀 표시 & 파일 첨부 기능)
       // ==========================================================
       async function loadLeadBoardPosts(leadId) {
         var listContainer = document.getElementById('boardPostList');
@@ -1246,12 +1243,37 @@
             var canDelete = (currentRole === 'admin') || (p.author === currentUserName);
             var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" onclick="deleteBoardPost(\'' + p.post_id + '\')">삭제</button>' : '';
 
+            // ★ [요청반영] 첫 소절(첫 문장 또는 30자)을 굵은 타이틀로 생성
+            var rawText = (p.content || '').trim();
+            var firstLine = rawText.split('\n')[0].trim();
+            var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+            if (!titleSnippet) titleSnippet = '안건 의견';
+
+            // 첨부파일 파싱 (URL 링크가 포함된 경우)
+            var attachHtml = '';
+            var fileUrlMatch = rawText.match(/https:\/\/[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.pdf|\.xlsx|\.docx)/i);
+            if (fileUrlMatch) {
+              var fUrl = fileUrlMatch[0];
+              var isImg = /\.(jpg|jpeg|png|gif)$/i.test(fUrl);
+              if (isImg) {
+                attachHtml = '<div class="board-attachment"><img src="' + fUrl + '" class="board-attachment-img" onclick="window.open(\'' + fUrl + '\', \'_blank\')"></div>';
+              } else {
+                attachHtml = '<div class="board-attachment"><a href="' + fUrl + '" target="_blank">📎 첨부파일 다운로드 ↗</a></div>';
+              }
+            }
+
             html += '<div class="board-card">'
-              + '<div class="board-card-header">'
-              + '<div><span class="board-author">' + (p.author || '직원') + '</span><span class="board-role-badge">' + (p.author_role || '일반') + '</span></div>'
-              + '<div><span class="board-date">' + formatKoreanDate(p.created_at) + '</span> ' + delBtnHtml + '</div>'
+              + '<div class="board-card-top">'
+              + '<span class="board-title-snippet">📌 ' + titleSnippet + '</span>'
+              + delBtnHtml
               + '</div>'
-              + '<div class="board-content">' + p.content + '</div>'
+              + '<div class="board-card-meta">'
+              + '<span><strong>' + (p.author || '직원') + '</strong></span>'
+              + '<span class="board-role-tag">' + (p.author_role || '일반') + '</span>'
+              + '<span>· ' + formatKoreanDate(p.created_at) + '</span>'
+              + '</div>'
+              + '<div class="board-content">' + rawText + '</div>'
+              + attachHtml
               + '</div>';
           });
 
@@ -1281,19 +1303,42 @@
         if (!input || !activeLeadItem || !supabase) return;
 
         var content = input.value.trim();
-        if (!content) { alert('의견 내용을 입력해주세요.'); return; }
+        if (!content && !selectedBoardFile) { alert('의견 내용 또는 첨부파일을 선택해주세요.'); return; }
 
         var btn = document.getElementById('btnSubmitBoardPost');
         if (btn) { btn.disabled = true; btn.innerText = '등록 중...'; }
 
-        var postId = 'B-' + Date.now();
-        var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
-
         try {
+          var fileUrl = '';
+          // 첨부파일이 선택된 경우 Supabase Storage 업로드
+          if (selectedBoardFile) {
+            var ext = selectedBoardFile.name.split('.').pop();
+            var filePath = 'board_files/' + activeLeadItem.lead_id + '_' + Date.now() + '.' + ext;
+            var upRes = await supabase.storage.from('lead-photos').upload(filePath, selectedBoardFile);
+            if (!upRes.error) {
+              var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+              if (pub && pub.data && pub.data.publicUrl) {
+                fileUrl = pub.data.publicUrl;
+              }
+            }
+          }
+
+          var finalContent = content;
+          if (fileUrl) {
+            finalContent = (finalContent ? finalContent + '\n\n' : '') + fileUrl;
+          }
+
+          var firstLine = finalContent.split('\n')[0].trim();
+          var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+
+          var postId = 'B-' + Date.now();
+          var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
+
           var res = await supabase.from('lead_board').insert([{
             post_id: postId,
             lead_id: activeLeadItem.lead_id,
-            content: content,
+            title: titleSnippet,
+            content: finalContent,
             author: currentUserName,
             author_role: authorRole
           }]);
@@ -1301,12 +1346,21 @@
           if (res.error) throw res.error;
 
           input.value = '';
+          clearBoardFile();
           loadLeadBoardPosts(activeLeadItem.lead_id);
         } catch (err) {
           alert('등록 실패: ' + (err.message || err));
         } finally {
           if (btn) { btn.disabled = false; btn.innerText = '의견 등록'; }
         }
+      }
+
+      function clearBoardFile() {
+        selectedBoardFile = null;
+        var fileInp = document.getElementById('boardFileInput');
+        if (fileInp) fileInp.value = '';
+        var statusBox = document.getElementById('boardFileStatus');
+        if (statusBox) statusBox.style.display = 'none';
       }
 
       // ==========================================================
@@ -1385,6 +1439,7 @@
         }
 
         // 3. 해당 안건 전용 게시판 불러오기
+        clearBoardFile();
         loadLeadBoardPosts(item.lead_id);
         var bInput = document.getElementById('boardContentInput');
         if (bInput) bInput.value = '';
@@ -1398,6 +1453,7 @@
         if (modal) modal.classList.remove('open');
         var editContainer = document.getElementById('editLeadContainer');
         if (editContainer) editContainer.style.display = 'none';
+        clearBoardFile();
         activeLeadItem = null;
       }
 
@@ -1513,7 +1569,7 @@
           });
         }
 
-        // 2. 통합 직원 로그인 폼 제출 (★ 관리자 둔갑 방지 적용)
+        // 2. 통합 직원 로그인 폼 제출
         var fMember = document.getElementById('formLoginMember');
         if (fMember) {
           fMember.addEventListener('submit', async function(e) {
@@ -1544,7 +1600,6 @@
                 return;
               }
 
-              // 가입 시 입력된 직무를 정확히 적용 (일반 탭에서는 admin 절대 부여 금지)
               currentRole = user.job ? user.job.trim() : 'CS근무자';
               if (currentRole === 'admin' || currentRole === '지사장') {
                 currentRole = 'CS관리자';
@@ -1563,7 +1618,7 @@
           });
         }
 
-        // 3. 지사 관리자 전용 로그인 폼 제출 (★ 오직 여기서만 admin 부여)
+        // 3. 지사 관리자 전용 로그인 폼 제출
         var fAdm = document.getElementById('formLoginAdmin');
         if (fAdm) {
           fAdm.addEventListener('submit', function(e) {
@@ -1650,7 +1705,25 @@
           }
         });
 
-        // 안건별 게시판 의견 등록 이벤트
+        // ★ [게시판 파일 첨부 및 등록 이벤트]
+        document.getElementById('btnAttachBoardFile').addEventListener('click', function() {
+          document.getElementById('boardFileInput').click();
+        });
+
+        document.getElementById('boardFileInput').addEventListener('change', function(e) {
+          var f = e.target.files[0];
+          if (f) {
+            selectedBoardFile = f;
+            var statusBox = document.getElementById('boardFileStatus');
+            var nameText = document.getElementById('boardFileNameText');
+            if (statusBox && nameText) {
+              nameText.innerText = '선택된 파일: ' + f.name;
+              statusBox.style.display = 'flex';
+            }
+          }
+        });
+
+        document.getElementById('btnRemoveBoardFile').addEventListener('click', clearBoardFile);
         document.getElementById('btnSubmitBoardPost').addEventListener('click', submitBoardPost);
 
         // 화면 전환 버튼
