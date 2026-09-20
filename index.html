@@ -756,7 +756,7 @@
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
 
-        <!-- ★ [안건별 전용 실시간 게시판] 누구나 자유롭게 이용 가능 -->
+        <!-- 안건별 전용 실시간 게시판 -->
         <div class="board-box">
           <div class="board-header">
             <h4>💬 안건 피드백 및 의견 공유 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
@@ -1384,7 +1384,7 @@
           }
         }
 
-        // 3. ★ 해당 안건 전용 게시판 불러오기
+        // 3. 해당 안건 전용 게시판 불러오기
         loadLeadBoardPosts(item.lead_id);
         var bInput = document.getElementById('boardContentInput');
         if (bInput) bInput.value = '';
@@ -1498,8 +1498,8 @@
 
               alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.');
 
-              currentRole = job;
-              currentUserName = name;
+              currentRole = job.trim();
+              currentUserName = name.trim();
               currentUserPhone = phone;
 
               document.getElementById('agentName').value = name;
@@ -1513,7 +1513,7 @@
           });
         }
 
-        // 2. 통합 직원 로그인 폼 제출
+        // 2. 통합 직원 로그인 폼 제출 (★ 관리자 둔갑 방지 적용)
         var fMember = document.getElementById('formLoginMember');
         if (fMember) {
           fMember.addEventListener('submit', async function(e) {
@@ -1525,15 +1525,6 @@
             if (!phone || !pwd) { showLoginError('memberLoginErr', '전화번호와 비밀번호를 모두 입력해주세요.'); return; }
 
             btn.disabled = true; btn.innerText = '인증 확인 중...';
-
-            if (pwd === ADMIN_PASSWORD) {
-              currentRole = 'admin';
-              currentUserName = '지사장(관리자)';
-              currentUserPhone = '';
-              btn.disabled = false; btn.innerText = '로그인 접속';
-              showScreen('dashboard');
-              return;
-            }
 
             try {
               var q = await supabase.from('app_users').select('*').eq('phone', phone);
@@ -1553,11 +1544,16 @@
                 return;
               }
 
-              currentRole = user.job || '일반';
-              currentUserName = user.name;
+              // 가입 시 입력된 직무를 정확히 적용 (일반 탭에서는 admin 절대 부여 금지)
+              currentRole = user.job ? user.job.trim() : 'CS근무자';
+              if (currentRole === 'admin' || currentRole === '지사장') {
+                currentRole = 'CS관리자';
+              }
+
+              currentUserName = user.name ? user.name.trim() : '직원';
               currentUserPhone = user.phone;
 
-              document.getElementById('agentName').value = user.name;
+              document.getElementById('agentName').value = currentUserName;
               showScreen('dashboard');
 
             } catch (err) {
@@ -1567,7 +1563,7 @@
           });
         }
 
-        // 3. 관리자 로그인 폼 제출
+        // 3. 지사 관리자 전용 로그인 폼 제출 (★ 오직 여기서만 admin 부여)
         var fAdm = document.getElementById('formLoginAdmin');
         if (fAdm) {
           fAdm.addEventListener('submit', function(e) {
@@ -1850,6 +1846,7 @@
 
             alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
 
+            // 폼 초기화
             document.getElementById('customerName').value = '';
             document.getElementById('contactPerson').value = '';
             document.getElementById('contactPhone').value = '';
