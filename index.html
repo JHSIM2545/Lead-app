@@ -260,7 +260,7 @@
       pointer-events: auto !important;
     }
     .modal-card {
-      background: #ffffff; width: 100%; max-width: 580px; max-height: 90vh;
+      background: #ffffff; width: 100%; max-width: 600px; max-height: 90vh;
       border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
       box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     }
@@ -286,6 +286,26 @@
     .status-update-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 10px; padding: 14px; margin-top: 14px; }
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
     .btn-save-status { width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px; }
+
+    /* [게시판 디자인] */
+    .board-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 16px; }
+    .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1.5px solid #edf2f7; padding-bottom: 8px; }
+    .board-header h4 { margin: 0; font-size: 0.96rem; color: #202124; display: flex; align-items: center; gap: 6px; }
+    .board-list { display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; padding-right: 4px; }
+    .board-card {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;
+      position: relative; transition: all 0.15s ease;
+    }
+    .board-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .board-author { font-size: 0.82rem; font-weight: 700; color: #1e293b; }
+    .board-role-badge { font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; background: #e2e8f0; color: #475569; font-weight: 600; margin-left: 4px; }
+    .board-date { font-size: 0.72rem; color: #94a3b8; }
+    .board-content { font-size: 0.85rem; color: #334155; line-height: 1.45; white-space: pre-wrap; word-break: break-all; }
+    .board-del-btn { background: none; border: none; color: #ef4444; font-size: 0.74rem; cursor: pointer; padding: 0 4px; font-weight: 600; }
+    
+    .board-input-box { display: flex; flex-direction: column; gap: 8px; background: #f1f5f9; padding: 10px; border-radius: 8px; }
+    .board-input-box textarea { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; background: #fff; resize: vertical; min-height: 60px; outline: none; }
+    .board-submit-btn { align-self: flex-end; padding: 7px 16px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
 
     .lead-author-actions {
       background: #fff8f6; border: 1px dashed #f5c2b7; border-radius: 10px;
@@ -628,7 +648,7 @@
 
   </div>
 
-  <!-- 안건 상세 모달 -->
+  <!-- 안건 상세 모달 (상세정보 + 게시판 + 상태변경) -->
   <div class="modal-overlay" id="detailModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -704,7 +724,7 @@
           </div>
         </div>
 
-        <!-- 최초 작성자 및 관리자 전용 액션 영역 -->
+        <!-- 안건 관리 액션 (수정/삭제: 관리자 또는 작성자) -->
         <div class="lead-author-actions" id="authorActionsBox">
           <div class="lead-author-actions-title">
             <span>⚙️ 안건 정보 관리</span>
@@ -735,6 +755,26 @@
           </div>
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
+
+        <!-- ★ [안건별 전용 실시간 게시판] 누구나 자유롭게 이용 가능 -->
+        <div class="board-box">
+          <div class="board-header">
+            <h4>💬 안건 피드백 및 의견 공유 <span id="boardCountBadge" style="font-size:0.75rem; color:#1a73e8; font-weight:700;">(0)</span></h4>
+            <span style="font-size:0.75rem; color:#64748b;">누구나 자유롭게 의견 작성 가능</span>
+          </div>
+
+          <!-- 댓글 목록 -->
+          <div class="board-list" id="boardPostList">
+            <p style="text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;">등록된 의견이 없습니다.</p>
+          </div>
+
+          <!-- 의견 작성 입력창 -->
+          <div class="board-input-box">
+            <textarea id="boardContentInput" placeholder="이 안건에 대해 공유할 내용이나 전달사항을 입력해주세요..."></textarea>
+            <button type="button" class="board-submit-btn" id="btnSubmitBoardPost">의견 등록</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -852,7 +892,7 @@
       }
 
       // ==========================================================
-      // [4] 전역 상태 및 직무별 화면 라우팅
+      // [4] 전역 상태 및 화면 전환
       // ==========================================================
       var currentRole = ''; // 'admin' | '컨설턴트' | 'CS근무자' | 'CS관리자' | '기술사원'
       var currentUserName = '';
@@ -876,14 +916,12 @@
         if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
         if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
 
-        // 비밀번호 변경 버튼
         var regPwdBtn = document.getElementById('regPwdBtn');
         var dashPwdBtn = document.getElementById('dashPwdBtn');
         var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
         if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
         if (dashPwdBtn) dashPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
 
-        // 화면 상단 제목 및 전환 버튼 제어
         if (screenId === 'register') {
           var regTitle = document.getElementById('regUserTitle');
           var regSub = document.getElementById('regUserSub');
@@ -1063,7 +1101,7 @@
       }
 
       // ==========================================================
-      // [6] DB 조회 및 권한별 필터링
+      // [6] DB 조회 및 권한별 목록 표시
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -1072,16 +1110,11 @@
         try {
           var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
 
-          // ★ [핵심 권한 분기]
-          // 1. 컨설턴트: 본인에게 배당된 안건만 조회
           if (currentRole === '컨설턴트') {
             query = query.eq('assigned_rep', currentUserName);
-          } 
-          // 2. CS근무자 / CS관리자 / 기술사원: 본인이 등록한 안건만 조회
-          else if (currentRole !== 'admin') {
+          } else if (currentRole !== 'admin') {
             query = query.eq('agent_name', currentUserName);
           }
-          // 3. 지사 관리자(admin): 전체 조회 유지
 
           var res = await query;
           if (res.error) throw res.error;
@@ -1184,6 +1217,101 @@
         });
       }
 
+      // ==========================================================
+      // [7] 안건별 전용 게시판 로직 (누구나 이용 가능)
+      // ==========================================================
+      async function loadLeadBoardPosts(leadId) {
+        var listContainer = document.getElementById('boardPostList');
+        var badge = document.getElementById('boardCountBadge');
+        if (!listContainer || !supabase || !leadId) return;
+
+        try {
+          var res = await supabase.from('lead_board')
+            .select('*')
+            .eq('lead_id', leadId)
+            .order('created_at', { ascending: true });
+
+          if (res.error) throw res.error;
+
+          var posts = res.data || [];
+          if (badge) badge.innerText = '(' + posts.length + ')';
+
+          if (posts.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;">등록된 의견이 없습니다. 첫 의견을 남겨보세요!</p>';
+            return;
+          }
+
+          var html = '';
+          posts.forEach(function(p) {
+            var canDelete = (currentRole === 'admin') || (p.author === currentUserName);
+            var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" onclick="deleteBoardPost(\'' + p.post_id + '\')">삭제</button>' : '';
+
+            html += '<div class="board-card">'
+              + '<div class="board-card-header">'
+              + '<div><span class="board-author">' + (p.author || '직원') + '</span><span class="board-role-badge">' + (p.author_role || '일반') + '</span></div>'
+              + '<div><span class="board-date">' + formatKoreanDate(p.created_at) + '</span> ' + delBtnHtml + '</div>'
+              + '</div>'
+              + '<div class="board-content">' + p.content + '</div>'
+              + '</div>';
+          });
+
+          listContainer.innerHTML = html;
+          listContainer.scrollTop = listContainer.scrollHeight;
+
+        } catch (e) {
+          console.error("게시판 로드 실패:", e);
+          listContainer.innerHTML = '<p style="text-align:center; padding:15px; font-size:0.8rem; color:#ef4444;">의견을 불러오지 못했습니다.</p>';
+        }
+      }
+
+      window.deleteBoardPost = async function(postId) {
+        if (!confirm('이 의견을 삭제하시겠습니까?')) return;
+        if (!supabase || !activeLeadItem) return;
+
+        var res = await supabase.from('lead_board').delete().eq('post_id', postId);
+        if (!res.error) {
+          loadLeadBoardPosts(activeLeadItem.lead_id);
+        } else {
+          alert('삭제 실패: ' + res.error.message);
+        }
+      };
+
+      async function submitBoardPost() {
+        var input = document.getElementById('boardContentInput');
+        if (!input || !activeLeadItem || !supabase) return;
+
+        var content = input.value.trim();
+        if (!content) { alert('의견 내용을 입력해주세요.'); return; }
+
+        var btn = document.getElementById('btnSubmitBoardPost');
+        if (btn) { btn.disabled = true; btn.innerText = '등록 중...'; }
+
+        var postId = 'B-' + Date.now();
+        var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
+
+        try {
+          var res = await supabase.from('lead_board').insert([{
+            post_id: postId,
+            lead_id: activeLeadItem.lead_id,
+            content: content,
+            author: currentUserName,
+            author_role: authorRole
+          }]);
+
+          if (res.error) throw res.error;
+
+          input.value = '';
+          loadLeadBoardPosts(activeLeadItem.lead_id);
+        } catch (err) {
+          alert('등록 실패: ' + (err.message || err));
+        } finally {
+          if (btn) { btn.disabled = false; btn.innerText = '의견 등록'; }
+        }
+      }
+
+      // ==========================================================
+      // [8] 상세 모달 오픈 및 닫기
+      // ==========================================================
       function openDetailModal(idx) {
         var item = currentLeadsData[idx];
         if (!item) return;
@@ -1238,7 +1366,7 @@
           if (authorTag) authorTag.innerText = (currentRole === 'admin') ? '👑 지사 관리자' : '🛡️ 본인 등록 안건';
         }
 
-        // 2. ★ 상태 변경 권한 (컨설턴트 및 지사 관리자만 가능)
+        // 2. 상태 변경 권한 (컨설턴트 및 지사 관리자만 가능)
         var statusBox = document.getElementById('statusUpdateBox');
         var statusPermTag = document.getElementById('statusPermissionTag');
         var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
@@ -1255,6 +1383,11 @@
             if (statusPermTag) statusPermTag.innerText = '(컨설턴트/관리자 전용)';
           }
         }
+
+        // 3. ★ 해당 안건 전용 게시판 불러오기
+        loadLeadBoardPosts(item.lead_id);
+        var bInput = document.getElementById('boardContentInput');
+        if (bInput) bInput.value = '';
 
         var modal = document.getElementById('detailModal');
         if (modal) modal.classList.add('open');
@@ -1303,7 +1436,7 @@
       }
 
       // ==========================================================
-      // [7] 이벤트 리스너 바인딩
+      // [9] 이벤트 리스너 바인딩
       // ==========================================================
       document.addEventListener('DOMContentLoaded', function() {
         var tabMember = document.getElementById('tabBtnMember');
@@ -1370,8 +1503,6 @@
               currentUserPhone = phone;
 
               document.getElementById('agentName').value = name;
-
-              // 직무별 최초 진입 화면 분기
               showScreen('dashboard');
 
             } catch (err) {
@@ -1427,8 +1558,6 @@
               currentUserPhone = user.phone;
 
               document.getElementById('agentName').value = user.name;
-
-              // 로그인 시 즉시 본인 직무에 맞는 목록 대시보드로 진입
               showScreen('dashboard');
 
             } catch (err) {
@@ -1524,6 +1653,9 @@
             showLoginError('pwdChangeErr', '통신 오류: ' + (err.message || err));
           }
         });
+
+        // 안건별 게시판 의견 등록 이벤트
+        document.getElementById('btnSubmitBoardPost').addEventListener('click', submitBoardPost);
 
         // 화면 전환 버튼
         document.getElementById('regSwitchBtn').addEventListener('click', function() { showScreen('dashboard'); });
@@ -1718,7 +1850,6 @@
 
             alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
 
-            // 폼 초기화
             document.getElementById('customerName').value = '';
             document.getElementById('contactPerson').value = '';
             document.getElementById('contactPhone').value = '';
@@ -1733,7 +1864,6 @@
             uploadedPhotos = [];
             renderPreview();
 
-            // 등록 후 본인 안건 목록 화면으로 이동
             showScreen('dashboard');
 
           } catch (err) {
