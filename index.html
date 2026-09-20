@@ -76,6 +76,16 @@
     .row { display: flex; gap: 10px; }
     .row > div { flex: 1; }
 
+    /* 지도 핀 아이콘 버튼 스타일 */
+    .map-pin-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #fff0f0; border: 1px solid #ffcdd2; border-radius: 6px;
+      padding: 3px 8px; color: #e53935; font-size: 0.8rem; font-weight: 700;
+      text-decoration: none; cursor: pointer; transition: all 0.15s;
+    }
+    .map-pin-btn:hover { background: #ffebee; border-color: #e53935; }
+    .map-pin-icon { width: 14px; height: 14px; vertical-align: middle; margin-right: 3px; }
+
     .btn-login-action {
       width: 100%; padding: 14px; background: #1a73e8; color: #ffffff; border: none;
       border-radius: 9px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
@@ -235,7 +245,7 @@
     .m-agent-tag { background: #e8f0fe; color: #1a73e8; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
     .m-customer-name { font-size: 1.15rem; font-weight: 800; color: #1a73e8; margin-bottom: 4px; }
     .m-phone-link { display: inline-flex; align-items: center; gap: 4px; color: #202124; text-decoration: none; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
-    .m-info-row { font-size: 0.82rem; color: #5f6368; margin-bottom: 4px; }
+    .m-info-row { font-size: 0.82rem; color: #5f6368; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .m-footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f1f3f4; }
     .btn-detail { padding: 6px 12px; background: #e8f0fe; color: #1a73e8; border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
 
@@ -251,13 +261,10 @@
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 99999;
-      display: none;
-      pointer-events: none;
-      align-items: center; justify-content: center; padding: 16px;
+      display: none; pointer-events: none; align-items: center; justify-content: center; padding: 16px;
     }
     .modal-overlay.open {
-      display: flex !important;
-      pointer-events: auto !important;
+      display: flex !important; pointer-events: auto !important;
     }
     .modal-card {
       background: #ffffff; width: 100%; max-width: 600px; max-height: 90vh;
@@ -501,8 +508,14 @@
             </div>
           </div>
 
+          <!-- 사업장 주소 (네이버 지도 핀 포인트 연동) -->
           <div class="form-group">
-            <label class="form-label" style="margin-bottom:6px;">사업장 주소 / 위치</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="form-label" style="margin-bottom:0;">사업장 주소 / 위치</label>
+              <button type="button" class="map-pin-btn" id="btnOpenNaverMapForm">
+                📍 네이버 지도 검색
+              </button>
+            </div>
             <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" style="width:100%;">
           </div>
 
@@ -671,7 +684,14 @@
           <div class="detail-label">고객(상호)</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
           <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
           <div class="detail-label">연락처</div><div class="detail-val" id="mContactPhone"></div>
-          <div class="detail-label">사업장 주소</div><div class="detail-val"><span id="mAddress"></span></div>
+          
+          <!-- 모달 내 사업장 주소 및 네이버 지도 연동 -->
+          <div class="detail-label">사업장 주소</div>
+          <div class="detail-val" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span id="mAddress"></span>
+            <button type="button" class="map-pin-btn" id="btnModalMap">📍 네이버 지도</button>
+          </div>
+          
           <div class="detail-label">업종</div><div class="detail-val" id="mBusinessType"></div>
           <div class="detail-label">사용회사</div><div class="detail-val" id="mCurrentCompany"></div>
           <div class="detail-label">관심상품</div><div class="detail-val" id="mProduct"></div>
@@ -820,7 +840,7 @@
   <script>
     (function() {
       // ==========================================================
-      // [1] Supabase 다이렉트 초기화 (이전 정상 작동 방식 100% 원복)
+      // [1] Supabase 설정
       // ==========================================================
       var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
       var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
@@ -836,6 +856,16 @@
       var activeLeadItem = null;
       var uploadedPhotos = [];
       var selectedBoardFile = null;
+
+      // ==========================================================
+      // [네이버 지도 열기 헬퍼 함수]
+      // ==========================================================
+      function openNaverMap(query) {
+        if (!query) return;
+        var cleanQuery = query.replace(/\([^)]*\)/g, '').trim(); // 괄호 안 내용 정리
+        var mapUrl = "https://map.naver.com/v5/search/" + encodeURIComponent(cleanQuery);
+        window.open(mapUrl, '_blank');
+      }
 
       // ==========================================================
       // [2] 탭 전환
@@ -1090,7 +1120,7 @@
       }
 
       // ==========================================================
-      // [6] DB 조회 및 목록 표시
+      // [6] DB 조회 및 목록 표시 (네이버 지도 핀 아이콘 버튼 추가)
       // ==========================================================
       async function loadDashboardLeads() {
         if (!supabase) return;
@@ -1168,6 +1198,7 @@
         list.forEach(function(r, idx) {
           var pCount = (r.photo_urls && r.photo_urls.length) ? r.photo_urls.length : 0;
           var phoneFmt = formatPhone(r.contact_phone);
+          var addr = r.address || '';
 
           pcHtml += '<tr>'
             + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
@@ -1175,7 +1206,12 @@
             + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
             + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
             + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
-            + '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (r.address || '-') + '</td>'
+            + '<td>'
+            + '<div style="display:flex; align-items:center; gap:6px;">'
+            + '<span style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (addr || '-') + '</span>'
+            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" title="네이버 지도">📍</button>' : '')
+            + '</div>'
+            + '</td>'
             + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
             + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
             + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
@@ -1187,7 +1223,10 @@
             + '<div class="m-card-header"><span class="m-agent-tag">소개자: ' + (r.agent_name || '-') + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
             + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
             + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
-            + '<div class="m-info-row">📍 ' + (r.address || '주소 없음') + '</div>'
+            + '<div class="m-info-row">'
+            + '<span>📍 ' + (addr || '주소 없음') + '</span>'
+            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" style="padding:1px 6px;">지도</button>' : '')
+            + '</div>'
             + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
             + '<div class="m-footer-actions">'
             + '<span style="font-size:0.75rem; color:#5f6368;">담당: <strong>' + (r.assigned_rep || '-') + '</strong></span>'
@@ -1198,10 +1237,19 @@
         if (pcBody) pcBody.innerHTML = pcHtml;
         if (mList) mList.innerHTML = mHtml;
 
+        // 동적 이벤트 바인딩
         document.querySelectorAll('.btn-detail, .customer-cell, .m-customer-name').forEach(function(el) {
           el.addEventListener('click', function() {
             var i = this.getAttribute('data-idx');
             if (i !== null) openDetailModal(parseInt(i, 10));
+          });
+        });
+
+        document.querySelectorAll('.btn-table-map').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var a = this.getAttribute('data-addr');
+            openNaverMap(a);
           });
         });
       }
@@ -1387,6 +1435,17 @@
         b.innerText = item.status || '접수대기';
         b.className = 'badge ' + getBadgeClass(item.status);
 
+        // 모달 내 지도 버튼 이벤트 바인딩
+        var btnModalMap = document.getElementById('btnModalMap');
+        if (btnModalMap) {
+          if (item.address) {
+            btnModalMap.style.display = 'inline-flex';
+            btnModalMap.onclick = function() { openNaverMap(item.address); };
+          } else {
+            btnModalMap.style.display = 'none';
+          }
+        }
+
         var pGrid = document.getElementById('mPhotoGrid');
         pGrid.innerHTML = '';
         if (item.photo_urls && item.photo_urls.length > 0) {
@@ -1404,7 +1463,6 @@
         var uSel = document.getElementById('uStatus');
         if (uSel) uSel.value = item.status || '접수대기';
 
-        // 1. 안건수정 / 안건삭제 버튼 노출 제어
         var actionsBox = document.getElementById('authorActionsBox');
         var editContainer = document.getElementById('editLeadContainer');
         if (editContainer) editContainer.style.display = 'none';
@@ -1414,7 +1472,6 @@
           actionsBox.style.display = canModify ? 'block' : 'none';
         }
 
-        // 2. 상태 변경 권한 (컨설턴트 및 지사 관리자만 가능)
         var statusBox = document.getElementById('statusUpdateBox');
         var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
 
@@ -1482,10 +1539,9 @@
       }
 
       // ==========================================================
-      // [9] 이벤트 리스너 강력 바인딩
+      // [9] 이벤트 리스너 바인딩
       // ==========================================================
       document.addEventListener('DOMContentLoaded', function() {
-        // 탭 버튼 리스너
         var tabMember = document.getElementById('tabBtnMember');
         var tabAdm = document.getElementById('tabBtnAdmin');
         if (tabMember) tabMember.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
@@ -1495,6 +1551,21 @@
         var btnBackToLogin = document.getElementById('btnBackToLogin');
         if (btnGoSignup) btnGoSignup.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('signup'); });
         if (btnBackToLogin) btnBackToLogin.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
+
+        // 현장등록 주소 옆 네이버 지도 검색 버튼 클릭
+        var btnOpenMapForm = document.getElementById('btnOpenNaverMapForm');
+        if (btnOpenMapForm) {
+          btnOpenMapForm.addEventListener('click', function() {
+            var addr = document.getElementById('address').value.trim();
+            var cust = document.getElementById('customerName').value.trim();
+            var target = addr || cust;
+            if (!target) {
+              alert('검색할 주소 또는 고객(상호)을 먼저 입력해주세요.');
+              return;
+            }
+            openNaverMap(target);
+          });
+        }
 
         // 1. 신규 회원가입 폼 제출
         var fSignup = document.getElementById('formSignup');
