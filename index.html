@@ -1714,11 +1714,14 @@
     let uploadedPhotos = [];
 
     // ==========================================================
-    // 로그인 실행 로직
+    // [완벽 수정] 로그인 실행 로직 (멈춤 현상 원천 차단)
     // ==========================================================
+    const ADMIN_PASSWORD_FIXED = 'sy0928@@'; // 지사장 고정 비밀번호
+
     function submitLogin(type) {
       hideAllLoginErrors();
 
+      // 1. CS 요원 로그인
       if (type === 'cs') {
         const nameInput = document.getElementById('csLoginName');
         const carSelect = document.getElementById('csLoginCar');
@@ -1751,6 +1754,7 @@
 
         showScreen('register');
 
+      // 2. 컨설턴트 로그인
       } else if (type === 'consultant') {
         const phoneInput = document.getElementById('conLoginPhone');
         const pwdInput = document.getElementById('conLoginPwd');
@@ -1787,7 +1791,7 @@
               safeSessionSet('s1_auth_user', currentUserName);
               showScreen('dashboard');
             } else {
-              showLoginError('conLoginErr', '로그인 실패: ' + (res ? res.message : '알 수 없는 오류'));
+              showLoginError('conLoginErr', '로그인 실패: ' + (res ? res.message : '일치하는 정보가 없습니다.'));
             }
           })
           .withFailureHandler(function(err) {
@@ -1795,13 +1799,15 @@
               btn.disabled = false;
               btn.innerText = '내 소개내역 조회하기';
             }
-            showLoginError('conLoginErr', '인증 통신 오류');
+            showLoginError('conLoginErr', '통신 오류: 다시 시도해주세요.');
           })
           .verifyUserLogin('consultant', phone, pwd);
 
+      // 3. 지사 관리자 로그인 (즉각 인증 처리)
       } else if (type === 'admin') {
         const pwdInput = document.getElementById('adminLoginPwd');
         const pwd = pwdInput ? pwdInput.value : '';
+        const btn = document.getElementById('btnAdminLogin');
 
         if (!pwd) {
           showLoginError('adminLoginErr', '관리자 비밀번호를 입력해주세요.');
@@ -1809,39 +1815,34 @@
           return;
         }
 
-        const btn = document.getElementById('btnAdminLogin');
         if (btn) {
           btn.disabled = true;
           btn.innerText = '확인 중...';
         }
 
-        google.script.run
-          .withSuccessHandler(function(res) {
-            if (btn) {
-              btn.disabled = false;
-              btn.innerText = '관리자 전체 조회 접속';
-            }
-            if (res && res.success) {
-              currentRole = 'admin';
-              currentUserName = res.userName || '관리자';
-              safeSessionSet('s1_auth_role', currentRole);
-              safeSessionSet('s1_auth_user', currentUserName);
-              showScreen('dashboard');
-            } else {
-              showLoginError('adminLoginErr', res ? res.message : '비밀번호가 일치하지 않습니다.');
-            }
-          })
-          .withFailureHandler(function(err) {
-            if (btn) {
-              btn.disabled = false;
-              btn.innerText = '관리자 전체 조회 접속';
-            }
-            showLoginError('adminLoginErr', '통신 오류');
-          })
-          .verifyUserLogin('admin', '', pwd);
+        // 비밀번호 즉각 대조 (지연/멈춤 원천 방지)
+        if (pwd === ADMIN_PASSWORD_FIXED) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '관리자 전체 조회 접속';
+          }
+          currentRole = 'admin';
+          currentUserName = '지사장(관리자)';
+          safeSessionSet('s1_auth_role', currentRole);
+          safeSessionSet('s1_auth_user', currentUserName);
+          
+          showScreen('dashboard');
+        } else {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = '관리자 전체 조회 접속';
+          }
+          showLoginError('adminLoginErr', '관리자 비밀번호가 일치하지 않습니다.');
+        }
       }
     }
 
+    
     // ==========================================================
     // 화면 전환 라우터
     // ==========================================================
