@@ -180,7 +180,7 @@
 
     /* 대시보드 화면 */
     #viewDashboard { display: none; position: relative; z-index: 20; }
-    .stat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 16px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 10px; margin-bottom: 16px; }
     .stat-card {
       background: #fff; padding: 16px; border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-left: 4px solid #dadce0;
@@ -192,6 +192,7 @@
     .stat-card.ing { border-left-color: #1a73e8; }
     .stat-card.done { border-left-color: #137333; }
     .stat-card.cancel { border-left-color: #d93025; }
+    .stat-card.quote { border-left-color: #9c27b0; }
     .stat-label { font-size: 0.8rem; font-weight: 600; color: #5f6368; }
     .stat-value { font-size: 1.5rem; font-weight: 800; color: #202124; margin-top: 4px; }
 
@@ -372,12 +373,7 @@
           <p id="loginGuideText">휴대전화번호와 비밀번호로 로그인해 주세요</p>
         </div>
 
-        <div class="login-tab-bar" id="loginTabBar">
-          <button type="button" class="login-tab-item active" id="tabBtnMember">직원 로그인</button>
-          <button type="button" class="login-tab-item" id="tabBtnAdmin">지사 관리자</button>
-        </div>
-
-        <!-- 1. 일반 직원 로그인 폼 -->
+        <!-- 1. 통합 로그인 폼 (일반 직원 / 지사관리자 공용) -->
         <div id="loginFormMember" style="display:block;">
           <form id="formLoginMember">
             <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 북서울지사 직원 로그인 (전화번호+비밀번호)</div>
@@ -445,18 +441,6 @@
           </form>
         </div>
 
-        <!-- 3. 지사 관리자 전용 폼 -->
-        <div id="loginFormAdmin" style="display:none;">
-          <form id="formLoginAdmin">
-            <div style="background:#fce8e6; color:#c5221f; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #fad2cf;">👑 지사 관리자 (전용 비밀번호)</div>
-            <div class="form-group">
-              <label class="form-label">관리자 비밀번호 <span class="req">*</span></label>
-              <input type="password" id="adminLoginPwd" placeholder="관리자 전용 비밀번호 입력" autocomplete="current-password">
-            </div>
-            <button type="submit" class="btn-login-action" id="btnAdminLogin">관리자 전체 조회 접속</button>
-            <div class="login-error-msg" id="adminLoginErr"></div>
-          </form>
-        </div>
 
       </div>
     </div>
@@ -625,21 +609,29 @@
 
       <div class="stat-grid">
         <div class="stat-card total" id="cardStatTotal"><div class="stat-label">조회 안건</div><div class="stat-value" id="cntTotal">0</div></div>
-        <div class="stat-card wait" id="cardStatWait"><div class="stat-label">접수대기</div><div class="stat-value" id="cntWait">0</div></div>
-        <div class="stat-card ing" id="cardStatIng"><div class="stat-label">상담진행</div><div class="stat-value" id="cntIng">0</div></div>
-        <div class="stat-card ing" id="cardStatQuote" style="border-left-color: #9c27b0;"><div class="stat-label">견적제출</div><div class="stat-value" id="cntQuote">0</div></div>
-        <div class="stat-card done" id="cardStatDone"><div class="stat-label">계약완료</div><div class="stat-value" id="cntDone">0</div></div>
-        <div class="stat-card cancel" id="cardStatCancel"><div class="stat-label">취소/보류</div><div class="stat-value" id="cntCancel">0</div></div>
+        <div class="stat-card wait" id="cardStatWait"><div class="stat-label">1.접수대기</div><div class="stat-value" id="cntWait">0</div></div>
+        <div class="stat-card ing" id="cardStatConfirm"><div class="stat-label">2.접수확인</div><div class="stat-value" id="cntConfirm">0</div></div>
+        <div class="stat-card ing" id="cardStatConsult"><div class="stat-label">3.고객면담</div><div class="stat-value" id="cntConsult">0</div></div>
+        <div class="stat-card ing" id="cardStatMoreConsult"><div class="stat-label">4.추가면담</div><div class="stat-value" id="cntMoreConsult">0</div></div>
+        <div class="stat-card quote" id="cardStatQuote"><div class="stat-label">5.견적제출</div><div class="stat-value" id="cntQuote">0</div></div>
+        <div class="stat-card quote" id="cardStatQuoteConsult"><div class="stat-label">6.견적상담</div><div class="stat-value" id="cntQuoteConsult">0</div></div>
+        <div class="stat-card done" id="cardStatDone"><div class="stat-label">7.계약완료</div><div class="stat-value" id="cntDone">0</div></div>
+        <div class="stat-card cancel" id="cardStatFail"><div class="stat-label">8.계약실패</div><div class="stat-value" id="cntFail">0</div></div>
+        <div class="stat-card cancel" id="cardStatHold"><div class="stat-label">9.계약보류</div><div class="stat-value" id="cntHold">0</div></div>
       </div>
 
       <div class="toolbar-card">
         <div class="status-filters" id="statusFilterBar">
           <button type="button" class="filter-chip active" data-status="전체">전체 <span class="chip-count" id="cCntTotal">0</span></button>
-          <button type="button" class="filter-chip" data-status="접수대기">접수대기 <span class="chip-count" id="cCntWait">0</span></button>
-          <button type="button" class="filter-chip" data-status="상담진행">상담진행 <span class="chip-count" id="cCntIng">0</span></button>
-          <button type="button" class="filter-chip" data-status="견적제출">견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
-          <button type="button" class="filter-chip" data-status="계약완료">계약완료 <span class="chip-count" id="cCntDone">0</span></button>
-          <button type="button" class="filter-chip" data-status="취소/보류">취소/보류 <span class="chip-count" id="cCntCancel">0</span></button>
+          <button type="button" class="filter-chip" data-status="접수대기">1.접수대기 <span class="chip-count" id="cCntWait">0</span></button>
+          <button type="button" class="filter-chip" data-status="접수확인">2.접수확인 <span class="chip-count" id="cCntConfirm">0</span></button>
+          <button type="button" class="filter-chip" data-status="고객면담">3.고객면담 <span class="chip-count" id="cCntConsult">0</span></button>
+          <button type="button" class="filter-chip" data-status="추가면담">4.추가면담 <span class="chip-count" id="cCntMoreConsult">0</span></button>
+          <button type="button" class="filter-chip" data-status="견적제출">5.견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
+          <button type="button" class="filter-chip" data-status="견적상담">6.견적상담 <span class="chip-count" id="cCntQuoteConsult">0</span></button>
+          <button type="button" class="filter-chip" data-status="계약완료">7.계약완료 <span class="chip-count" id="cCntDone">0</span></button>
+          <button type="button" class="filter-chip" data-status="계약실패">8.계약실패 <span class="chip-count" id="cCntFail">0</span></button>
+          <button type="button" class="filter-chip" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
           <input type="text" id="searchKeyword" placeholder="고객(상호), 연락처, 주소 검색">
@@ -864,6 +856,7 @@
                 <option value="CS관리자">CS관리자</option>
                 <option value="컨설턴트">컨설턴트</option>
                 <option value="기술사원">기술사원</option>
+                <option value="지사관리자">지사관리자</option>
               </select>
             </div>
           </div>
@@ -919,7 +912,6 @@
       var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
       var supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-      var ADMIN_PASSWORD = "sy0928@@";
 
       var currentRole = '';
       var currentUserName = '';
@@ -939,32 +931,20 @@
 
       function applyLoginTab(tab) {
         hideLoginErrors();
-        var btnMember = document.getElementById('tabBtnMember');
-        var btnAdm = document.getElementById('tabBtnAdmin');
-
         var formMember = document.getElementById('loginFormMember');
         var formSignup = document.getElementById('loginFormSignup');
-        var formAdm = document.getElementById('loginFormAdmin');
-        var tabBar = document.getElementById('loginTabBar');
 
         if (tab === 'signup') {
-          if (tabBar) tabBar.style.display = 'none';
           if (formMember) formMember.style.display = 'none';
           if (formSignup) formSignup.style.display = 'block';
-          if (formAdm) formAdm.style.display = 'none';
         } else {
-          if (tabBar) tabBar.style.display = 'flex';
-          if (btnMember) btnMember.className = 'login-tab-item' + (tab === 'member' ? ' active' : '');
-          if (btnAdm) btnAdm.className = 'login-tab-item' + (tab === 'admin' ? ' active' : '');
-
-          if (formMember) formMember.style.display = (tab === 'member' ? 'block' : 'none');
+          if (formMember) formMember.style.display = 'block';
           if (formSignup) formSignup.style.display = 'none';
-          if (formAdm) formAdm.style.display = (tab === 'admin' ? 'block' : 'none');
         }
       }
 
       function hideLoginErrors() {
-        ['memberLoginErr', 'signupErr', 'adminLoginErr', 'pwdChangeErr'].forEach(function(id) {
+        ['memberLoginErr', 'signupErr', 'pwdChangeErr'].forEach(function(id) {
           var el = document.getElementById(id);
           if (el) el.style.display = 'none';
         });
@@ -1039,18 +1019,16 @@
         if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
 
         var regPwdBtn = document.getElementById('regPwdBtn');
-        var showPwdBtn = (currentRole !== 'admin' && screenId !== 'login');
+        var showPwdBtn = (screenId !== 'login');
         if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
 
         var btnContainer = document.getElementById('dashHeaderButtons');
         if (btnContainer) {
           var htmlBtns = '';
-          if (currentRole === 'admin') {
+          if (currentRole === '지사관리자') {
             htmlBtns += '<button type="button" class="btn-inner btn-users" id="dashUsersBtn">👥 사용자</button>';
           }
-          if (currentRole !== 'admin') {
-            htmlBtns += '<button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>';
-          }
+          htmlBtns += '<button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>';
           htmlBtns += '<button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>';
           htmlBtns += '<button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>';
           btnContainer.innerHTML = htmlBtns;
@@ -1068,7 +1046,7 @@
           if (loBtn) loBtn.addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
         }
 
-        var displayName = (currentRole === 'admin') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
+        var displayName = (currentRole === '지사관리자') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
         var regUserTitle = document.getElementById('regUserTitle');
         var dashUserTitle = document.getElementById('dashUserTitle');
         if (regUserTitle) regUserTitle.innerText = displayName;
@@ -1234,7 +1212,7 @@
 
           if (currentRole === '컨설턴트') {
             query = query.eq('assigned_rep', currentUserName);
-          } else if (currentRole !== 'admin') {
+          } else if (currentRole !== '지사관리자') {
             query = query.eq('agent_name', currentUserName);
           }
 
@@ -1242,33 +1220,47 @@
           if (res.error) throw res.error;
 
           var list = res.data || [];
-          var counts = { total: 0, wait: 0, ing: 0, quote: 0, done: 0, cancel: 0 };
+          var counts = { total: 0, wait: 0, confirm: 0, consult: 0, moreConsult: 0, quote: 0, quoteConsult: 0, done: 0, fail: 0, hold: 0 };
 
           list.forEach(function(r) {
             var st = r.status || '접수대기';
             counts.total++;
-            if (st === '접수대기') counts.wait++;
-            else if (st === '견적제출' || st === '견적상담') counts.quote++;
+            if (st === '접수확인') counts.confirm++;
+            else if (st === '고객면담') counts.consult++;
+            else if (st === '추가면담') counts.moreConsult++;
+            else if (st === '견적제출') counts.quote++;
+            else if (st === '견적상담') counts.quoteConsult++;
             else if (st === '계약완료') counts.done++;
-            else if (st === '계약실패' || st === '계약보류' || st === '취소/보류') counts.cancel++;
-            else counts.ing++;
+            else if (st === '계약실패') counts.fail++;
+            else if (st === '계약보류') counts.hold++;
+            else counts.wait++;
           });
 
           document.getElementById('cntTotal').innerText = counts.total;
           document.getElementById('cntWait').innerText = counts.wait;
-          document.getElementById('cntIng').innerText = counts.ing;
+          document.getElementById('cntConfirm').innerText = counts.confirm;
+          document.getElementById('cntConsult').innerText = counts.consult;
+          document.getElementById('cntMoreConsult').innerText = counts.moreConsult;
           document.getElementById('cntQuote').innerText = counts.quote;
+          document.getElementById('cntQuoteConsult').innerText = counts.quoteConsult;
           document.getElementById('cntDone').innerText = counts.done;
-          document.getElementById('cntCancel').innerText = counts.cancel;
+          document.getElementById('cntFail').innerText = counts.fail;
+          document.getElementById('cntHold').innerText = counts.hold;
+
+          document.getElementById('cCntTotal').innerText = counts.total;
+          document.getElementById('cCntWait').innerText = counts.wait;
+          document.getElementById('cCntConfirm').innerText = counts.confirm;
+          document.getElementById('cCntConsult').innerText = counts.consult;
+          document.getElementById('cCntMoreConsult').innerText = counts.moreConsult;
+          document.getElementById('cCntQuote').innerText = counts.quote;
+          document.getElementById('cCntQuoteConsult').innerText = counts.quoteConsult;
+          document.getElementById('cCntDone').innerText = counts.done;
+          document.getElementById('cCntFail').innerText = counts.fail;
+          document.getElementById('cCntHold').innerText = counts.hold;
 
           var filtered = list.filter(function(r) {
             var st = r.status || '접수대기';
-            if (currentStatusFilter !== '전체') {
-              if (currentStatusFilter === '상담진행' && !(st === '접수확인' || st === '고객면담' || st === '추가면담' || st === '상담진행')) return false;
-              else if (currentStatusFilter === '견적제출' && !(st === '견적제출' || st === '견적상담')) return false;
-              else if (currentStatusFilter === '취소/보류' && !(st === '계약실패' || st === '계약보류' || st === '취소/보류')) return false;
-              else if (currentStatusFilter !== '상담진행' && currentStatusFilter !== '견적제출' && currentStatusFilter !== '취소/보류' && st !== currentStatusFilter) return false;
-            }
+            if (currentStatusFilter !== '전체' && st !== currentStatusFilter) return false;
             if (kw) {
               var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(' ').toLowerCase();
               if (txt.indexOf(kw) === -1) return false;
@@ -1287,7 +1279,7 @@
         var pcBody = document.getElementById('pcTableBody');
         var mList = document.getElementById('mobileCardList');
 
-        var emptyMsg = (currentRole === '컨설턴트') ? '나에게 배당된 안건이 없습니다.' : (currentRole === 'admin' ? '조회된 소개 내역이 없습니다.' : '내가 소개한 안건이 아직 없습니다.');
+        var emptyMsg = (currentRole === '컨설턴트') ? '나에게 배당된 안건이 없습니다.' : (currentRole === '지사관리자' ? '조회된 소개 내역이 없습니다.' : '내가 소개한 안건이 아직 없습니다.');
 
         if (!list || list.length === 0) {
           if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</td></tr>';
@@ -1379,7 +1371,7 @@
 
           var html = '';
           posts.forEach(function(p) {
-            var canDelete = (currentRole === 'admin') || (p.author === currentUserName);
+            var canDelete = (currentRole === '지사관리자') || (p.author === currentUserName);
             var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" data-delid="' + p.post_id + '">삭제</button>' : '';
 
             var rawText = (p.content || '').trim();
@@ -1475,7 +1467,7 @@
           var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
 
           var postId = 'B-' + Date.now();
-          var authorRole = (currentRole === 'admin') ? '지사 관리자' : currentRole;
+          var authorRole = (currentRole === '지사관리자') ? '지사 관리자' : currentRole;
 
           var res = await supabase.from('lead_board').insert([{
             post_id: postId,
@@ -1562,13 +1554,13 @@
         var editContainer = document.getElementById('editLeadContainer');
         if (editContainer) editContainer.style.display = 'none';
 
-        var canModify = (currentRole === 'admin') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
+        var canModify = (currentRole === '지사관리자') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
         if (actionsBox) {
           actionsBox.style.display = canModify ? 'block' : 'none';
         }
 
         var statusBox = document.getElementById('statusUpdateBox');
-        var canChangeStatus = (currentRole === 'admin') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
+        var canChangeStatus = (currentRole === '지사관리자') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
 
         if (statusBox) {
           var btnSave = document.getElementById('btnSaveStatus');
@@ -1615,7 +1607,7 @@
       }
 
       async function openUserModal() {
-        if (currentRole !== 'admin') return;
+        if (currentRole !== '지사관리자') return;
         var modal = document.getElementById('userManageModal');
         if (modal) modal.classList.add('open');
         document.getElementById('userEditBox').style.display = 'none';
@@ -1724,7 +1716,6 @@
             return;
           }
           var hashed = await sha256(newPwd);
-          updateData.password = newPwd;
           updateData.hash = hashed;
         }
 
@@ -1763,7 +1754,7 @@
         if (!supabase) return;
 
         var query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
-        if (currentRole !== 'admin' && currentUserName) {
+        if (currentRole !== '지사관리자' && currentUserName) {
           query = query.eq('agent_name', currentUserName);
         }
 
@@ -1778,11 +1769,6 @@
       }
 
       document.addEventListener('DOMContentLoaded', function() {
-        var tabMember = document.getElementById('tabBtnMember');
-        var tabAdm = document.getElementById('tabBtnAdmin');
-        if (tabMember) tabMember.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
-        if (tabAdm) tabAdm.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('admin'); });
-
         var btnGoSignup = document.getElementById('btnGoSignup');
         var btnBackToLogin = document.getElementById('btnBackToLogin');
         if (btnGoSignup) btnGoSignup.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('signup'); });
@@ -1843,7 +1829,6 @@
                 phone: phone,
                 name: name,
                 job: job,
-                password: pwd,
                 hash: hashedPwd
               }]);
 
@@ -1890,7 +1875,7 @@
 
               var user = q.data[0];
               var hashedInput = await sha256(pwd);
-              var isMatch = (user.password === pwd) || (user.hash && user.hash === hashedInput);
+              var isMatch = !!(user.hash && user.hash === hashedInput);
 
               if (!isMatch) {
                 showLoginError('memberLoginErr', '비밀번호가 일치하지 않습니다.');
@@ -1898,9 +1883,6 @@
               }
 
               currentRole = user.job ? user.job.trim() : 'CS근무자';
-              if (currentRole === 'admin' || currentRole === '지사장') {
-                currentRole = 'CS관리자';
-              }
 
               currentUserName = user.name ? user.name.trim() : '직원';
               currentUserPhone = user.phone;
@@ -1912,25 +1894,6 @@
             } catch (err) {
               btn.disabled = false; btn.innerText = '로그인 접속';
               showLoginError('memberLoginErr', '통신 오류: ' + (err.message || err));
-            }
-          });
-        }
-
-        var fAdm = document.getElementById('formLoginAdmin');
-        if (fAdm) {
-          fAdm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            var pwd = document.getElementById('adminLoginPwd').value;
-            if (!pwd) { showLoginError('adminLoginErr', '비밀번호를 입력해주세요.'); return; }
-
-            if (pwd === ADMIN_PASSWORD) {
-              currentRole = 'admin';
-              currentUserName = '지사장(관리자)';
-              currentUserPhone = '';
-              registerServiceWorkerAndSubscribe('', '지사장(관리자)');
-              showScreen('dashboard');
-            } else {
-              showLoginError('adminLoginErr', '관리자 비밀번호가 일치하지 않습니다.');
             }
           });
         }
@@ -1988,7 +1951,7 @@
 
               var user = res.data;
               var hashedCur = await sha256(curPwd);
-              var isCurrentMatch = (user.password === curPwd) || (user.hash && user.hash === hashedCur);
+              var isCurrentMatch = !!(user.hash && user.hash === hashedCur);
 
               if (!isCurrentMatch) {
                 btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
@@ -1998,7 +1961,6 @@
 
               var newHashed = await sha256(newPwd);
               var upRes = await supabase.from('app_users').update({
-                password: newPwd,
                 hash: newHashed,
                 updated_at: new Date().toISOString()
               }).eq('phone', currentUserPhone);
