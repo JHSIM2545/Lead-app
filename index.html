@@ -490,6 +490,11 @@
           </div>
 
           <div class="form-group">
+            <label class="form-label">차량번호</label>
+            <input type="text" id="carNumber" placeholder="컨설턴트 선택 시 자동 입력" readonly style="background-color:#f1f3f4;">
+          </div>
+
+          <div class="form-group">
             <label class="form-label" style="margin-bottom:6px;">고객(상호) <span class="req">*</span></label>
             <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
           </div>
@@ -509,8 +514,12 @@
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <label class="form-label" style="margin-bottom:0;">사업장 주소 / 위치</label>
-              <button type="button" class="map-pin-btn" id="btnOpenNaverMapForm">
-                📍 네이버 지도 검색
+              <button type="button" class="map-pin-btn" id="btnOpenNaverMapForm" title="네이버 지도 검색" aria-label="네이버 지도 검색">
+                <svg width="16" height="20" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg" style="display:block;">
+                  <ellipse cx="12" cy="27" rx="7" ry="2.2" fill="#0b0f10"></ellipse>
+                  <path d="M12 1C6.5 1 2 5.5 2 11c0 7 10 17 10 17s10-10 10-17c0-5.5-4.5-10-10-10z" fill="#17b06b"></path>
+                  <circle cx="12" cy="11" r="4.2" fill="#ffffff"></circle>
+                </svg>
               </button>
             </div>
             <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" style="width:100%;">
@@ -528,6 +537,7 @@
                 <option value="미사용">미사용</option>
                 <option value="SK 쉴더스">SK 쉴더스</option>
                 <option value="KT 텔레캅">KT 텔레캅</option>
+                <option value="911보안">911보안</option>
                 <option value="기타 회사">기타 회사</option>
               </select>
             </div>
@@ -745,6 +755,22 @@
             <label class="form-label">현장설명</label>
             <textarea id="editFieldDesc" rows="3"></textarea>
           </div>
+          <div class="form-group">
+            <label class="form-label">현장 사진 수정 <span class="opt">(최대 4장)</span></label>
+            <input type="file" id="editCameraInput" accept="image/*" capture="environment" style="display:none;">
+            <input type="file" id="editGalleryInput" accept="image/*" multiple style="display:none;">
+            <div class="photo-btn-group">
+              <button type="button" class="photo-btn" id="btnEditShootCamera">📷 직접 촬영</button>
+              <button type="button" class="photo-btn" id="btnEditSelectGallery">🖼️ 갤러리 선택</button>
+            </div>
+            <div class="photo-status">
+              <span>📷 등록된/추가할 사진</span>
+              <span id="editPhotoCountText" style="font-weight:700; color:#1a73e8;">0 / 4장</span>
+            </div>
+            <div class="photo-preview-grid" id="editPreviewGrid">
+              <div class="photo-empty-msg">선택된 사진이 없습니다.</div>
+            </div>
+          </div>
           <div style="display:flex; gap:8px; margin-top:8px;">
             <button type="button" class="btn-save-status" id="btnConfirmEditLead" style="margin-top:0;">수정 완료 저장</button>
             <button type="button" id="btnCancelEditLead" style="padding:10px 16px; background:#f1f3f4; border:none; border-radius:8px; font-weight:700; cursor:pointer;">취소</button>
@@ -920,6 +946,8 @@
       var currentLeadsData = [];
       var activeLeadItem = null;
       var uploadedPhotos = [];
+      var editKeptPhotoUrls = [];
+      var editNewPhotos = [];
       var selectedBoardFile = null;
 
       function openNaverMap(query) {
@@ -1067,8 +1095,22 @@
 
       function formatPhone(phone) {
         var s = String(phone || '').replace(/[^0-9]/g, '');
-        if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        if (!s) return '';
+
+        // 서울(02): 9자리(2-3-4) 또는 10자리(2-4-4)
+        if (s.indexOf('02') === 0) {
+          if (s.length === 9) return s.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
+          if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
+          return s;
+        }
+
+        // 휴대폰/그외 지역번호(3자리 국번): 10자리(3-3-4) 또는 11자리(3-4-4)
         if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+
+        // 8자리 대표번호(예: 1588-0000 등 지역번호 없는 형식)
+        if (s.length === 8) return s.replace(/(\d{4})(\d{4})/, '$1-$2');
+
         return s;
       }
 
@@ -1170,6 +1212,71 @@
             });
           });
         }
+      }
+
+      function renderEditPreview() {
+        var grid = document.getElementById('editPreviewGrid');
+        var countText = document.getElementById('editPhotoCountText');
+        var total = editKeptPhotoUrls.length + editNewPhotos.length;
+        if (countText) countText.innerText = total + ' / 4장';
+        if (!grid) return;
+
+        if (total === 0) {
+          grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
+          return;
+        }
+
+        grid.innerHTML = '';
+        editKeptPhotoUrls.forEach(function(url, idx) {
+          var slot = document.createElement('div');
+          slot.className = 'photo-slot';
+          slot.innerHTML = '<img src="' + url + '">'
+            + '<button type="button" class="photo-del-btn" data-kept="' + idx + '">×</button>';
+          grid.appendChild(slot);
+        });
+        editNewPhotos.forEach(function(p, idx) {
+          var slot = document.createElement('div');
+          slot.className = 'photo-slot';
+          slot.innerHTML = '<img src="' + p.data + '">'
+            + '<span class="photo-size-tag">' + p.kb + 'KB</span>'
+            + '<button type="button" class="photo-del-btn" data-new="' + idx + '">×</button>';
+          grid.appendChild(slot);
+        });
+
+        grid.querySelectorAll('[data-kept]').forEach(function(b) {
+          b.addEventListener('click', function() {
+            editKeptPhotoUrls.splice(parseInt(this.getAttribute('data-kept'), 10), 1);
+            renderEditPreview();
+          });
+        });
+        grid.querySelectorAll('[data-new]').forEach(function(b) {
+          b.addEventListener('click', function() {
+            editNewPhotos.splice(parseInt(this.getAttribute('data-new'), 10), 1);
+            renderEditPreview();
+          });
+        });
+      }
+
+      function handleEditFileSelect(e) {
+        var files = Array.from(e.target.files);
+        if (!files.length) return;
+        var currentTotal = editKeptPhotoUrls.length + editNewPhotos.length;
+        if (currentTotal + files.length > 4) {
+          alert('사진은 최대 4장까지만 등록 가능합니다.');
+        }
+        var remaining = 4 - currentTotal;
+        var targets = files.slice(0, remaining);
+        if (targets.length === 0) { e.target.value = ''; return; }
+
+        var count = 0;
+        targets.forEach(function(file) {
+          compressImage(file, 900, 0.65, function(base64, kb) {
+            editNewPhotos.push({ data: base64, name: file.name, kb: kb });
+            count++;
+            if (count === targets.length) renderEditPreview();
+          });
+        });
+        e.target.value = '';
       }
 
       async function uploadPhotosToSupabase(leadId, photos) {
@@ -2046,11 +2153,12 @@
         }
 
         document.querySelectorAll('.prod-item').forEach(function(item) {
-          item.addEventListener('click', function(e) {
-            var cb = this.querySelector('input[type="checkbox"]');
-            if (e.target !== cb) cb.checked = !cb.checked;
-            this.classList.toggle('checked', cb.checked);
-          });
+          var cb = item.querySelector('input[type="checkbox"]');
+          if (cb) {
+            cb.addEventListener('change', function() {
+              item.classList.toggle('checked', cb.checked);
+            });
+          }
         });
 
         var btnSaveStatus = document.getElementById('btnSaveStatus');
@@ -2092,6 +2200,10 @@
             document.getElementById('editProduct').value = activeLeadItem.product || '';
             document.getElementById('editFieldDesc').value = activeLeadItem.field_description || '';
 
+            editKeptPhotoUrls = Array.isArray(activeLeadItem.photo_urls) ? activeLeadItem.photo_urls.slice() : [];
+            editNewPhotos = [];
+            renderEditPreview();
+
             editBox.style.display = 'block';
             editBox.scrollIntoView({ behavior: 'smooth' });
           });
@@ -2114,6 +2226,13 @@
 
             this.disabled = true; this.innerText = '수정 저장 중...';
 
+            var finalPhotoUrls = editKeptPhotoUrls.slice();
+            if (editNewPhotos.length > 0) {
+              this.innerText = '사진 업로드 중...';
+              var newUrls = await uploadPhotosToSupabase(activeLeadItem.lead_id, editNewPhotos);
+              finalPhotoUrls = finalPhotoUrls.concat(newUrls);
+            }
+
             var updatedData = {
               customer_name: cName,
               contact_person: document.getElementById('editContactPerson').value.trim(),
@@ -2122,7 +2241,8 @@
               business_type: document.getElementById('editBusinessType').value.trim(),
               current_company: document.getElementById('editCurrentCompany').value.trim(),
               product: document.getElementById('editProduct').value.trim(),
-              field_description: document.getElementById('editFieldDesc').value.trim()
+              field_description: document.getElementById('editFieldDesc').value.trim(),
+              photo_urls: finalPhotoUrls
             };
 
             var res = await supabase.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
@@ -2130,6 +2250,7 @@
 
             if (!res.error) {
               alert('✅ 안건 상세 정보가 성공적으로 수정되었습니다.');
+              editNewPhotos = [];
               closeDetailModal();
               loadDashboardLeads();
             } else {
@@ -2171,6 +2292,24 @@
         if (camInput) camInput.addEventListener('change', handleFileSelect);
         if (galInput) galInput.addEventListener('change', handleFileSelect);
 
+        var btnEditShoot = document.getElementById('btnEditShootCamera');
+        var btnEditGallery = document.getElementById('btnEditSelectGallery');
+        var editCamInput = document.getElementById('editCameraInput');
+        var editGalInput = document.getElementById('editGalleryInput');
+        if (btnEditShoot && editCamInput) btnEditShoot.addEventListener('click', function() { editCamInput.click(); });
+        if (btnEditGallery && editGalInput) btnEditGallery.addEventListener('click', function() { editGalInput.click(); });
+        if (editCamInput) editCamInput.addEventListener('change', handleEditFileSelect);
+        if (editGalInput) editGalInput.addEventListener('change', handleEditFileSelect);
+
+        var repSelectEl = document.getElementById('assignedRep');
+        var carNumEl = document.getElementById('carNumber');
+        var CAR_NUMBER_MAP = { '최영국': '28호', '박광춘': '160호', '임영민': '127호', '이수열': '27호', '정문재': '26호' };
+        if (repSelectEl && carNumEl) {
+          repSelectEl.addEventListener('change', function() {
+            carNumEl.value = CAR_NUMBER_MAP[this.value] || '';
+          });
+        }
+
         var formLead = document.getElementById('leadForm');
         if (formLead) {
           formLead.addEventListener('submit', async function(e) {
@@ -2205,7 +2344,7 @@
 
               var res = await supabase.from('leads').insert([{
                 lead_id: leadId,
-                car_number: '',
+                car_number: document.getElementById('carNumber').value || '',
                 agent_name: agent,
                 customer_name: document.getElementById('customerName').value,
                 contact_person: document.getElementById('contactPerson').value,
@@ -2231,6 +2370,8 @@
               document.getElementById('address').value = '';
               document.getElementById('businessType').value = '';
               document.getElementById('fieldDescription').value = '';
+              document.getElementById('assignedRep').value = '';
+              document.getElementById('carNumber').value = '';
               document.querySelectorAll('input[name="prod"]').forEach(function(cb) {
                 cb.checked = false;
                 if (cb.closest('.prod-item')) cb.closest('.prod-item').classList.remove('checked');
