@@ -705,7 +705,7 @@
           <div class="detail-label">사업장 주소</div>
           <div class="detail-val" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <span id="mAddress"></span>
-            <button type="button" class="map-pin-btn" id="btnModalMap">📍 네이버 지도</button>
+            <button type="button" class="map-pin-btn" id="btnModalMap"><svg width="14" height="18" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin-right:4px;"><ellipse cx="12" cy="27" rx="7" ry="2.2" fill="#0b0f10"></ellipse><path d="M12 1C6.5 1 2 5.5 2 11c0 7 10 17 10 17s10-10 10-17c0-5.5-4.5-10-10-10z" fill="#17b06b"></path><circle cx="12" cy="11" r="4.2" fill="#ffffff"></circle></svg>네이버 지도</button>
           </div>
           
           <div class="detail-label">업종</div><div class="detail-val" id="mBusinessType"></div>
@@ -826,7 +826,7 @@
             </div>
 
             <div class="board-input-footer">
-              <button type="button" class="btn-attach-file" id="btnAttachBoardFile">📎 사진/파일 첨부</button>
+              <button type="button" class="btn-attach-file" id="btnAttachBoardFile" title="사진/파일 첨부" aria-label="사진/파일 첨부"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="#475569" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
               <button type="button" class="board-submit-btn" id="btnSubmitBoardPost">의견 등록</button>
             </div>
           </div>
@@ -1129,6 +1129,9 @@
       }
 
       var PRODUCT_LIST = ['알람', '영상렌탈', '블루스캔', '정보보안', '영상매각', '금고', 'AED', 'AI도어캠', '기타'];
+
+      var MAP_PIN_ICON_SVG = '<svg width="14" height="18" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><ellipse cx="12" cy="27" rx="7" ry="2.2" fill="#0b0f10"></ellipse><path d="M12 1C6.5 1 2 5.5 2 11c0 7 10 17 10 17s10-10 10-17c0-5.5-4.5-10-10-10z" fill="#17b06b"></path><circle cx="12" cy="11" r="4.2" fill="#ffffff"></circle></svg>';
+      var PHONE_ICON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 
       function buildProductCheckboxGrid(name, selectedStr) {
         var sel = String(selectedStr || '').split(',').map(function(s) { return s.trim(); });
@@ -1543,11 +1546,11 @@
             + '<td><strong>' + (r.agent_name || '-') + '</strong></td>'
             + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
             + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
-            + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600;">' + phoneFmt + '</a></td>'
+            + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">' + PHONE_ICON_SVG + phoneFmt + '</a></td>'
             + '<td>'
             + '<div style="display:flex; align-items:center; gap:6px;">'
             + '<span style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (addr || '-') + '</span>'
-            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" title="네이버 지도">📍</button>' : '')
+            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" title="네이버 지도">' + MAP_PIN_ICON_SVG + '</button>' : '')
             + '</div>'
             + '</td>'
             + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
@@ -1560,9 +1563,9 @@
           mHtml += '<div class="mobile-lead-card">'
             + '<div class="m-card-header"><span class="m-agent-tag">소개자: ' + (r.agent_name || '-') + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
             + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
-            + '<a href="tel:' + phoneFmt + '" class="m-phone-link">📞 ' + phoneFmt + '</a>'
+            + '<a href="tel:' + phoneFmt + '" class="m-phone-link">' + PHONE_ICON_SVG + ' ' + phoneFmt + '</a>'
             + '<div class="m-info-row">'
-            + '<span>📍 ' + (addr || '주소 없음') + '</span>'
+            + '<span>' + MAP_PIN_ICON_SVG + ' ' + (addr || '주소 없음') + '</span>'
             + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" style="padding:1px 6px;">지도</button>' : '')
             + '</div>'
             + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
@@ -1760,7 +1763,7 @@
         document.getElementById('mFieldDesc').innerText = item.field_description || '없음';
 
         var phoneFmt = formatPhone(item.contact_phone);
-        document.getElementById('mContactPhone').innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700;">' + phoneFmt + ' 📞</a>';
+        document.getElementById('mContactPhone').innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700; display:inline-flex; align-items:center; gap:5px;">' + phoneFmt + PHONE_ICON_SVG + '</a>';
 
         var b = document.getElementById('mHeaderStatusBadge');
         b.innerText = item.status || '접수대기';
