@@ -1142,6 +1142,11 @@
         if (box) box.style.display = 'none';
       }
 
+      // onclick="..." 인라인 속성은 전역(window) 스코프에서 실행되므로,
+      // 이 IIFE 안에 정의된 함수를 인라인 핸들러에서 호출하려면 반드시 window에 노출해야 함.
+      window.openPhotoLightbox = openPhotoLightbox;
+      window.closePhotoLightbox = closePhotoLightbox;
+
       function formatKoreanDate(dateInput) {
         if (!dateInput) return '';
         var d = new Date(dateInput);
