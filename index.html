@@ -296,7 +296,10 @@
     .modal-photo-card { border: 1px solid #dadce0; border-radius: 10px; overflow: hidden; background: #ffffff; text-align: center; }
     .modal-photo-card img { width: 100%; height: 140px; object-fit: cover; cursor: pointer; background: #f1f3f4; display: block; }
     .photo-card-footer { padding: 6px; background: #f8f9fa; border-top: 1px solid #e8eaed; }
-    .photo-zoom-btn { display: inline-block; width: 100%; padding: 4px 6px; background: #e8f0fe; color: #1a73e8; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+    .photo-zoom-btn { display: inline-block; width: 100%; padding: 4px 6px; background: #e8f0fe; color: #1a73e8; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .photo-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .photo-lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+    .photo-lightbox-close { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.15); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; line-height: 1; cursor: pointer; }
     
     .status-update-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 10px; padding: 14px; margin-top: 14px; }
     .status-update-box h4 { margin: 0 0 10px 0; font-size: 0.92rem; color: #1a73e8; }
@@ -932,6 +935,12 @@
     </div>
   </div>
 
+  <!-- 사진 확대보기 라이트박스 (페이지 이동/새창 없이 이미지만 확대) -->
+  <div id="photoLightbox" class="photo-lightbox" style="display:none;">
+    <button type="button" id="btnClosePhotoLightbox" class="photo-lightbox-close">×</button>
+    <img id="photoLightboxImg" src="" alt="사진 확대보기">
+  </div>
+
   <!-- 자바스크립트 완전 제어부 -->
   <script>
     (function() {
@@ -1118,6 +1127,19 @@
       function formatCurrencyInput(el) {
         var digits = el.value.replace(/[^0-9]/g, '');
         el.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
+      }
+
+      function openPhotoLightbox(url) {
+        var box = document.getElementById('photoLightbox');
+        var img = document.getElementById('photoLightboxImg');
+        if (!box || !img || !url) return;
+        img.src = url;
+        box.style.display = 'flex';
+      }
+
+      function closePhotoLightbox() {
+        var box = document.getElementById('photoLightbox');
+        if (box) box.style.display = 'none';
       }
 
       function formatKoreanDate(dateInput) {
@@ -1631,7 +1653,7 @@
               var fUrl = fileUrlMatch[0];
               var isImg = /\.(jpg|jpeg|png|gif)$/i.test(fUrl);
               if (isImg) {
-                attachHtml = '<div class="board-attachment"><img src="' + fUrl + '" class="board-attachment-img" onclick="window.open(\'' + fUrl + '\', \'_blank\')"></div>';
+                attachHtml = '<div class="board-attachment"><img src="' + fUrl + '" class="board-attachment-img" onclick="openPhotoLightbox(\'' + fUrl + '\')"></div>';
               } else {
                 attachHtml = '<div class="board-attachment"><a href="' + fUrl + '" target="_blank">📎 첨부파일 다운로드 ↗</a></div>';
               }
@@ -1785,8 +1807,8 @@
           item.photo_urls.forEach(function(url, pIdx) {
             var d = document.createElement('div');
             d.className = 'modal-photo-card';
-            d.innerHTML = '<img src="' + url + '" onclick="window.open(\'' + url + '\', \'_blank\')">'
-              + '<div class="photo-card-footer"><a href="' + url + '" target="_blank" class="photo-zoom-btn">🔍 사진 ' + (pIdx + 1) + ' 원본보기 ↗</a></div>';
+            d.innerHTML = '<img src="' + url + '" onclick="openPhotoLightbox(\'' + url + '\')">'
+              + '<div class="photo-card-footer"><span class="photo-zoom-btn" onclick="openPhotoLightbox(\'' + url + '\')">🔍 사진 ' + (pIdx + 1) + ' 확대보기</span></div>';
             pGrid.appendChild(d);
           });
         } else {
@@ -2020,6 +2042,15 @@
         var btnBackToLogin = document.getElementById('btnBackToLogin');
         if (btnGoSignup) btnGoSignup.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('signup'); });
         if (btnBackToLogin) btnBackToLogin.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
+
+        var btnClosePhotoLightbox = document.getElementById('btnClosePhotoLightbox');
+        var photoLightboxEl = document.getElementById('photoLightbox');
+        if (btnClosePhotoLightbox) btnClosePhotoLightbox.addEventListener('click', closePhotoLightbox);
+        if (photoLightboxEl) {
+          photoLightboxEl.addEventListener('click', function(e) {
+            if (e.target === photoLightboxEl) closePhotoLightbox();
+          });
+        }
 
         var btnOpenMapForm = document.getElementById('btnOpenNaverMapForm');
         if (btnOpenMapForm) {
