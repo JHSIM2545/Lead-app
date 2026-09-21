@@ -543,7 +543,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">현 서비스료(원) <span class="opt">(선택사항)</span></label>
-              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled style="background-color: #f1f3f4;">
+              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled style="background-color: #f1f3f4; text-align:right;">
             </div>
           </div>
 
@@ -802,6 +802,7 @@
               <option value="계약보류">9. 계약보류</option>
             </select>
           </div>
+          <div id="statusExtraFields"></div>
           <button type="button" class="btn-save-status" id="btnSaveStatus">상태 저장하기</button>
         </div>
 
@@ -1114,12 +1115,146 @@
         return s;
       }
 
+      function formatCurrencyInput(el) {
+        var digits = el.value.replace(/[^0-9]/g, '');
+        el.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
+      }
+
       function formatKoreanDate(dateInput) {
         if (!dateInput) return '';
         var d = new Date(dateInput);
         if (isNaN(d.getTime())) return String(dateInput);
         var days = ['일', '월', '화', '수', '목', '금', '토'];
         return String(d.getFullYear()).slice(-2) + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' (' + days[d.getDay()] + ') ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+      }
+
+      var PRODUCT_LIST = ['알람', '영상렌탈', '블루스캔', '정보보안', '영상매각', '금고', 'AED', 'AI도어캠', '기타'];
+
+      function buildProductCheckboxGrid(name, selectedStr) {
+        var sel = String(selectedStr || '').split(',').map(function(s) { return s.trim(); });
+        var html = '<div class="prod-grid" style="margin-top:6px;">';
+        PRODUCT_LIST.forEach(function(p) {
+          var checked = sel.indexOf(p) !== -1;
+          html += '<label class="prod-item' + (checked ? ' checked' : '') + '"><input type="checkbox" name="' + name + '" value="' + p + '"' + (checked ? ' checked' : '') + '> ' + p + '</label>';
+        });
+        html += '</div>';
+        return html;
+      }
+
+      function wireProductGrid(name) {
+        document.querySelectorAll('.prod-item input[name="' + name + '"]').forEach(function(cb) {
+          cb.addEventListener('change', function() {
+            var box = this.closest('.prod-item');
+            if (box) box.classList.toggle('checked', this.checked);
+          });
+        });
+      }
+
+      function toDatetimeLocalValue(v) {
+        if (!v) return '';
+        var d = new Date(v);
+        if (isNaN(d.getTime())) return '';
+        var pad = function(n) { return ('0' + n).slice(-2); };
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+      }
+
+      function toDateValue(v) {
+        if (!v) return '';
+        var d = new Date(v);
+        if (isNaN(d.getTime())) return String(v).slice(0, 10);
+        var pad = function(n) { return ('0' + n).slice(-2); };
+        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      }
+
+      function buildMethodSelectHtml(id, selected) {
+        var opts = ['', '직접방문', '전화상담'];
+        var html = '<select id="' + id + '">';
+        opts.forEach(function(o) {
+          html += '<option value="' + o + '"' + (o === selected ? ' selected' : '') + '>' + (o || '선택') + '</option>';
+        });
+        html += '</select>';
+        return html;
+      }
+
+      function renderStatusFields(status) {
+        var box = document.getElementById('statusExtraFields');
+        if (!box) return;
+        var item = activeLeadItem || {};
+        var html = '';
+
+        if (status === '접수확인') {
+          html += '<div class="form-group"><label class="form-label">영업상담메모 <span class="req">*</span> <span class="opt">(10자 이상)</span></label>'
+            + '<textarea id="fConsultMemo" rows="3" placeholder="확인 후 상담 내용을 10자 이상 입력해주세요.">' + (item.consult_memo || '') + '</textarea></div>';
+
+        } else if (status === '고객면담' || status === '추가면담') {
+          var pMethod = (status === '고객면담') ? (item.meeting_method || '') : '';
+          var pContent = (status === '고객면담') ? (item.meeting_content || '') : '';
+          var pDt = (status === '고객면담') ? toDatetimeLocalValue(item.meeting_datetime) : '';
+          html += '<div class="form-group"><label class="form-label">면담방법 <span class="req">*</span></label>' + buildMethodSelectHtml('fMeetingMethod', pMethod) + '</div>'
+            + '<div class="form-group"><label class="form-label">상담내용 <span class="req">*</span> <span class="opt">(10자 이상)</span></label>'
+            + '<textarea id="fMeetingContent" rows="3" placeholder="상담 내용을 10자 이상 입력해주세요.">' + pContent + '</textarea></div>'
+            + '<div class="form-group"><label class="form-label">면담일시 <span class="req">*</span></label>'
+            + '<input type="datetime-local" id="fMeetingDatetime" value="' + pDt + '"></div>';
+          if (status === '추가면담') {
+            html += '<p style="font-size:0.75rem; color:#5f6368; margin:4px 0 0;">※ 추가면담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>';
+          }
+
+        } else if (status === '견적제출') {
+          html += '<div class="form-group"><label class="form-label">제출 상품 <span class="req">*</span></label>' + buildProductCheckboxGrid('quoteProd', item.quote_products || item.product) + '</div>'
+            + '<div class="form-group"><label class="form-label">견적금액(원) <span class="req">*</span></label><input type="text" id="fQuoteAmount" placeholder="예: 150,000" style="text-align:right;" value="' + (item.quote_amount ? Number(item.quote_amount).toLocaleString('ko-KR') : '') + '"></div>'
+            + '<div class="form-group"><label class="form-label">예상 계약일정 <span class="req">*</span></label><input type="date" id="fExpectedContractDate" value="' + toDateValue(item.expected_contract_date) + '"></div>'
+            + '<div class="form-group"><label class="form-label">비고사항 <span class="req">*</span></label><textarea id="fQuoteNote" rows="3" placeholder="고객 요구사항, 견적 보충 설명 등을 입력해주세요.">' + (item.quote_note || '') + '</textarea></div>';
+
+        } else if (status === '견적상담') {
+          html += '<p style="font-size:0.75rem; color:#5f6368; margin:0 0 6px;">※ 견적상담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>'
+            + '<div class="form-group"><label class="form-label">상품 <span class="opt">(변경 시에만 선택)</span></label>' + buildProductCheckboxGrid('quoteConsultProd', '') + '</div>'
+            + '<div class="form-group"><label class="form-label">견적금액(원) <span class="opt">(기존: ' + (item.quote_amount ? Number(item.quote_amount).toLocaleString('ko-KR') + '원' : '-') + ', 변경 시에만 입력)</span></label><input type="text" id="fQuoteConsultAmount" placeholder="변경 시에만 입력" style="text-align:right;"></div>'
+            + '<div class="form-group"><label class="form-label">계약 예정일자 변경 <span class="opt">(변경 시에만)</span></label><input type="date" id="fQuoteConsultDate"></div>'
+            + '<div class="form-group"><label class="form-label">상담 내용 <span class="req">*</span></label><textarea id="fQuoteConsultNote" rows="3" placeholder="추가 상담/변경 내용을 입력해주세요."></textarea></div>';
+
+        } else if (status === '계약완료') {
+          html += '<div class="form-group"><label class="form-label">계약성공일자 <span class="req">*</span></label><input type="date" id="fContractDate" value="' + toDateValue(item.contract_success_date) + '"></div>'
+            + '<div class="form-group"><label class="form-label">확정 상품종류 <span class="req">*</span></label>' + buildProductCheckboxGrid('contractProd', item.contract_products || item.product) + '</div>'
+            + '<div class="form-group"><label class="form-label">계약금액(원) <span class="req">*</span></label><input type="text" id="fContractAmount" placeholder="예: 1,500,000" style="text-align:right;" value="' + (item.contract_amount ? Number(item.contract_amount).toLocaleString('ko-KR') : '') + '"></div>'
+            + '<div class="form-group"><label class="form-label">추가요구사항 <span class="opt">(선택)</span></label><textarea id="fContractExtra" rows="2">' + (item.contract_extra_request || '') + '</textarea></div>';
+
+        } else if (status === '계약실패') {
+          html += '<div class="form-group"><label class="form-label">실패일자 <span class="req">*</span></label><input type="date" id="fFailDate" value="' + toDateValue(item.fail_date) + '"></div>'
+            + '<div class="form-group"><label class="form-label">실패사유 <span class="req">*</span></label><textarea id="fFailReason" rows="3" placeholder="실패 사유를 정확히 입력해주세요.">' + (item.fail_reason || '') + '</textarea></div>';
+
+        } else if (status === '계약보류') {
+          html += '<div class="form-group"><label class="form-label">보류 기한 <span class="req">*</span></label><input type="date" id="fHoldUntil" value="' + toDateValue(item.hold_until) + '"></div>'
+            + '<div class="form-group"><label class="form-label">보류 사유 <span class="req">*</span></label><textarea id="fHoldReason" rows="3" placeholder="보류 사유를 입력해주세요.">' + (item.hold_reason || '') + '</textarea></div>'
+            + '<p style="font-size:0.75rem; color:#5f6368; margin:4px 0 0;">※ 보류 기한이 지나면 다음 접속(대시보드 조회) 시 자동으로 이전 진행상태로 복귀합니다.</p>';
+        }
+
+        box.innerHTML = html;
+
+        if (status === '견적제출') wireProductGrid('quoteProd');
+        if (status === '견적상담') wireProductGrid('quoteConsultProd');
+        if (status === '계약완료') wireProductGrid('contractProd');
+
+        ['fQuoteAmount', 'fQuoteConsultAmount', 'fContractAmount'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.addEventListener('input', function() { formatCurrencyInput(this); });
+        });
+      }
+
+      async function reactivateExpiredHolds(list) {
+        var todayStr = new Date().toISOString().slice(0, 10);
+        for (var i = 0; i < list.length; i++) {
+          var r = list[i];
+          if (r.status === '계약보류' && r.hold_until && r.hold_until <= todayStr) {
+            var revertTo = r.hold_prev_status || '접수확인';
+            try {
+              var up = await supabase.from('leads').update({ status: revertTo, hold_until: null }).eq('lead_id', r.lead_id);
+              if (!up.error) { r.status = revertTo; r.hold_until = null; }
+            } catch (e) {
+              console.error('보류 자동해제 실패:', e);
+            }
+          }
+        }
+        return list;
       }
 
       function getBadgeClass(status) {
@@ -1327,6 +1462,7 @@
           if (res.error) throw res.error;
 
           var list = res.data || [];
+          list = await reactivateExpiredHolds(list);
           var counts = { total: 0, wait: 0, confirm: 0, consult: 0, moreConsult: 0, quote: 0, quoteConsult: 0, done: 0, fail: 0, hold: 0 };
 
           list.forEach(function(r) {
@@ -1656,6 +1792,7 @@
 
         var uSel = document.getElementById('uStatus');
         if (uSel) uSel.value = item.status || '접수대기';
+        renderStatusFields(uSel ? uSel.value : '접수대기');
 
         var actionsBox = document.getElementById('authorActionsBox');
         var editContainer = document.getElementById('editLeadContainer');
@@ -2152,6 +2289,9 @@
           });
         }
 
+        var curFeeEl = document.getElementById('currentFee');
+        if (curFeeEl) curFeeEl.addEventListener('input', function() { formatCurrencyInput(this); });
+
         document.querySelectorAll('.prod-item').forEach(function(item) {
           var cb = item.querySelector('input[type="checkbox"]');
           if (cb) {
@@ -2161,14 +2301,117 @@
           }
         });
 
+        var uStatusSel = document.getElementById('uStatus');
+        if (uStatusSel) {
+          uStatusSel.addEventListener('change', function() {
+            renderStatusFields(this.value);
+          });
+        }
+
         var btnSaveStatus = document.getElementById('btnSaveStatus');
         if (btnSaveStatus) {
           btnSaveStatus.addEventListener('click', async function() {
             if (!activeLeadItem || !supabase) return;
             var newSt = document.getElementById('uStatus').value;
+            var updateData = { status: newSt };
+            var nowIso = new Date().toISOString();
+
+            if (newSt === '접수확인') {
+              var memo = (document.getElementById('fConsultMemo').value || '').trim();
+              if (memo.length < 10) { alert('영업상담메모를 10자 이상 입력해주세요.'); return; }
+              updateData.consult_memo = memo;
+              updateData.consult_confirmed_at = nowIso;
+
+            } else if (newSt === '고객면담') {
+              var method = document.getElementById('fMeetingMethod').value;
+              var mcontent = (document.getElementById('fMeetingContent').value || '').trim();
+              var mdt = document.getElementById('fMeetingDatetime').value;
+              if (!method) { alert('면담방법을 선택해주세요.'); return; }
+              if (mcontent.length < 10) { alert('상담내용을 10자 이상 입력해주세요.'); return; }
+              if (!mdt) { alert('면담일시를 입력해주세요.'); return; }
+              updateData.meeting_method = method;
+              updateData.meeting_content = mcontent;
+              updateData.meeting_datetime = new Date(mdt).toISOString();
+
+            } else if (newSt === '추가면담') {
+              var aMethod = document.getElementById('fMeetingMethod').value;
+              var aContent = (document.getElementById('fMeetingContent').value || '').trim();
+              var aDt = document.getElementById('fMeetingDatetime').value;
+              if (!aMethod) { alert('면담방법을 선택해주세요.'); return; }
+              if (aContent.length < 10) { alert('상담내용을 10자 이상 입력해주세요.'); return; }
+              if (!aDt) { alert('면담일시를 입력해주세요.'); return; }
+              var existingAdd = Array.isArray(activeLeadItem.additional_meetings) ? activeLeadItem.additional_meetings.slice() : [];
+              existingAdd.push({ method: aMethod, content: aContent, datetime: new Date(aDt).toISOString(), created_at: nowIso });
+              updateData.additional_meetings = existingAdd;
+
+            } else if (newSt === '견적제출') {
+              var qProd = Array.from(document.querySelectorAll('input[name="quoteProd"]:checked')).map(function(c) { return c.value; });
+              var qAmountRaw = document.getElementById('fQuoteAmount').value.replace(/[^0-9]/g, '');
+              var qDate = document.getElementById('fExpectedContractDate').value;
+              var qNote = (document.getElementById('fQuoteNote').value || '').trim();
+              if (qProd.length === 0) { alert('제출 상품을 1개 이상 선택해주세요.'); return; }
+              if (!qAmountRaw) { alert('견적금액을 입력해주세요.'); return; }
+              if (!qDate) { alert('예상 계약일정을 입력해주세요.'); return; }
+              if (!qNote) { alert('비고사항을 입력해주세요.'); return; }
+              updateData.quote_products = qProd.join(', ');
+              updateData.quote_amount = Number(qAmountRaw);
+              updateData.expected_contract_date = qDate;
+              updateData.quote_note = qNote;
+
+            } else if (newSt === '견적상담') {
+              var qcNote = (document.getElementById('fQuoteConsultNote').value || '').trim();
+              if (!qcNote) { alert('상담 내용을 입력해주세요.'); return; }
+              var qcProd = Array.from(document.querySelectorAll('input[name="quoteConsultProd"]:checked')).map(function(c) { return c.value; });
+              var qcAmountRaw = document.getElementById('fQuoteConsultAmount').value.replace(/[^0-9]/g, '');
+              var qcDate = document.getElementById('fQuoteConsultDate').value;
+
+              var existingQC = Array.isArray(activeLeadItem.quote_consults) ? activeLeadItem.quote_consults.slice() : [];
+              existingQC.push({
+                note: qcNote,
+                amount: qcAmountRaw ? Number(qcAmountRaw) : null,
+                products: qcProd.length ? qcProd.join(', ') : null,
+                expected_date: qcDate || null,
+                created_at: nowIso
+              });
+              updateData.quote_consults = existingQC;
+              if (qcAmountRaw) updateData.quote_amount = Number(qcAmountRaw);
+              if (qcProd.length) updateData.quote_products = qcProd.join(', ');
+              if (qcDate) updateData.expected_contract_date = qcDate;
+
+            } else if (newSt === '계약완료') {
+              var cDate = document.getElementById('fContractDate').value;
+              var cProd = Array.from(document.querySelectorAll('input[name="contractProd"]:checked')).map(function(c) { return c.value; });
+              var cAmountRaw = document.getElementById('fContractAmount').value.replace(/[^0-9]/g, '');
+              var cExtra = (document.getElementById('fContractExtra').value || '').trim();
+              if (!cDate) { alert('계약성공일자를 입력해주세요.'); return; }
+              if (cProd.length === 0) { alert('확정 상품종류를 1개 이상 선택해주세요.'); return; }
+              if (!cAmountRaw) { alert('계약금액을 입력해주세요.'); return; }
+              updateData.contract_success_date = cDate;
+              updateData.contract_products = cProd.join(', ');
+              updateData.contract_amount = Number(cAmountRaw);
+              updateData.contract_extra_request = cExtra;
+
+            } else if (newSt === '계약실패') {
+              var fDate = document.getElementById('fFailDate').value;
+              var fReason = (document.getElementById('fFailReason').value || '').trim();
+              if (!fDate) { alert('실패일자를 입력해주세요.'); return; }
+              if (!fReason) { alert('실패사유를 입력해주세요.'); return; }
+              updateData.fail_date = fDate;
+              updateData.fail_reason = fReason;
+
+            } else if (newSt === '계약보류') {
+              var hUntil = document.getElementById('fHoldUntil').value;
+              var hReason = (document.getElementById('fHoldReason').value || '').trim();
+              if (!hUntil) { alert('보류 기한을 입력해주세요.'); return; }
+              if (!hReason) { alert('보류 사유를 입력해주세요.'); return; }
+              updateData.hold_until = hUntil;
+              updateData.hold_reason = hReason;
+              updateData.hold_prev_status = activeLeadItem.status || '접수대기';
+            }
+
             this.disabled = true; this.innerText = '저장 중...';
 
-            var res = await supabase.from('leads').update({ status: newSt }).eq('lead_id', activeLeadItem.lead_id);
+            var res = await supabase.from('leads').update(updateData).eq('lead_id', activeLeadItem.lead_id);
             this.disabled = false; this.innerText = '상태 저장하기';
 
             if (!res.error) {
@@ -2352,7 +2595,7 @@
                 address: document.getElementById('address').value,
                 business_type: document.getElementById('businessType').value,
                 current_company: document.getElementById('currentCompany').value,
-                current_fee: document.getElementById('currentFee').value,
+                current_fee: document.getElementById('currentFee').value.replace(/[^0-9]/g, ''),
                 product: checked.join(', '),
                 field_description: document.getElementById('fieldDescription').value,
                 photo_urls: photoUrls,
