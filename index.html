@@ -2065,10 +2065,11 @@
         var btn = document.getElementById("btnSaveUserEdit");
         btn.disabled = true; btn.innerText = "저장 중...";
 
+        var userRole = (job === '본사관리자' || job === '지사관리자') ? 'master' : 'user';
         var updateData = {
           name: name,
           job: job,
-          updated_at: new Date().toISOString()
+          role: userRole
         };
 
         if (newPwd) {
@@ -2369,8 +2370,7 @@
               // 표준 해시 공식(phone + ":" + newPwd)으로 해시 생성
               var newHashed = await hashPassword(user.phone, newPwd);
               var upRes = await supabase.from("app_users").update({
-                hash: newHashed,
-                updated_at: new Date().toISOString()
+                hash: newHashed
               }).eq("phone", user.phone);
 
               btn.disabled = false; btn.innerText = "비밀번호 변경 완료";
