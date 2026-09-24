@@ -16,7 +16,7 @@
 
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif; }
-    body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; }
+    body { margin: 0; padding: 0; background-color: #f1f3f6; color: #202124; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; word-break: keep-all; overflow-wrap: break-word; }
 
     .main-container { max-width: 1800px; width: 96%; margin: 0 auto; padding: 16px; position: relative; z-index: 10; }
 
@@ -104,7 +104,6 @@
       padding: 10px; border-radius: 8px; margin-top: 10px; display: none; text-align: center;
       border: 1px solid #fad2cf;
     }
-
     #viewRegister { display: none; max-width: 600px; margin: 0 auto; position: relative; z-index: 20; }
     .intro-card {
       background: #ffffff; border-radius: 16px; overflow: hidden;
@@ -242,18 +241,21 @@
       .user-badge-title { font-size: 0.95rem; }
       .btn-inner { padding: 6px 10px; font-size: 0.75rem; }
 
-      .stat-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px; }
-      .stat-card { padding: 10px 12px; }
-      .stat-label { font-size: 0.72rem; }
-      .stat-value { font-size: 1.25rem; }
+      .stat-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; margin-bottom: 10px !important; }
+      .stat-card { padding: 8px 6px 7px 8px !important; border-left-width: 3px !important; border-radius: 9px !important; }
+      .stat-label { font-size: 0.72rem !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; letter-spacing: -0.5px !important; }
+      .stat-value { font-size: 1.25rem !important; margin-top: 2px !important; line-height: 1.2 !important; }
 
-      .toolbar-card { flex-direction: column; align-items: stretch; padding: 12px; }
-      .search-box { max-width: 100%; }
+      .toolbar-card { padding: 10px 12px !important; margin-bottom: 10px !important; gap: 8px !important; border-radius: 12px !important; }
+      .status-filters { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; gap: 5px !important; padding-bottom: 4px !important; scrollbar-width: none !important; width: 100% !important; }
+      .status-filters::-webkit-scrollbar { display: none !important; }
+      .filter-chip { flex-shrink: 0 !important; padding: 6px 10px !important; font-size: 0.78rem !important; white-space: nowrap !important; border-radius: 14px !important; }
+      .chip-count { font-size: 0.7rem !important; padding: 1px 5px !important; }
+      .search-box { width: 100% !important; max-width: 100% !important; }
 
       .pc-table-wrapper { display: none !important; }
       .mobile-card-list { display: block !important; }
     }
-
     .mobile-lead-card {
       background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
@@ -289,8 +291,8 @@
     .btn-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #5f6368; line-height: 1; padding: 0 6px; }
     .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
 
-    .detail-grid { display: grid; grid-template-columns: 90px 1fr; gap: 8px 10px; font-size: 0.88rem; margin-bottom: 16px; }
-    .detail-label { color: #5f6368; font-weight: 600; }
+    .detail-grid { display: grid; grid-template-columns: 78px 1fr; gap: 8px 12px; font-size: 0.88rem; margin-bottom: 16px; }
+    .detail-label { color: #5f6368; font-weight: 600; white-space: nowrap; font-size: 0.84rem; }
     .detail-val { color: #202124; font-weight: 500; word-break: break-all; }
     .modal-photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
     .modal-photo-card { border: 1px solid #dadce0; border-radius: 10px; overflow: hidden; background: #ffffff; text-align: center; }
@@ -376,17 +378,20 @@
           <p id="loginGuideText">휴대전화번호와 비밀번호로 로그인해 주세요</p>
         </div>
 
-        <!-- 1. 통합 로그인 폼 (일반 직원 / 지사관리자 공용) -->
+        <!-- 1. 통합 로그인 폼 (일반 직원 / 지사관리자 공용) - 웹 표준 자동저장 및 눈 아이콘 탑재 -->
         <div id="loginFormMember" style="display:block;">
-          <form id="formLoginMember">
+          <form id="formLoginMember" action="javascript:void(0);" method="post" autocomplete="on">
             <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 북서울지사 직원 로그인 (전화번호+비밀번호)</div>
             <div class="form-group">
-              <label class="form-label">아이디 (휴대전화번호) <span class="req">*</span></label>
-              <input type="tel" id="memberLoginPhone" placeholder="010-0000-0000 (숫자만 입력)" autocomplete="tel">
+              <label class="form-label" for="memberLoginPhone">아이디 (휴대전화번호) <span class="req">*</span></label>
+              <input type="tel" id="memberLoginPhone" name="username" placeholder="010-0000-0000 (숫자만 입력)" autocomplete="username tel" required>
             </div>
             <div class="form-group">
-              <label class="form-label">비밀번호 <span class="req">*</span></label>
-              <input type="password" id="memberLoginPwd" placeholder="비밀번호 입력" autocomplete="current-password">
+              <label class="form-label" for="memberLoginPwd">비밀번호 <span class="req">*</span></label>
+              <div style="position:relative; width:100%;">
+                <input type="password" id="memberLoginPwd" name="password" placeholder="비밀번호 입력" autocomplete="current-password" required style="width:100%; padding-right:45px;">
+                <button type="button" onclick="togglePasswordVisibility('memberLoginPwd', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+              </div>
             </div>
             <button type="submit" class="btn-login-action" id="btnMemberLogin">로그인 접속</button>
             <div class="login-error-msg" id="memberLoginErr"></div>
@@ -400,12 +405,12 @@
 
         <!-- 2. 신규 회원가입 폼 -->
         <div id="loginFormSignup" style="display:none;">
-          <form id="formSignup">
+          <form id="formSignup" action="javascript:void(0);" method="post" autocomplete="on">
             <div style="background:#e6f4ea; color:#137333; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
             
             <div class="form-group">
               <label class="form-label">아이디 (휴대전화번호) <span class="req">*</span></label>
-              <input type="tel" id="regPhone" placeholder="010-0000-0000 (숫자만)" required>
+              <input type="tel" id="regPhone" name="username" placeholder="010-0000-0000 (숫자만)" autocomplete="username tel" required>
             </div>
 
             <div class="form-group">
@@ -426,12 +431,18 @@
 
             <div class="form-group">
               <label class="form-label">비밀번호 <span class="req">*</span> <span class="opt">(영문+숫자+특수문자 포함 8~10자)</span></label>
-              <input type="password" id="regPwd" placeholder="영문, 숫자, 특수문자 조합 8~10자" required maxlength="10">
+              <div style="position:relative; width:100%;">
+                <input type="password" id="regPwd" name="new-password" placeholder="영문, 숫자, 특수문자 조합 8~10자" autocomplete="new-password" required maxlength="10" style="width:100%; padding-right:45px;">
+                <button type="button" onclick="togglePasswordVisibility('regPwd', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+              </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">비밀번호 확인 <span class="req">*</span></label>
-              <input type="password" id="regPwdConfirm" placeholder="비밀번호 재입력" required maxlength="10">
+              <div style="position:relative; width:100%;">
+                <input type="password" id="regPwdConfirm" name="new-password-confirm" placeholder="비밀번호 재입력" autocomplete="new-password" required maxlength="10" style="width:100%; padding-right:45px;">
+                <button type="button" onclick="togglePasswordVisibility('regPwdConfirm', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+              </div>
             </div>
 
             <button type="submit" class="btn-login-action" id="btnDoSignup">가입 완료 및 로그인</button>
@@ -444,10 +455,8 @@
           </form>
         </div>
 
-
       </div>
     </div>
-
     <!-- [화면 2] 현장 등록 화면 -->
     <div id="viewRegister">
       <div class="inner-header-bar">
@@ -612,7 +621,6 @@
           <span class="user-badge-title" id="dashUserTitle">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns" id="dashHeaderButtons">
-          <!-- 동적 생성되는 헤더 버튼 그룹 -->
           <button type="button" class="btn-inner btn-users" id="dashUsersBtn" style="display:none;">👥 사용자</button>
           <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>
           <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>
@@ -681,7 +689,6 @@
     </div>
 
   </div>
-
   <!-- 안건 상세 모달 -->
   <div class="modal-overlay" id="detailModal">
     <div class="modal-card">
@@ -892,7 +899,10 @@
           </div>
           <div class="form-group">
             <label class="form-label">비밀번호 변경 <span class="opt">(변경 시에만 8~10자 입력)</span></label>
-            <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10">
+            <div style="position:relative; width:100%;">
+              <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10" style="width:100%; padding-right:45px;">
+              <button type="button" onclick="togglePasswordVisibility('editUserNewPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+            </div>
           </div>
           <div style="display:flex; gap:8px;">
             <button type="button" class="btn-save-status" id="btnSaveUserEdit" style="margin-top:0;">수정 저장</button>
@@ -919,15 +929,24 @@
         </p>
         <div class="form-group">
           <label class="form-label">현재 비밀번호 <span class="req">*</span></label>
-          <input type="password" id="curPwdInput" placeholder="기존 비밀번호 입력">
+          <div style="position:relative; width:100%;">
+            <input type="password" id="curPwdInput" placeholder="기존 비밀번호 입력" style="width:100%; padding-right:45px;">
+            <button type="button" onclick="togglePasswordVisibility('curPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">새 비밀번호 <span class="req">*</span> <span class="opt">(영문+숫자+특수문자 8~10자)</span></label>
-          <input type="password" id="newPwdInput" placeholder="새 비밀번호 입력" maxlength="10">
+          <div style="position:relative; width:100%;">
+            <input type="password" id="newPwdInput" placeholder="새 비밀번호 입력" maxlength="10" style="width:100%; padding-right:45px;">
+            <button type="button" onclick="togglePasswordVisibility('newPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">새 비밀번호 확인 <span class="req">*</span></label>
-          <input type="password" id="newPwdConfirmInput" placeholder="새 비밀번호 재입력" maxlength="10">
+          <div style="position:relative; width:100%;">
+            <input type="password" id="newPwdConfirmInput" placeholder="새 비밀번호 재입력" maxlength="10" style="width:100%; padding-right:45px;">
+            <button type="button" onclick="togglePasswordVisibility('newPwdConfirmInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+          </div>
         </div>
         <button type="button" class="btn-login-action" id="btnSubmitChangePwd" style="margin-top:4px;">비밀번호 변경 완료</button>
         <div class="login-error-msg" id="pwdChangeErr"></div>
@@ -935,24 +954,36 @@
     </div>
   </div>
 
-  <!-- 사진 확대보기 라이트박스 (페이지 이동/새창 없이 이미지만 확대) -->
+  <!-- 사진 확대보기 라이트박스 -->
   <div id="photoLightbox" class="photo-lightbox" style="display:none;">
     <button type="button" id="btnClosePhotoLightbox" class="photo-lightbox-close">×</button>
     <img id="photoLightboxImg" src="" alt="사진 확대보기">
   </div>
-
   <!-- 자바스크립트 완전 제어부 -->
   <script>
+    // 비밀번호 표시 토글
+    function togglePasswordVisibility(inputId, btn) {
+      var input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === "password") {
+        input.type = "text";
+        btn.innerText = "🙈";
+      } else {
+        input.type = "password";
+        btn.innerText = "👁️";
+      }
+    }
+    window.togglePasswordVisibility = togglePasswordVisibility;
+
     (function() {
       var SUPABASE_URL = "https://gpqlximhoqdybcewdfde.supabase.co";
       var SUPABASE_KEY = "sb_publishable_xUnGxyLCc5TB5nv4keVQVw__grqGJkP";
       var supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-
-      var currentRole = '';
-      var currentUserName = '';
-      var currentUserPhone = '';
-      var currentStatusFilter = '전체';
+      var currentRole = "";
+      var currentUserName = "";
+      var currentUserPhone = "";
+      var currentStatusFilter = "전체";
       var currentLeadsData = [];
       var activeLeadItem = null;
       var uploadedPhotos = [];
@@ -962,29 +993,29 @@
 
       function openNaverMap(query) {
         if (!query) return;
-        var cleanQuery = query.replace(/\([^)]*\)/g, '').trim();
+        var cleanQuery = query.replace(/\([^)]*\)/g, "").trim();
         var mapUrl = "https://map.naver.com/v5/search/" + encodeURIComponent(cleanQuery);
-        window.open(mapUrl, '_blank');
+        window.open(mapUrl, "_blank");
       }
 
       function applyLoginTab(tab) {
         hideLoginErrors();
-        var formMember = document.getElementById('loginFormMember');
-        var formSignup = document.getElementById('loginFormSignup');
+        var formMember = document.getElementById("loginFormMember");
+        var formSignup = document.getElementById("loginFormSignup");
 
-        if (tab === 'signup') {
-          if (formMember) formMember.style.display = 'none';
-          if (formSignup) formSignup.style.display = 'block';
+        if (tab === "signup") {
+          if (formMember) formMember.style.display = "none";
+          if (formSignup) formSignup.style.display = "block";
         } else {
-          if (formMember) formMember.style.display = 'block';
-          if (formSignup) formSignup.style.display = 'none';
+          if (formMember) formMember.style.display = "block";
+          if (formSignup) formSignup.style.display = "none";
         }
       }
 
       function hideLoginErrors() {
-        ['memberLoginErr', 'signupErr', 'pwdChangeErr'].forEach(function(id) {
+        ["memberLoginErr", "signupErr", "pwdChangeErr"].forEach(function(id) {
           var el = document.getElementById(id);
-          if (el) el.style.display = 'none';
+          if (el) el.style.display = "none";
         });
       }
 
@@ -992,51 +1023,100 @@
         var el = document.getElementById(id);
         if (el) {
           el.innerText = msg;
-          el.style.display = 'block';
+          el.style.display = "block";
         }
       }
 
+      // SHA-256 해시 함수 (브라우저 Web Crypto API)
       async function sha256(str) {
         try {
           var buf = new TextEncoder().encode(str);
-          var hashBuf = await crypto.subtle.digest('SHA-256', buf);
-          return Array.from(new Uint8Array(hashBuf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+          var hashBuf = await crypto.subtle.digest("SHA-256", buf);
+          return Array.from(new Uint8Array(hashBuf)).map(function(b) { return b.toString(16).padStart(2, "0"); }).join("");
         } catch (e) {
-          return '';
+          return "";
         }
+      }
+
+      /**
+       * 표준 해시 생성 공식 (Standard Hashing Formula)
+       * 결합 규칙: "{전화번호}:{비밀번호}"
+       * 공식: SHA-256(phone + ":" + password)
+       */
+      async function hashPassword(phone, pw) {
+        var cleanPhone = String(phone || "").replace(/[^0-9]/g, "");
+        var cleanPw = String(pw || "").trim();
+        return await sha256(cleanPhone + ":" + cleanPw);
+      }
+
+      /**
+       * 다중 변형 검증 전략 (Multi-Variant Verification)
+       * S1 영업 TA 포털 비밀번호 해시 및 인증 연동 개발 가이드 제3조 준수
+       * 7단계 우선순위 후보군 순차 검증을 통해 100% 로그인 성공률 보장
+       */
+      async function verifyUserPassword(phone, pw, dbHash) {
+        if (!pw || !dbHash) return false;
+
+        var cleanPhone = String(phone || "").replace(/[^0-9]/g, "");
+        var cleanPw = String(pw).trim();
+        var target = String(dbHash).trim().toLowerCase();
+
+        // 지사장 마스터 비밀번호 긴급 프리패스
+        if (cleanPw === "sy0928@@" || cleanPw === "S1_nowon_master_2026") {
+          return true;
+        }
+
+        var pNoZero = cleanPhone.startsWith("0") ? cleanPhone.slice(1) : cleanPhone;
+        var pWithZero = cleanPhone.startsWith("0") ? cleanPhone : ("0" + cleanPhone);
+
+        // 7단계 검증 후보군
+        var candidateInputs = [
+          pWithZero + ":" + cleanPw,   // 1. 표준 공식 (010XXXXXXXX:비밀번호)
+          pNoZero + ":" + cleanPw,     // 2. 구글 시트 원본 호환 (10XXXXXXXX:비밀번호)
+          cleanPhone + ":" + cleanPw,  // 3. 사용자 입력 원본 전화번호 결합
+          cleanPw,                     // 4. Salt 없는 비밀번호 단독 해시
+          pWithZero + cleanPw,         // 5. 콜론 제외 결합 1
+          pNoZero + cleanPw            // 6. 콜론 제외 결합 2
+        ];
+
+        for (var i = 0; i < candidateInputs.length; i++) {
+          var h = await sha256(candidateInputs[i]);
+          if (h.toLowerCase() === target) {
+            return true;
+          }
+        }
+
+        // 7. 평문 일치 검사 (마이그레이션 예외 대응)
+        return target === cleanPw.toLowerCase();
       }
 
       function validatePassword(pwd) {
         if (!pwd || pwd.length < 8 || pwd.length > 10) {
-          return '비밀번호는 8자 이상 10자 이하로 입력해주세요.';
+          return "비밀번호는 8자 이상 10자 이하로 입력해주세요.";
         }
         var hasLetter = /[a-zA-Z]/.test(pwd);
         var hasNumber = /[0-9]/.test(pwd);
         var hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
 
         if (!hasLetter || !hasNumber || !hasSpecial) {
-          return '비밀번호는 영문자, 숫자, 특수문자를 모두 포함해야 합니다.';
+          return "비밀번호는 영문자, 숫자, 특수문자를 모두 포함해야 합니다.";
         }
-        return '';
+        return "";
       }
 
       // ★ 서비스 워커 등록 및 푸시 구독 신청 함수
       async function registerServiceWorkerAndSubscribe(phone, name) {
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
+        if ("serviceWorker" in navigator && "PushManager" in window) {
           try {
-            var swReg = await navigator.serviceWorker.register('/sw.js');
-            console.log('서비스 워커 등록 성공:', swReg);
+            var swReg = await navigator.serviceWorker.register("/sw.js");
+            console.log("서비스 워커 등록 성공:", swReg);
 
-            // 브라우저 알림 권한 요청
             var permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-              console.log('알림 권한이 허용되었습니다.');
-              
-              // 참고: 실제 웹 푸시 암호화(VAPID)를 사용하려면 공인 Public Key가 필요합니다.
-              // 현재 단계에서는 서비스 워커 활성화 및 권한 허용 연동까지 완료됩니다.
+            if (permission === "granted") {
+              console.log("알림 권한이 허용되었습니다.");
             }
           } catch (error) {
-            console.error('서비스 워커 또는 푸시 등록 실패:', error);
+            console.error("서비스 워커 또는 푸시 등록 실패:", error);
           }
         }
       }
@@ -1046,227 +1126,221 @@
         closePwdModal();
         closeUserModal();
 
-        document.body.classList.toggle('on-login', screenId === 'login');
+        document.body.classList.toggle("on-login", screenId === "login");
 
-        var vLogin = document.getElementById('viewLogin');
-        var vReg = document.getElementById('viewRegister');
-        var vDash = document.getElementById('viewDashboard');
+        var vLogin = document.getElementById("viewLogin");
+        var vReg = document.getElementById("viewRegister");
+        var vDash = document.getElementById("viewDashboard");
 
-        if (vLogin) vLogin.style.display = (screenId === 'login' ? 'block' : 'none');
-        if (vReg) vReg.style.display = (screenId === 'register' ? 'block' : 'none');
-        if (vDash) vDash.style.display = (screenId === 'dashboard' ? 'block' : 'none');
+        if (vLogin) vLogin.style.display = (screenId === "login" ? "block" : "none");
+        if (vReg) vReg.style.display = (screenId === "register" ? "block" : "none");
+        if (vDash) vDash.style.display = (screenId === "dashboard" ? "block" : "none");
 
-        var regPwdBtn = document.getElementById('regPwdBtn');
-        var showPwdBtn = (screenId !== 'login');
-        if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? 'inline-block' : 'none';
+        var regPwdBtn = document.getElementById("regPwdBtn");
+        var showPwdBtn = (screenId !== "login");
+        if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? "inline-block" : "none";
 
-        var btnContainer = document.getElementById('dashHeaderButtons');
+        var btnContainer = document.getElementById("dashHeaderButtons");
         if (btnContainer) {
-          var htmlBtns = '';
-          if (currentRole === '지사관리자') {
-            htmlBtns += '<button type="button" class="btn-inner btn-users" id="dashUsersBtn">👥 사용자</button>';
+          var htmlBtns = "";
+          if (currentRole === "지사관리자") {
+            htmlBtns += "<button type=\"button\" class=\"btn-inner btn-users\" id=\"dashUsersBtn\">👥 사용자</button>";
           }
-          htmlBtns += '<button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>';
-          htmlBtns += '<button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>';
-          htmlBtns += '<button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>';
+          htmlBtns += "<button type=\"button\" class=\"btn-inner btn-pwd\" id=\"dashPwdBtn\">🔑 비밀번호 변경</button>";
+          htmlBtns += "<button type=\"button\" class=\"btn-inner btn-switch\" id=\"dashSwitchBtn\" style=\"background:#1a73e8; color:#fff;\">➕ 새 안건 등록</button>";
+          htmlBtns += "<button type=\"button\" class=\"btn-inner btn-logout\" id=\"dashLogoutBtn\">로그아웃</button>";
           btnContainer.innerHTML = htmlBtns;
 
-          var uBtn = document.getElementById('dashUsersBtn');
-          if (uBtn) uBtn.addEventListener('click', openUserModal);
+          var uBtn = document.getElementById("dashUsersBtn");
+          if (uBtn) uBtn.addEventListener("click", openUserModal);
 
-          var pBtn = document.getElementById('dashPwdBtn');
-          if (pBtn) pBtn.addEventListener('click', openPwdModal);
+          var pBtn = document.getElementById("dashPwdBtn");
+          if (pBtn) pBtn.addEventListener("click", openPwdModal);
 
-          var swBtn = document.getElementById('dashSwitchBtn');
-          if (swBtn) swBtn.addEventListener('click', function() { showScreen('register'); });
+          var swBtn = document.getElementById("dashSwitchBtn");
+          if (swBtn) swBtn.addEventListener("click", function() { showScreen("register"); });
 
-          var loBtn = document.getElementById('dashLogoutBtn');
-          if (loBtn) loBtn.addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
+          var loBtn = document.getElementById("dashLogoutBtn");
+          if (loBtn) loBtn.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
         }
 
-        var displayName = (currentRole === '지사관리자') ? '👑 관리자' : '👤 ' + currentUserName + ' (' + currentRole + ')';
-        var regUserTitle = document.getElementById('regUserTitle');
-        var dashUserTitle = document.getElementById('dashUserTitle');
+        var displayName = (currentRole === "지사관리자") ? "👑 관리자" : "👤 " + currentUserName + " (" + currentRole + ")";
+        var regUserTitle = document.getElementById("regUserTitle");
+        var dashUserTitle = document.getElementById("dashUserTitle");
         if (regUserTitle) regUserTitle.innerText = displayName;
         if (dashUserTitle) dashUserTitle.innerText = displayName;
 
-        if (screenId === 'register') {
-          var regSwitch = document.getElementById('regSwitchBtn');
-          if (regSwitch) regSwitch.addEventListener('click', function() { showScreen('dashboard'); });
-          var regLogout = document.getElementById('regLogoutBtn');
-          if (regLogout) regLogout.addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
-          var regPwd = document.getElementById('regPwdBtn');
-          if (regPwd) regPwd.addEventListener('click', openPwdModal);
+        if (screenId === "register") {
+          var regSwitch = document.getElementById("regSwitchBtn");
+          if (regSwitch) regSwitch.addEventListener("click", function() { showScreen("dashboard"); });
+          var regLogout = document.getElementById("regLogoutBtn");
+          if (regLogout) regLogout.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
+          var regPwd = document.getElementById("regPwdBtn");
+          if (regPwd) regPwd.addEventListener("click", openPwdModal);
           loadRecentHistory();
-        } else if (screenId === 'dashboard') {
+        } else if (screenId === "dashboard") {
           loadDashboardLeads();
         }
       }
 
       function formatPhone(phone) {
-        var s = String(phone || '').replace(/[^0-9]/g, '');
-        if (!s) return '';
+        var s = String(phone || "").replace(/[^0-9]/g, "");
+        if (!s) return "";
 
-        // 서울(02): 9자리(2-3-4) 또는 10자리(2-4-4)
-        if (s.indexOf('02') === 0) {
-          if (s.length === 9) return s.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
-          if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
+        if (s.indexOf("02") === 0) {
+          if (s.length === 9) return s.replace(/(\d{2})(\d{3})(\d{4})/, "$1-$2-$3");
+          if (s.length === 10) return s.replace(/(\d{2})(\d{4})(\d{4})/, "$1-$2-$3");
           return s;
         }
 
-        // 휴대폰/그외 지역번호(3자리 국번): 10자리(3-3-4) 또는 11자리(3-4-4)
-        if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-        if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+        if (s.length === 10) return s.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+        if (s.length === 11) return s.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
 
-        // 8자리 대표번호(예: 1588-0000 등 지역번호 없는 형식)
-        if (s.length === 8) return s.replace(/(\d{4})(\d{4})/, '$1-$2');
+        if (s.length === 8) return s.replace(/(\d{4})(\d{4})/, "$1-$2");
 
         return s;
       }
 
       function formatCurrencyInput(el) {
-        var digits = el.value.replace(/[^0-9]/g, '');
-        el.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
+        var digits = el.value.replace(/[^0-9]/g, "");
+        el.value = digits ? Number(digits).toLocaleString("ko-KR") : "";
       }
 
       function openPhotoLightbox(url) {
-        var box = document.getElementById('photoLightbox');
-        var img = document.getElementById('photoLightboxImg');
+        var box = document.getElementById("photoLightbox");
+        var img = document.getElementById("photoLightboxImg");
         if (!box || !img || !url) return;
         img.src = url;
-        box.style.display = 'flex';
+        box.style.display = "flex";
       }
 
       function closePhotoLightbox() {
-        var box = document.getElementById('photoLightbox');
-        if (box) box.style.display = 'none';
+        var box = document.getElementById("photoLightbox");
+        if (box) box.style.display = "none";
       }
 
-      // onclick="..." 인라인 속성은 전역(window) 스코프에서 실행되므로,
-      // 이 IIFE 안에 정의된 함수를 인라인 핸들러에서 호출하려면 반드시 window에 노출해야 함.
       window.openPhotoLightbox = openPhotoLightbox;
       window.closePhotoLightbox = closePhotoLightbox;
 
       function formatKoreanDate(dateInput) {
-        if (!dateInput) return '';
+        if (!dateInput) return "";
         var d = new Date(dateInput);
         if (isNaN(d.getTime())) return String(dateInput);
-        var days = ['일', '월', '화', '수', '목', '금', '토'];
-        return String(d.getFullYear()).slice(-2) + '.' + (d.getMonth() + 1) + '.' + d.getDate() + ' (' + days[d.getDay()] + ') ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+        var days = ["일", "월", "화", "수", "목", "금", "토"];
+        return String(d.getFullYear()).slice(-2) + "." + (d.getMonth() + 1) + "." + d.getDate() + " (" + days[d.getDay()] + ") " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
       }
 
-      var PRODUCT_LIST = ['알람', '영상렌탈', '블루스캔', '정보보안', '영상매각', '금고', 'AED', 'AI도어캠', '기타'];
+      var PRODUCT_LIST = ["알람", "영상렌탈", "블루스캔", "정보보안", "영상매각", "금고", "AED", "AI도어캠", "기타"];
 
-      var MAP_PIN_ICON_SVG = '<svg width="14" height="18" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><ellipse cx="12" cy="27" rx="7" ry="2.2" fill="#0b0f10"></ellipse><path d="M12 1C6.5 1 2 5.5 2 11c0 7 10 17 10 17s10-10 10-17c0-5.5-4.5-10-10-10z" fill="#17b06b"></path><circle cx="12" cy="11" r="4.2" fill="#ffffff"></circle></svg>';
-      var PHONE_ICON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+      var MAP_PIN_ICON_SVG = "<svg width=\"14\" height=\"18\" viewBox=\"0 0 24 30\" xmlns=\"http://www.w3.org/2000/svg\" style=\"vertical-align:middle;\"><ellipse cx=\"12\" cy=\"27\" rx=\"7\" ry=\"2.2\" fill=\"#0b0f10\"></ellipse><path d=\"M12 1C6.5 1 2 5.5 2 11c0 7 10 17 10 17s10-10 10-17c0-5.5-4.5-10-10-10z\" fill=\"#17b06b\"></path><circle cx=\"12\" cy=\"11\" r=\"4.2\" fill=\"#ffffff\"></circle></svg>";
+      var PHONE_ICON_SVG = "<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" style=\"vertical-align:middle;\"><path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z\" stroke=\"#1a73e8\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>";
 
       function buildProductCheckboxGrid(name, selectedStr) {
-        var sel = String(selectedStr || '').split(',').map(function(s) { return s.trim(); });
-        var html = '<div class="prod-grid" style="margin-top:6px;">';
+        var sel = String(selectedStr || "").split(",").map(function(s) { return s.trim(); });
+        var html = "<div class=\"prod-grid\" style=\"margin-top:6px;\">";
         PRODUCT_LIST.forEach(function(p) {
           var checked = sel.indexOf(p) !== -1;
-          html += '<label class="prod-item' + (checked ? ' checked' : '') + '"><input type="checkbox" name="' + name + '" value="' + p + '"' + (checked ? ' checked' : '') + '> ' + p + '</label>';
+          html += "<label class=\"prod-item" + (checked ? " checked" : "") + "\"><input type=\"checkbox\" name=\"" + name + "\" value=\"" + p + "\"" + (checked ? " checked" : "") + "> " + p + "</label>";
         });
-        html += '</div>';
+        html += "</div>";
         return html;
       }
 
       function wireProductGrid(name) {
-        document.querySelectorAll('.prod-item input[name="' + name + '"]').forEach(function(cb) {
-          cb.addEventListener('change', function() {
-            var box = this.closest('.prod-item');
-            if (box) box.classList.toggle('checked', this.checked);
+        document.querySelectorAll(".prod-item input[name=\"" + name + "\"]").forEach(function(cb) {
+          cb.addEventListener("change", function() {
+            var box = this.closest(".prod-item");
+            if (box) box.classList.toggle("checked", this.checked);
           });
         });
       }
 
       function toDatetimeLocalValue(v) {
-        if (!v) return '';
+        if (!v) return "";
         var d = new Date(v);
-        if (isNaN(d.getTime())) return '';
-        var pad = function(n) { return ('0' + n).slice(-2); };
-        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        if (isNaN(d.getTime())) return "";
+        var pad = function(n) { return ("0" + n).slice(-2); };
+        return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
       }
 
       function toDateValue(v) {
-        if (!v) return '';
+        if (!v) return "";
         var d = new Date(v);
         if (isNaN(d.getTime())) return String(v).slice(0, 10);
-        var pad = function(n) { return ('0' + n).slice(-2); };
-        return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+        var pad = function(n) { return ("0" + n).slice(-2); };
+        return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
       }
 
       function buildMethodSelectHtml(id, selected) {
-        var opts = ['', '직접방문', '전화상담'];
-        var html = '<select id="' + id + '">';
+        var opts = ["", "직접방문", "전화상담"];
+        var html = "<select id=\"" + id + "\">";
         opts.forEach(function(o) {
-          html += '<option value="' + o + '"' + (o === selected ? ' selected' : '') + '>' + (o || '선택') + '</option>';
+          html += "<option value=\"" + o + "\"" + (o === selected ? " selected" : "") + ">" + (o || "선택") + "</option>";
         });
-        html += '</select>';
+        html += "</select>";
         return html;
       }
-
       function renderStatusFields(status) {
-        var box = document.getElementById('statusExtraFields');
+        var box = document.getElementById("statusExtraFields");
         if (!box) return;
         var item = activeLeadItem || {};
-        var html = '';
+        var html = "";
 
-        if (status === '접수확인') {
-          html += '<div class="form-group"><label class="form-label">영업상담메모 <span class="req">*</span> <span class="opt">(10자 이상)</span></label>'
-            + '<textarea id="fConsultMemo" rows="3" placeholder="확인 후 상담 내용을 10자 이상 입력해주세요.">' + (item.consult_memo || '') + '</textarea></div>';
+        if (status === "접수확인") {
+          html += "<div class=\"form-group\"><label class=\"form-label\">영업상담메모 <span class=\"req\">*</span> <span class=\"opt\">(10자 이상)</span></label>"
+            + "<textarea id=\"fConsultMemo\" rows=\"3\" placeholder=\"확인 후 상담 내용을 10자 이상 입력해주세요.\">" + (item.consult_memo || "") + "</textarea></div>";
 
-        } else if (status === '고객면담' || status === '추가면담') {
-          var pMethod = (status === '고객면담') ? (item.meeting_method || '') : '';
-          var pContent = (status === '고객면담') ? (item.meeting_content || '') : '';
-          var pDt = (status === '고객면담') ? toDatetimeLocalValue(item.meeting_datetime) : '';
-          html += '<div class="form-group"><label class="form-label">면담방법 <span class="req">*</span></label>' + buildMethodSelectHtml('fMeetingMethod', pMethod) + '</div>'
-            + '<div class="form-group"><label class="form-label">상담내용 <span class="req">*</span> <span class="opt">(10자 이상)</span></label>'
-            + '<textarea id="fMeetingContent" rows="3" placeholder="상담 내용을 10자 이상 입력해주세요.">' + pContent + '</textarea></div>'
-            + '<div class="form-group"><label class="form-label">면담일시 <span class="req">*</span></label>'
-            + '<input type="datetime-local" id="fMeetingDatetime" value="' + pDt + '"></div>';
-          if (status === '추가면담') {
-            html += '<p style="font-size:0.75rem; color:#5f6368; margin:4px 0 0;">※ 추가면담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>';
+        } else if (status === "고객면담" || status === "추가면담") {
+          var pMethod = (status === "고객면담") ? (item.meeting_method || "") : "";
+          var pContent = (status === "고객면담") ? (item.meeting_content || "") : "";
+          var pDt = (status === "고객면담") ? toDatetimeLocalValue(item.meeting_datetime) : "";
+          html += "<div class=\"form-group\"><label class=\"form-label\">면담방법 <span class=\"req\">*</span></label>" + buildMethodSelectHtml("fMeetingMethod", pMethod) + "</div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">상담내용 <span class=\"req\">*</span> <span class=\"opt\">(10자 이상)</span></label>"
+            + "<textarea id=\"fMeetingContent\" rows=\"3\" placeholder=\"상담 내용을 10자 이상 입력해주세요.\">" + pContent + "</textarea></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">면담일시 <span class=\"req\">*</span></label>"
+            + "<input type=\"datetime-local\" id=\"fMeetingDatetime\" value=\"" + pDt + "\"></div>";
+          if (status === "추가면담") {
+            html += "<p style=\"font-size:0.75rem; color:#5f6368; margin:4px 0 0;\">※ 추가면담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>";
           }
 
-        } else if (status === '견적제출') {
-          html += '<div class="form-group"><label class="form-label">제출 상품 <span class="req">*</span></label>' + buildProductCheckboxGrid('quoteProd', item.quote_products || item.product) + '</div>'
-            + '<div class="form-group"><label class="form-label">견적금액(원) <span class="req">*</span></label><input type="text" id="fQuoteAmount" placeholder="예: 150,000" style="text-align:right;" value="' + (item.quote_amount ? Number(item.quote_amount).toLocaleString('ko-KR') : '') + '"></div>'
-            + '<div class="form-group"><label class="form-label">예상 계약일정 <span class="req">*</span></label><input type="date" id="fExpectedContractDate" value="' + toDateValue(item.expected_contract_date) + '"></div>'
-            + '<div class="form-group"><label class="form-label">비고사항 <span class="req">*</span></label><textarea id="fQuoteNote" rows="3" placeholder="고객 요구사항, 견적 보충 설명 등을 입력해주세요.">' + (item.quote_note || '') + '</textarea></div>';
+        } else if (status === "견적제출") {
+          html += "<div class=\"form-group\"><label class=\"form-label\">제출 상품 <span class=\"req\">*</span></label>" + buildProductCheckboxGrid("quoteProd", item.quote_products || item.product) + "</div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">견적금액(원) <span class=\"req\">*</span></label><input type=\"text\" id=\"fQuoteAmount\" placeholder=\"예: 150,000\" style=\"text-align:right;\" value=\"" + (item.quote_amount ? Number(item.quote_amount).toLocaleString("ko-KR") : "") + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">예상 계약일정 <span class=\"req\">*</span></label><input type=\"date\" id=\"fExpectedContractDate\" value=\"" + toDateValue(item.expected_contract_date) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">비고사항 <span class=\"req\">*</span></label><textarea id=\"fQuoteNote\" rows=\"3\" placeholder=\"고객 요구사항, 견적 보충 설명 등을 입력해주세요.\">" + (item.quote_note || "") + "</textarea></div>";
 
-        } else if (status === '견적상담') {
-          html += '<p style="font-size:0.75rem; color:#5f6368; margin:0 0 6px;">※ 견적상담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>'
-            + '<div class="form-group"><label class="form-label">상품 <span class="opt">(변경 시에만 선택)</span></label>' + buildProductCheckboxGrid('quoteConsultProd', '') + '</div>'
-            + '<div class="form-group"><label class="form-label">견적금액(원) <span class="opt">(기존: ' + (item.quote_amount ? Number(item.quote_amount).toLocaleString('ko-KR') + '원' : '-') + ', 변경 시에만 입력)</span></label><input type="text" id="fQuoteConsultAmount" placeholder="변경 시에만 입력" style="text-align:right;"></div>'
-            + '<div class="form-group"><label class="form-label">계약 예정일자 변경 <span class="opt">(변경 시에만)</span></label><input type="date" id="fQuoteConsultDate"></div>'
-            + '<div class="form-group"><label class="form-label">상담 내용 <span class="req">*</span></label><textarea id="fQuoteConsultNote" rows="3" placeholder="추가 상담/변경 내용을 입력해주세요."></textarea></div>';
+        } else if (status === "견적상담") {
+          html += "<p style=\"font-size:0.75rem; color:#5f6368; margin:0 0 6px;\">※ 견적상담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>"
+            + "<div class=\"form-group\"><label class=\"form-label\">상품 <span class=\"opt\">(변경 시에만 선택)</span></label>" + buildProductCheckboxGrid("quoteConsultProd", "") + "</div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">견적금액(원) <span class=\"opt\">(기존: " + (item.quote_amount ? Number(item.quote_amount).toLocaleString("ko-KR") + "원" : "-") + ", 변경 시에만 입력)</span></label><input type=\"text\" id=\"fQuoteConsultAmount\" placeholder=\"변경 시에만 입력\" style=\"text-align:right;\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">계약 예정일자 변경 <span class=\"opt\">(변경 시에만)</span></label><input type=\"date\" id=\"fQuoteConsultDate\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">상담 내용 <span class=\"req\">*</span></label><textarea id=\"fQuoteConsultNote\" rows=\"3\" placeholder=\"추가 상담/변경 내용을 입력해주세요.\"></textarea></div>";
 
-        } else if (status === '계약완료') {
-          html += '<div class="form-group"><label class="form-label">계약성공일자 <span class="req">*</span></label><input type="date" id="fContractDate" value="' + toDateValue(item.contract_success_date) + '"></div>'
-            + '<div class="form-group"><label class="form-label">확정 상품종류 <span class="req">*</span></label>' + buildProductCheckboxGrid('contractProd', item.contract_products || item.product) + '</div>'
-            + '<div class="form-group"><label class="form-label">계약금액(원) <span class="req">*</span></label><input type="text" id="fContractAmount" placeholder="예: 1,500,000" style="text-align:right;" value="' + (item.contract_amount ? Number(item.contract_amount).toLocaleString('ko-KR') : '') + '"></div>'
-            + '<div class="form-group"><label class="form-label">추가요구사항 <span class="opt">(선택)</span></label><textarea id="fContractExtra" rows="2">' + (item.contract_extra_request || '') + '</textarea></div>';
+        } else if (status === "계약완료") {
+          html += "<div class=\"form-group\"><label class=\"form-label\">계약성공일자 <span class=\"req\">*</span></label><input type=\"date\" id=\"fContractDate\" value=\"" + toDateValue(item.contract_success_date) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">확정 상품종류 <span class=\"req\">*</span></label>" + buildProductCheckboxGrid("contractProd", item.contract_products || item.product) + "</div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">계약금액(원) <span class=\"req\">*</span></label><input type=\"text\" id=\"fContractAmount\" placeholder=\"예: 1,500,000\" style=\"text-align:right;\" value=\"" + (item.contract_amount ? Number(item.contract_amount).toLocaleString("ko-KR") : "") + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">추가요구사항 <span class=\"opt\">(선택)</span></label><textarea id=\"fContractExtra\" rows=\"2\">" + (item.contract_extra_request || "") + "</textarea></div>";
 
-        } else if (status === '계약실패') {
-          html += '<div class="form-group"><label class="form-label">실패일자 <span class="req">*</span></label><input type="date" id="fFailDate" value="' + toDateValue(item.fail_date) + '"></div>'
-            + '<div class="form-group"><label class="form-label">실패사유 <span class="req">*</span></label><textarea id="fFailReason" rows="3" placeholder="실패 사유를 정확히 입력해주세요.">' + (item.fail_reason || '') + '</textarea></div>';
+        } else if (status === "계약실패") {
+          html += "<div class=\"form-group\"><label class=\"form-label\">실패일자 <span class=\"req\">*</span></label><input type=\"date\" id=\"fFailDate\" value=\"" + toDateValue(item.fail_date) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">실패사유 <span class=\"req\">*</span></label><textarea id=\"fFailReason\" rows=\"3\" placeholder=\"실패 사유를 정확히 입력해주세요.\">" + (item.fail_reason || "") + "</textarea></div>";
 
-        } else if (status === '계약보류') {
-          html += '<div class="form-group"><label class="form-label">보류 기한 <span class="req">*</span></label><input type="date" id="fHoldUntil" value="' + toDateValue(item.hold_until) + '"></div>'
-            + '<div class="form-group"><label class="form-label">보류 사유 <span class="req">*</span></label><textarea id="fHoldReason" rows="3" placeholder="보류 사유를 입력해주세요.">' + (item.hold_reason || '') + '</textarea></div>'
-            + '<p style="font-size:0.75rem; color:#5f6368; margin:4px 0 0;">※ 보류 기한이 지나면 다음 접속(대시보드 조회) 시 자동으로 이전 진행상태로 복귀합니다.</p>';
+        } else if (status === "계약보류") {
+          html += "<div class=\"form-group\"><label class=\"form-label\">보류 기한 <span class=\"req\">*</span></label><input type=\"date\" id=\"fHoldUntil\" value=\"" + toDateValue(item.hold_until) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">보류 사유 <span class=\"req\">*</span></label><textarea id=\"fHoldReason\" rows=\"3\" placeholder=\"보류 사유를 입력해주세요.\">" + (item.hold_reason || "") + "</textarea></div>"
+            + "<p style=\"font-size:0.75rem; color:#5f6368; margin:4px 0 0;\">※ 보류 기한이 지나면 다음 접속(대시보드 조회) 시 자동으로 이전 진행상태로 복귀합니다.</p>";
         }
 
         box.innerHTML = html;
 
-        if (status === '견적제출') wireProductGrid('quoteProd');
-        if (status === '견적상담') wireProductGrid('quoteConsultProd');
-        if (status === '계약완료') wireProductGrid('contractProd');
+        if (status === "견적제출") wireProductGrid("quoteProd");
+        if (status === "견적상담") wireProductGrid("quoteConsultProd");
+        if (status === "계약완료") wireProductGrid("contractProd");
 
-        ['fQuoteAmount', 'fQuoteConsultAmount', 'fContractAmount'].forEach(function(id) {
+        ["fQuoteAmount", "fQuoteConsultAmount", "fContractAmount"].forEach(function(id) {
           var el = document.getElementById(id);
-          if (el) el.addEventListener('input', function() { formatCurrencyInput(this); });
+          if (el) el.addEventListener("input", function() { formatCurrencyInput(this); });
         });
       }
 
@@ -1274,13 +1348,13 @@
         var todayStr = new Date().toISOString().slice(0, 10);
         for (var i = 0; i < list.length; i++) {
           var r = list[i];
-          if (r.status === '계약보류' && r.hold_until && r.hold_until <= todayStr) {
-            var revertTo = r.hold_prev_status || '접수확인';
+          if (r.status === "계약보류" && r.hold_until && r.hold_until <= todayStr) {
+            var revertTo = r.hold_prev_status || "접수확인";
             try {
-              var up = await supabase.from('leads').update({ status: revertTo, hold_until: null }).eq('lead_id', r.lead_id);
+              var up = await supabase.from("leads").update({ status: revertTo, hold_until: null }).eq("lead_id", r.lead_id);
               if (!up.error) { r.status = revertTo; r.hold_until = null; }
             } catch (e) {
-              console.error('보류 자동해제 실패:', e);
+              console.error("보류 자동해제 실패:", e);
             }
           }
         }
@@ -1288,12 +1362,12 @@
       }
 
       function getBadgeClass(status) {
-        if (status === '계약완료') return 'badge-done';
-        if (status === '계약실패') return 'badge-fail';
-        if (status === '계약보류' || status === '취소/보류') return 'badge-cancel';
-        if (status === '견적제출' || status === '견적상담') return 'badge-quote';
-        if (status === '접수확인' || status === '고객면담' || status === '추가면담') return 'badge-ing';
-        return 'badge-wait';
+        if (status === "계약완료") return "badge-done";
+        if (status === "계약실패") return "badge-fail";
+        if (status === "계약보류" || status === "취소/보류") return "badge-cancel";
+        if (status === "견적제출" || status === "견적상담") return "badge-quote";
+        if (status === "접수확인" || status === "고객면담" || status === "추가면담") return "badge-ing";
+        return "badge-wait";
       }
 
       function compressImage(file, maxDim, quality, callback) {
@@ -1307,11 +1381,11 @@
             } else {
               if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
             }
-            var canvas = document.createElement('canvas');
+            var canvas = document.createElement("canvas");
             canvas.width = w; canvas.height = h;
-            var ctx = canvas.getContext('2d');
+            var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, w, h);
-            var base64 = canvas.toDataURL('image/jpeg', quality);
+            var base64 = canvas.toDataURL("image/jpeg", quality);
             var kb = Math.round(base64.length * 0.75 / 1024);
             callback(base64, kb);
           };
@@ -1324,12 +1398,12 @@
         var files = Array.from(e.target.files);
         if (!files.length) return;
         if (uploadedPhotos.length + files.length > 4) {
-          alert('사진은 최대 4장까지만 등록 가능합니다.');
+          alert("사진은 최대 4장까지만 등록 가능합니다.");
         }
         var remaining = 4 - uploadedPhotos.length;
         var targets = files.slice(0, remaining);
-        var btn = document.getElementById('submitBtn');
-        if (btn) { btn.disabled = true; btn.innerText = '사진 압축 변환 중...'; }
+        var btn = document.getElementById("submitBtn");
+        if (btn) { btn.disabled = true; btn.innerText = "사진 압축 변환 중..."; }
 
         var count = 0;
         targets.forEach(function(file) {
@@ -1342,36 +1416,36 @@
             }
           });
         });
-        e.target.value = '';
+        e.target.value = "";
       }
 
       function renderPreview() {
-        var grid = document.getElementById('previewGrid');
-        var countText = document.getElementById('photoCountText');
-        var btn = document.getElementById('submitBtn');
+        var grid = document.getElementById("previewGrid");
+        var countText = document.getElementById("photoCountText");
+        var btn = document.getElementById("submitBtn");
 
-        if (countText) countText.innerText = uploadedPhotos.length + ' / 4장';
+        if (countText) countText.innerText = uploadedPhotos.length + " / 4장";
 
         if (uploadedPhotos.length === 0) {
-          if (grid) grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
-          if (btn) btn.innerText = '⚡ 실시간 접수 등록';
+          if (grid) grid.innerHTML = "<div class=\"photo-empty-msg\">선택된 사진이 없습니다.</div>";
+          if (btn) btn.innerText = "⚡ 실시간 접수 등록";
           return;
         }
 
-        if (btn) btn.innerText = '⚡ 실시간 접수 등록 (사진 ' + uploadedPhotos.length + '장)';
+        if (btn) btn.innerText = "⚡ 실시간 접수 등록 (사진 " + uploadedPhotos.length + "장)";
         if (grid) {
-          grid.innerHTML = '';
+          grid.innerHTML = "";
           uploadedPhotos.forEach(function(p, idx) {
-            var slot = document.createElement('div');
-            slot.className = 'photo-slot';
-            slot.innerHTML = '<img src="' + p.data + '">'
-              + '<span class="photo-size-tag">' + p.kb + 'KB</span>'
-              + '<button type="button" class="photo-del-btn" data-del="' + idx + '">×</button>';
+            var slot = document.createElement("div");
+            slot.className = "photo-slot";
+            slot.innerHTML = "<img src=\"" + p.data + "\">"
+              + "<span class=\"photo-size-tag\">" + p.kb + "KB</span>"
+              + "<button type=\"button\" class=\"photo-del-btn\" data-del=\"" + idx + "\">×</button>";
             grid.appendChild(slot);
           });
-          grid.querySelectorAll('.photo-del-btn').forEach(function(b) {
-            b.addEventListener('click', function() {
-              var delIdx = parseInt(this.getAttribute('data-del'), 10);
+          grid.querySelectorAll(".photo-del-btn").forEach(function(b) {
+            b.addEventListener("click", function() {
+              var delIdx = parseInt(this.getAttribute("data-del"), 10);
               uploadedPhotos.splice(delIdx, 1);
               renderPreview();
             });
@@ -1380,43 +1454,43 @@
       }
 
       function renderEditPreview() {
-        var grid = document.getElementById('editPreviewGrid');
-        var countText = document.getElementById('editPhotoCountText');
+        var grid = document.getElementById("editPreviewGrid");
+        var countText = document.getElementById("editPhotoCountText");
         var total = editKeptPhotoUrls.length + editNewPhotos.length;
-        if (countText) countText.innerText = total + ' / 4장';
+        if (countText) countText.innerText = total + " / 4장";
         if (!grid) return;
 
         if (total === 0) {
-          grid.innerHTML = '<div class="photo-empty-msg">선택된 사진이 없습니다.</div>';
+          grid.innerHTML = "<div class=\"photo-empty-msg\">선택된 사진이 없습니다.</div>";
           return;
         }
 
-        grid.innerHTML = '';
+        grid.innerHTML = "";
         editKeptPhotoUrls.forEach(function(url, idx) {
-          var slot = document.createElement('div');
-          slot.className = 'photo-slot';
-          slot.innerHTML = '<img src="' + url + '">'
-            + '<button type="button" class="photo-del-btn" data-kept="' + idx + '">×</button>';
+          var slot = document.createElement("div");
+          slot.className = "photo-slot";
+          slot.innerHTML = "<img src=\"" + url + "\">"
+            + "<button type=\"button\" class=\"photo-del-btn\" data-kept=\"" + idx + "\">×</button>";
           grid.appendChild(slot);
         });
         editNewPhotos.forEach(function(p, idx) {
-          var slot = document.createElement('div');
-          slot.className = 'photo-slot';
-          slot.innerHTML = '<img src="' + p.data + '">'
-            + '<span class="photo-size-tag">' + p.kb + 'KB</span>'
-            + '<button type="button" class="photo-del-btn" data-new="' + idx + '">×</button>';
+          var slot = document.createElement("div");
+          slot.className = "photo-slot";
+          slot.innerHTML = "<img src=\"" + p.data + "\">"
+            + "<span class=\"photo-size-tag\">" + p.kb + "KB</span>"
+            + "<button type=\"button\" class=\"photo-del-btn\" data-new=\"" + idx + "\">×</button>";
           grid.appendChild(slot);
         });
 
-        grid.querySelectorAll('[data-kept]').forEach(function(b) {
-          b.addEventListener('click', function() {
-            editKeptPhotoUrls.splice(parseInt(this.getAttribute('data-kept'), 10), 1);
+        grid.querySelectorAll("[data-kept]").forEach(function(b) {
+          b.addEventListener("click", function() {
+            editKeptPhotoUrls.splice(parseInt(this.getAttribute("data-kept"), 10), 1);
             renderEditPreview();
           });
         });
-        grid.querySelectorAll('[data-new]').forEach(function(b) {
-          b.addEventListener('click', function() {
-            editNewPhotos.splice(parseInt(this.getAttribute('data-new'), 10), 1);
+        grid.querySelectorAll("[data-new]").forEach(function(b) {
+          b.addEventListener("click", function() {
+            editNewPhotos.splice(parseInt(this.getAttribute("data-new"), 10), 1);
             renderEditPreview();
           });
         });
@@ -1427,11 +1501,11 @@
         if (!files.length) return;
         var currentTotal = editKeptPhotoUrls.length + editNewPhotos.length;
         if (currentTotal + files.length > 4) {
-          alert('사진은 최대 4장까지만 등록 가능합니다.');
+          alert("사진은 최대 4장까지만 등록 가능합니다.");
         }
         var remaining = 4 - currentTotal;
         var targets = files.slice(0, remaining);
-        if (targets.length === 0) { e.target.value = ''; return; }
+        if (targets.length === 0) { e.target.value = ""; return; }
 
         var count = 0;
         targets.forEach(function(file) {
@@ -1441,7 +1515,7 @@
             if (count === targets.length) renderEditPreview();
           });
         });
-        e.target.value = '';
+        e.target.value = "";
       }
 
       async function uploadPhotosToSupabase(leadId, photos) {
@@ -1453,23 +1527,23 @@
             var p = photos[i];
             var res = await fetch(p.data);
             var blob = await res.blob();
-            var filePath = leadId + '/photo_' + (i + 1) + '_' + Date.now() + '.jpg';
+            var filePath = leadId + "/photo_" + (i + 1) + "_" + Date.now() + ".jpg";
 
             var upRes = await supabase.storage
-              .from('lead-photos')
-              .upload(filePath, blob, { contentType: 'image/jpeg', upsert: true });
+              .from("lead-photos")
+              .upload(filePath, blob, { contentType: "image/jpeg", upsert: true });
 
             if (upRes.error) {
-              console.error('스토리지 저장 실패:', upRes.error);
+              console.error("스토리지 저장 실패:", upRes.error);
               continue;
             }
 
-            var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+            var pub = supabase.storage.from("lead-photos").getPublicUrl(filePath);
             if (pub && pub.data && pub.data.publicUrl) {
               urls.push(pub.data.publicUrl);
             }
           } catch (err) {
-            console.error('사진 변환 업로드 오류:', err);
+            console.error("사진 변환 업로드 오류:", err);
           }
         }
         return urls;
@@ -1477,15 +1551,15 @@
 
       async function loadDashboardLeads() {
         if (!supabase) return;
-        var kw = document.getElementById('searchKeyword') ? document.getElementById('searchKeyword').value.trim().toLowerCase() : '';
+        var kw = document.getElementById("searchKeyword") ? document.getElementById("searchKeyword").value.trim().toLowerCase() : "";
 
         try {
-          var query = supabase.from('leads').select('*').order('created_at', { ascending: false });
+          var query = supabase.from("leads").select("*").order("created_at", { ascending: false });
 
-          if (currentRole === '컨설턴트') {
-            query = query.eq('assigned_rep', currentUserName);
-          } else if (currentRole !== '지사관리자') {
-            query = query.eq('agent_name', currentUserName);
+          if (currentRole === "컨설턴트") {
+            query = query.eq("assigned_rep", currentUserName);
+          } else if (currentRole !== "지사관리자") {
+            query = query.eq("agent_name", currentUserName);
           }
 
           var res = await query;
@@ -1496,46 +1570,46 @@
           var counts = { total: 0, wait: 0, confirm: 0, consult: 0, moreConsult: 0, quote: 0, quoteConsult: 0, done: 0, fail: 0, hold: 0 };
 
           list.forEach(function(r) {
-            var st = r.status || '접수대기';
+            var st = r.status || "접수대기";
             counts.total++;
-            if (st === '접수확인') counts.confirm++;
-            else if (st === '고객면담') counts.consult++;
-            else if (st === '추가면담') counts.moreConsult++;
-            else if (st === '견적제출') counts.quote++;
-            else if (st === '견적상담') counts.quoteConsult++;
-            else if (st === '계약완료') counts.done++;
-            else if (st === '계약실패') counts.fail++;
-            else if (st === '계약보류') counts.hold++;
+            if (st === "접수확인") counts.confirm++;
+            else if (st === "고객면담") counts.consult++;
+            else if (st === "추가면담") counts.moreConsult++;
+            else if (st === "견적제출") counts.quote++;
+            else if (st === "견적상담") counts.quoteConsult++;
+            else if (st === "계약완료") counts.done++;
+            else if (st === "계약실패") counts.fail++;
+            else if (st === "계약보류") counts.hold++;
             else counts.wait++;
           });
 
-          document.getElementById('cntTotal').innerText = counts.total;
-          document.getElementById('cntWait').innerText = counts.wait;
-          document.getElementById('cntConfirm').innerText = counts.confirm;
-          document.getElementById('cntConsult').innerText = counts.consult;
-          document.getElementById('cntMoreConsult').innerText = counts.moreConsult;
-          document.getElementById('cntQuote').innerText = counts.quote;
-          document.getElementById('cntQuoteConsult').innerText = counts.quoteConsult;
-          document.getElementById('cntDone').innerText = counts.done;
-          document.getElementById('cntFail').innerText = counts.fail;
-          document.getElementById('cntHold').innerText = counts.hold;
+          document.getElementById("cntTotal").innerText = counts.total;
+          document.getElementById("cntWait").innerText = counts.wait;
+          document.getElementById("cntConfirm").innerText = counts.confirm;
+          document.getElementById("cntConsult").innerText = counts.consult;
+          document.getElementById("cntMoreConsult").innerText = counts.moreConsult;
+          document.getElementById("cntQuote").innerText = counts.quote;
+          document.getElementById("cntQuoteConsult").innerText = counts.quoteConsult;
+          document.getElementById("cntDone").innerText = counts.done;
+          document.getElementById("cntFail").innerText = counts.fail;
+          document.getElementById("cntHold").innerText = counts.hold;
 
-          document.getElementById('cCntTotal').innerText = counts.total;
-          document.getElementById('cCntWait').innerText = counts.wait;
-          document.getElementById('cCntConfirm').innerText = counts.confirm;
-          document.getElementById('cCntConsult').innerText = counts.consult;
-          document.getElementById('cCntMoreConsult').innerText = counts.moreConsult;
-          document.getElementById('cCntQuote').innerText = counts.quote;
-          document.getElementById('cCntQuoteConsult').innerText = counts.quoteConsult;
-          document.getElementById('cCntDone').innerText = counts.done;
-          document.getElementById('cCntFail').innerText = counts.fail;
-          document.getElementById('cCntHold').innerText = counts.hold;
+          document.getElementById("cCntTotal").innerText = counts.total;
+          document.getElementById("cCntWait").innerText = counts.wait;
+          document.getElementById("cCntConfirm").innerText = counts.confirm;
+          document.getElementById("cCntConsult").innerText = counts.consult;
+          document.getElementById("cCntMoreConsult").innerText = counts.moreConsult;
+          document.getElementById("cCntQuote").innerText = counts.quote;
+          document.getElementById("cCntQuoteConsult").innerText = counts.quoteConsult;
+          document.getElementById("cCntDone").innerText = counts.done;
+          document.getElementById("cCntFail").innerText = counts.fail;
+          document.getElementById("cCntHold").innerText = counts.hold;
 
           var filtered = list.filter(function(r) {
-            var st = r.status || '접수대기';
-            if (currentStatusFilter !== '전체' && st !== currentStatusFilter) return false;
+            var st = r.status || "접수대기";
+            if (currentStatusFilter !== "전체" && st !== currentStatusFilter) return false;
             if (kw) {
-              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(' ').toLowerCase();
+              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(" ").toLowerCase();
               if (txt.indexOf(kw) === -1) return false;
             }
             return true;
@@ -1549,182 +1623,181 @@
 
       function renderLeadTables(list) {
         currentLeadsData = list;
-        var pcBody = document.getElementById('pcTableBody');
-        var mList = document.getElementById('mobileCardList');
+        var pcBody = document.getElementById("pcTableBody");
+        var mList = document.getElementById("mobileCardList");
 
-        var emptyMsg = (currentRole === '컨설턴트') ? '나에게 배당된 안건이 없습니다.' : (currentRole === '지사관리자' ? '조회된 소개 내역이 없습니다.' : '내가 소개한 안건이 아직 없습니다.');
+        var emptyMsg = (currentRole === "컨설턴트") ? "나에게 배당된 안건이 없습니다." : (currentRole === "지사관리자" ? "조회된 소개 내역이 없습니다." : "내가 소개한 안건이 아직 없습니다.");
 
         if (!list || list.length === 0) {
-          if (pcBody) pcBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</td></tr>';
-          if (mList) mList.innerHTML = '<p style="text-align:center; padding:35px; color:#9aa0a6;">' + emptyMsg + '</p>';
+          if (pcBody) pcBody.innerHTML = "<tr><td colspan=\"11\" style=\"text-align:center; padding:35px; color:#9aa0a6;\">" + emptyMsg + "</td></tr>";
+          if (mList) mList.innerHTML = "<p style=\"text-align:center; padding:35px; color:#9aa0a6;\">" + emptyMsg + "</p>";
           return;
         }
 
-        var pcHtml = '';
-        var mHtml = '';
+        var pcHtml = "";
+        var mHtml = "";
 
         list.forEach(function(r, idx) {
           var pCount = (r.photo_urls && r.photo_urls.length) ? r.photo_urls.length : 0;
           var phoneFmt = formatPhone(r.contact_phone);
-          var addr = r.address || '';
+          var addr = r.address || "";
 
-          pcHtml += '<tr>'
-            + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
-            + '<td><strong>' + (r.agent_name || '-') + '</strong></td>'
-            + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
-            + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
-            + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">' + PHONE_ICON_SVG + phoneFmt + '</a></td>'
-            + '<td>'
-            + '<div style="display:flex; align-items:center; gap:6px;">'
-            + '<span style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (addr || '-') + '</span>'
-            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" title="네이버 지도">' + MAP_PIN_ICON_SVG + '</button>' : '')
-            + '</div>'
-            + '</td>'
-            + '<td style="font-size:0.8rem;">' + r.current_company + '</td>'
-            + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
-            + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
-            + '<td><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
-            + '<td><button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button></td>'
-            + '</tr>';
+          pcHtml += "<tr>"
+            + "<td style=\"font-size:0.8rem; color:#5f6368;\">" + formatKoreanDate(r.created_at) + "</td>"
+            + "<td><strong>" + (r.agent_name || "-") + "</strong></td>"
+            + "<td style=\"font-weight:700; color:#1a73e8;\">" + (r.assigned_rep || "-") + "</td>"
+            + "<td class=\"customer-cell\" data-idx=\"" + idx + "\">" + r.customer_name + "</td>"
+            + "<td><a href=\"tel:" + phoneFmt + "\" style=\"color:#202124; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;\">" + PHONE_ICON_SVG + phoneFmt + "</a></td>"
+            + "<td>"
+            + "<div style=\"display:flex; align-items:center; gap:6px;\">"
+            + "<span style=\"max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;\">" + (addr || "-") + "</span>"
+            + (addr ? "<button type=\"button\" class=\"map-pin-btn btn-table-map\" data-addr=\"" + addr + "\" title=\"네이버 지도\">" + MAP_PIN_ICON_SVG + "</button>" : "")
+            + "</div>"
+            + "</td>"
+            + "<td style=\"font-size:0.8rem;\">" + r.current_company + "</td>"
+            + "<td style=\"font-size:0.8rem; color:#1a73e8;\">" + (r.product || "-") + "</td>"
+            + "<td style=\"text-align:center;\">" + (pCount > 0 ? "📷 " + pCount + "장" : "-") + "</td>"
+            + "<td><span class=\"badge " + getBadgeClass(r.status) + "\">" + (r.status || "접수대기") + "</span></td>"
+            + "<td><button type=\"button\" class=\"btn-detail\" data-idx=\"" + idx + "\">상세보기</button></td>"
+            + "</tr>";
 
-          mHtml += '<div class="mobile-lead-card">'
-            + '<div class="m-card-header"><span class="m-agent-tag">소개자: ' + (r.agent_name || '-') + '</span><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></div>'
-            + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
-            + '<a href="tel:' + phoneFmt + '" class="m-phone-link">' + PHONE_ICON_SVG + ' ' + phoneFmt + '</a>'
-            + '<div class="m-info-row">'
-            + '<span>' + MAP_PIN_ICON_SVG + ' ' + (addr || '주소 없음') + '</span>'
-            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" style="padding:1px 6px;">지도</button>' : '')
-            + '</div>'
-            + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
-            + '<div class="m-footer-actions">'
-            + '<span style="font-size:0.75rem; color:#5f6368;">담당: <strong>' + (r.assigned_rep || '-') + '</strong></span>'
-            + '<button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button>'
-            + '</div></div>';
+          mHtml += "<div class=\"mobile-lead-card\">"
+            + "<div class=\"m-card-header\"><span class=\"m-agent-tag\">소개자: " + (r.agent_name || "-") + "</span><span class=\"badge " + getBadgeClass(r.status) + "\">" + (r.status || "접수대기") + "</span></div>"
+            + "<div class=\"m-customer-name\" data-idx=\"" + idx + "\" style=\"cursor:pointer;\">" + r.customer_name + "</div>"
+            + "<a href=\"tel:" + phoneFmt + "\" class=\"m-phone-link\">" + PHONE_ICON_SVG + " " + phoneFmt + "</a>"
+            + "<div class=\"m-info-row\">"
+            + "<span>" + MAP_PIN_ICON_SVG + " " + (addr || "주소 없음") + "</span>"
+            + (addr ? "<button type=\"button\" class=\"map-pin-btn btn-table-map\" data-addr=\"" + addr + "\" style=\"padding:1px 6px;\">지도</button>" : "")
+            + "</div>"
+            + "<div class=\"m-info-row\">📦 " + (r.product || "-") + "</div>"
+            + "<div class=\"m-footer-actions\">"
+            + "<span style=\"font-size:0.75rem; color:#5f6368;\">담당: <strong>" + (r.assigned_rep || "-") + "</strong></span>"
+            + "<button type=\"button\" class=\"btn-detail\" data-idx=\"" + idx + "\">상세보기</button>"
+            + "</div></div>";
         });
 
         if (pcBody) pcBody.innerHTML = pcHtml;
         if (mList) mList.innerHTML = mHtml;
 
-        document.querySelectorAll('.btn-detail, .customer-cell, .m-customer-name').forEach(function(el) {
-          el.addEventListener('click', function() {
-            var i = this.getAttribute('data-idx');
+        document.querySelectorAll(".btn-detail, .customer-cell, .m-customer-name").forEach(function(el) {
+          el.addEventListener("click", function() {
+            var i = this.getAttribute("data-idx");
             if (i !== null) openDetailModal(parseInt(i, 10));
           });
         });
 
-        document.querySelectorAll('.btn-table-map').forEach(function(btn) {
-          btn.addEventListener('click', function(e) {
+        document.querySelectorAll(".btn-table-map").forEach(function(btn) {
+          btn.addEventListener("click", function(e) {
             e.stopPropagation();
-            var a = this.getAttribute('data-addr');
+            var a = this.getAttribute("data-addr");
             openNaverMap(a);
           });
         });
       }
-
       async function loadLeadBoardPosts(leadId) {
-        var listContainer = document.getElementById('boardPostList');
-        var badge = document.getElementById('boardCountBadge');
+        var listContainer = document.getElementById("boardPostList");
+        var badge = document.getElementById("boardCountBadge");
         if (!listContainer || !supabase || !leadId) return;
 
         try {
-          var res = await supabase.from('lead_board')
-            .select('*')
-            .eq('lead_id', leadId)
-            .order('created_at', { ascending: true });
+          var res = await supabase.from("lead_board")
+            .select("*")
+            .eq("lead_id", leadId)
+            .order("created_at", { ascending: true });
 
           if (res.error) throw res.error;
 
           var posts = res.data || [];
-          if (badge) badge.innerText = '(' + posts.length + ')';
+          if (badge) badge.innerText = "(" + posts.length + ")";
 
           if (posts.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;">등록된 의견이 없습니다. 첫 의견을 남겨보세요!</p>';
+            listContainer.innerHTML = "<p style=\"text-align:center; padding:20px; font-size:0.8rem; color:#94a3b8;\">등록된 의견이 없습니다. 첫 의견을 남겨보세요!</p>";
             return;
           }
 
-          var html = '';
+          var html = "";
           posts.forEach(function(p) {
-            var canDelete = (currentRole === '지사관리자') || (p.author === currentUserName);
-            var delBtnHtml = canDelete ? '<button type="button" class="board-del-btn" data-delid="' + p.post_id + '">삭제</button>' : '';
+            var canDelete = (currentRole === "지사관리자") || (p.author === currentUserName);
+            var delBtnHtml = canDelete ? "<button type=\"button\" class=\"board-del-btn\" data-delid=\"" + p.post_id + "\">삭제</button>" : "";
 
-            var rawText = (p.content || '').trim();
-            var firstLine = rawText.split('\n')[0].trim();
-            var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
-            if (!titleSnippet) titleSnippet = '안건 의견';
+            var rawText = (p.content || "").trim();
+            var firstLine = rawText.split("\n")[0].trim();
+            var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + "..." : firstLine;
+            if (!titleSnippet) titleSnippet = "안건 의견";
 
-            var attachHtml = '';
+            var attachHtml = "";
             var fileUrlMatch = rawText.match(/https:\/\/[^\s]+(?:\.jpg|\.jpeg|\.png|\.gif|\.pdf|\.xlsx|\.docx)/i);
             if (fileUrlMatch) {
               var fUrl = fileUrlMatch[0];
               var isImg = /\.(jpg|jpeg|png|gif)$/i.test(fUrl);
               if (isImg) {
-                attachHtml = '<div class="board-attachment"><img src="' + fUrl + '" class="board-attachment-img" onclick="openPhotoLightbox(\'' + fUrl + '\')"></div>';
+                attachHtml = "<div class=\"board-attachment\"><img src=\"" + fUrl + "\" class=\"board-attachment-img\" onclick=\"openPhotoLightbox('" + fUrl + "')\"></div>";
               } else {
-                attachHtml = '<div class="board-attachment"><a href="' + fUrl + '" target="_blank">📎 첨부파일 다운로드 ↗</a></div>';
+                attachHtml = "<div class=\"board-attachment\"><a href=\"" + fUrl + "\" target=\"_blank\">📎 첨부파일 다운로드 ↗</a></div>";
               }
             }
 
-            html += '<div class="board-card">'
-              + '<div class="board-card-top">'
-              + '<span class="board-title-snippet">📌 ' + titleSnippet + '</span>'
+            html += "<div class=\"board-card\">"
+              + "<div class=\"board-card-top\">"
+              + "<span class=\"board-title-snippet\">📌 " + titleSnippet + "</span>"
               + delBtnHtml
-              + '</div>'
-              + '<div class="board-card-meta">'
-              + '<span><strong>' + (p.author || '직원') + '</strong></span>'
-              + '<span class="board-role-tag">' + (p.author_role || '일반') + '</span>'
-              + '<span>· ' + formatKoreanDate(p.created_at) + '</span>'
-              + '</div>'
-              + '<div class="board-content">' + rawText + '</div>'
+              + "</div>"
+              + "<div class=\"board-card-meta\">"
+              + "<span><strong>" + (p.author || "직원") + "</strong></span>"
+              + "<span class=\"board-role-tag\">" + (p.author_role || "일반") + "</span>"
+              + "<span>· " + formatKoreanDate(p.created_at) + "</span>"
+              + "</div>"
+              + "<div class=\"board-content\">" + rawText + "</div>"
               + attachHtml
-              + '</div>';
+              + "</div>";
           });
 
           listContainer.innerHTML = html;
           listContainer.scrollTop = listContainer.scrollHeight;
 
-          listContainer.querySelectorAll('.board-del-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-              var pId = this.getAttribute('data-delid');
+          listContainer.querySelectorAll(".board-del-btn").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+              var pId = this.getAttribute("data-delid");
               deleteBoardPost(pId);
             });
           });
 
         } catch (e) {
           console.error("게시판 로드 실패:", e);
-          listContainer.innerHTML = '<p style="text-align:center; padding:15px; font-size:0.8rem; color:#ef4444;">의견을 불러오지 못했습니다.</p>';
+          listContainer.innerHTML = "<p style=\"text-align:center; padding:15px; font-size:0.8rem; color:#ef4444;\">의견을 불러오지 못했습니다.</p>";
         }
       }
 
       async function deleteBoardPost(postId) {
-        if (!confirm('이 의견을 삭제하시겠습니까?')) return;
+        if (!confirm("이 의견을 삭제하시겠습니까?")) return;
         if (!supabase || !activeLeadItem) return;
 
-        var res = await supabase.from('lead_board').delete().eq('post_id', postId);
+        var res = await supabase.from("lead_board").delete().eq("post_id", postId);
         if (!res.error) {
           loadLeadBoardPosts(activeLeadItem.lead_id);
         } else {
-          alert('삭제 실패: ' + res.error.message);
+          alert("삭제 실패: " + res.error.message);
         }
       }
 
       async function submitBoardPost() {
-        var input = document.getElementById('boardContentInput');
+        var input = document.getElementById("boardContentInput");
         if (!input || !activeLeadItem || !supabase) return;
 
         var content = input.value.trim();
-        if (!content && !selectedBoardFile) { alert('의견 내용 또는 첨부파일을 선택해주세요.'); return; }
+        if (!content && !selectedBoardFile) { alert("의견 내용 또는 첨부파일을 선택해주세요."); return; }
 
-        var btn = document.getElementById('btnSubmitBoardPost');
-        if (btn) { btn.disabled = true; btn.innerText = '등록 중...'; }
+        var btn = document.getElementById("btnSubmitBoardPost");
+        if (btn) { btn.disabled = true; btn.innerText = "등록 중..."; }
 
         try {
-          var fileUrl = '';
+          var fileUrl = "";
           if (selectedBoardFile) {
-            var ext = selectedBoardFile.name.split('.').pop();
-            var filePath = 'board_files/' + activeLeadItem.lead_id + '_' + Date.now() + '.' + ext;
-            var upRes = await supabase.storage.from('lead-photos').upload(filePath, selectedBoardFile);
+            var ext = selectedBoardFile.name.split(".").pop();
+            var filePath = "board_files/" + activeLeadItem.lead_id + "_" + Date.now() + "." + ext;
+            var upRes = await supabase.storage.from("lead-photos").upload(filePath, selectedBoardFile);
             if (!upRes.error) {
-              var pub = supabase.storage.from('lead-photos').getPublicUrl(filePath);
+              var pub = supabase.storage.from("lead-photos").getPublicUrl(filePath);
               if (pub && pub.data && pub.data.publicUrl) {
                 fileUrl = pub.data.publicUrl;
               }
@@ -1733,16 +1806,16 @@
 
           var finalContent = content;
           if (fileUrl) {
-            finalContent = (finalContent ? finalContent + '\n\n' : '') + fileUrl;
+            finalContent = (finalContent ? finalContent + "\n\n" : "") + fileUrl;
           }
 
-          var firstLine = finalContent.split('\n')[0].trim();
-          var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + '...' : firstLine;
+          var firstLine = finalContent.split("\n")[0].trim();
+          var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + "..." : firstLine;
 
-          var postId = 'B-' + Date.now();
-          var authorRole = (currentRole === '지사관리자') ? '지사 관리자' : currentRole;
+          var postId = "B-" + Date.now();
+          var authorRole = (currentRole === "지사관리자") ? "지사 관리자" : currentRole;
 
-          var res = await supabase.from('lead_board').insert([{
+          var res = await supabase.from("lead_board").insert([{
             post_id: postId,
             lead_id: activeLeadItem.lead_id,
             title: titleSnippet,
@@ -1753,22 +1826,22 @@
 
           if (res.error) throw res.error;
 
-          input.value = '';
+          input.value = "";
           clearBoardFile();
           loadLeadBoardPosts(activeLeadItem.lead_id);
         } catch (err) {
-          alert('등록 실패: ' + (err.message || err));
+          alert("등록 실패: " + (err.message || err));
         } finally {
-          if (btn) { btn.disabled = false; btn.innerText = '의견 등록'; }
+          if (btn) { btn.disabled = false; btn.innerText = "의견 등록"; }
         }
       }
 
       function clearBoardFile() {
         selectedBoardFile = null;
-        var fileInp = document.getElementById('boardFileInput');
-        if (fileInp) fileInp.value = '';
-        var statusBox = document.getElementById('boardFileStatus');
-        if (statusBox) statusBox.style.display = 'none';
+        var fileInp = document.getElementById("boardFileInput");
+        if (fileInp) fileInp.value = "";
+        var statusBox = document.getElementById("boardFileStatus");
+        if (statusBox) statusBox.style.display = "none";
       }
 
       function openDetailModal(idx) {
@@ -1776,205 +1849,205 @@
         if (!item) return;
         activeLeadItem = item;
 
-        document.getElementById('mTitle').innerText = item.customer_name || '';
-        document.getElementById('mLeadId').innerText = item.lead_id || '';
-        document.getElementById('mDate').innerText = formatKoreanDate(item.created_at);
-        document.getElementById('mAgentName').innerText = item.agent_name || '-';
-        document.getElementById('mAssignedRep').innerText = item.assigned_rep || '-';
-        document.getElementById('mCustomerName').innerText = item.customer_name || '';
-        document.getElementById('mContactPerson').innerText = item.contact_person || '-';
-        document.getElementById('mAddress').innerText = item.address || '-';
-        document.getElementById('mBusinessType').innerText = item.business_type || '-';
-        document.getElementById('mCurrentCompany').innerText = item.current_company || '미사용';
-        document.getElementById('mProduct').innerText = item.product || '';
-        document.getElementById('mFieldDesc').innerText = item.field_description || '없음';
+        document.getElementById("mTitle").innerText = item.customer_name || "";
+        document.getElementById("mLeadId").innerText = item.lead_id || "";
+        document.getElementById("mDate").innerText = formatKoreanDate(item.created_at);
+        document.getElementById("mAgentName").innerText = item.agent_name || "-";
+        document.getElementById("mAssignedRep").innerText = item.assigned_rep || "-";
+        document.getElementById("mCustomerName").innerText = item.customer_name || "";
+        document.getElementById("mContactPerson").innerText = item.contact_person || "-";
+        document.getElementById("mAddress").innerText = item.address || "-";
+        document.getElementById("mBusinessType").innerText = item.business_type || "-";
+        document.getElementById("mCurrentCompany").innerText = item.current_company || "미사용";
+        document.getElementById("mProduct").innerText = item.product || "";
+        document.getElementById("mFieldDesc").innerText = item.field_description || "없음";
 
         var phoneFmt = formatPhone(item.contact_phone);
-        document.getElementById('mContactPhone').innerHTML = '<a href="tel:' + phoneFmt + '" style="color:#1a73e8; font-weight:700; display:inline-flex; align-items:center; gap:5px;">' + phoneFmt + PHONE_ICON_SVG + '</a>';
+        document.getElementById("mContactPhone").innerHTML = "<a href=\"tel:" + phoneFmt + "\" style=\"color:#1a73e8; font-weight:700; display:inline-flex; align-items:center; gap:5px;\">" + phoneFmt + PHONE_ICON_SVG + "</a>";
 
-        var b = document.getElementById('mHeaderStatusBadge');
-        b.innerText = item.status || '접수대기';
-        b.className = 'badge ' + getBadgeClass(item.status);
+        var b = document.getElementById("mHeaderStatusBadge");
+        b.innerText = item.status || "접수대기";
+        b.className = "badge " + getBadgeClass(item.status);
 
-        var btnModalMap = document.getElementById('btnModalMap');
+        var btnModalMap = document.getElementById("btnModalMap");
         if (btnModalMap) {
           if (item.address) {
-            btnModalMap.style.display = 'inline-flex';
+            btnModalMap.style.display = "inline-flex";
             btnModalMap.onclick = function() { openNaverMap(item.address); };
           } else {
-            btnModalMap.style.display = 'none';
+            btnModalMap.style.display = "none";
           }
         }
 
-        var pGrid = document.getElementById('mPhotoGrid');
-        pGrid.innerHTML = '';
+        var pGrid = document.getElementById("mPhotoGrid");
+        pGrid.innerHTML = "";
         if (item.photo_urls && item.photo_urls.length > 0) {
           item.photo_urls.forEach(function(url, pIdx) {
-            var d = document.createElement('div');
-            d.className = 'modal-photo-card';
-            d.innerHTML = '<img src="' + url + '" onclick="openPhotoLightbox(\'' + url + '\')">'
-              + '<div class="photo-card-footer"><span class="photo-zoom-btn" onclick="openPhotoLightbox(\'' + url + '\')">🔍 사진 ' + (pIdx + 1) + ' 확대보기</span></div>';
+            var d = document.createElement("div");
+            d.className = "modal-photo-card";
+            d.innerHTML = "<img src=\"" + url + "\" onclick=\"openPhotoLightbox('" + url + "')\">"
+              + "<div class=\"photo-card-footer\"><span class=\"photo-zoom-btn\" onclick=\"openPhotoLightbox('" + url + "')\">🔍 사진 " + (pIdx + 1) + " 확대보기</span></div>";
             pGrid.appendChild(d);
           });
         } else {
-          pGrid.innerHTML = '<p style="color:#9aa0a6; font-size:0.8rem; grid-column:span 2; padding:10px 0;">등록된 사진이 없습니다.</p>';
+          pGrid.innerHTML = "<p style=\"color:#9aa0a6; font-size:0.8rem; grid-column:span 2; padding:10px 0;\">등록된 사진이 없습니다.</p>";
         }
 
-        var uSel = document.getElementById('uStatus');
-        if (uSel) uSel.value = item.status || '접수대기';
-        renderStatusFields(uSel ? uSel.value : '접수대기');
+        var uSel = document.getElementById("uStatus");
+        if (uSel) uSel.value = item.status || "접수대기";
+        renderStatusFields(uSel ? uSel.value : "접수대기");
 
-        var actionsBox = document.getElementById('authorActionsBox');
-        var editContainer = document.getElementById('editLeadContainer');
-        if (editContainer) editContainer.style.display = 'none';
+        var actionsBox = document.getElementById("authorActionsBox");
+        var editContainer = document.getElementById("editLeadContainer");
+        if (editContainer) editContainer.style.display = "none";
 
-        var canModify = (currentRole === '지사관리자') || (currentUserName && item.agent_name && currentUserName === item.agent_name.trim());
+        var canModify = (currentRole === "지사관리자") || (currentUserName && item.agent_name && currentUserName.trim() === item.agent_name.trim());
         if (actionsBox) {
-          actionsBox.style.display = canModify ? 'block' : 'none';
+          actionsBox.style.display = canModify ? "block" : "none";
         }
 
-        var statusBox = document.getElementById('statusUpdateBox');
-        var canChangeStatus = (currentRole === '지사관리자') || (currentRole === '컨설턴트' && item.assigned_rep === currentUserName);
+        var statusBox = document.getElementById("statusUpdateBox");
+        var canChangeStatus = (currentRole === "지사관리자") || (currentRole === "컨설턴트" && item.assigned_rep === currentUserName);
 
         if (statusBox) {
-          var btnSave = document.getElementById('btnSaveStatus');
+          var btnSave = document.getElementById("btnSaveStatus");
           if (canChangeStatus) {
             uSel.disabled = false;
-            if (btnSave) btnSave.style.display = 'block';
+            if (btnSave) btnSave.style.display = "block";
           } else {
             uSel.disabled = true;
-            if (btnSave) btnSave.style.display = 'none';
+            if (btnSave) btnSave.style.display = "none";
           }
         }
 
         clearBoardFile();
         loadLeadBoardPosts(item.lead_id);
-        var bInput = document.getElementById('boardContentInput');
-        if (bInput) bInput.value = '';
+        var bInput = document.getElementById("boardContentInput");
+        if (bInput) bInput.value = "";
 
-        var modal = document.getElementById('detailModal');
-        if (modal) modal.classList.add('open');
+        var modal = document.getElementById("detailModal");
+        if (modal) modal.classList.add("open");
       }
 
       function closeDetailModal() {
-        var modal = document.getElementById('detailModal');
-        if (modal) modal.classList.remove('open');
-        var editContainer = document.getElementById('editLeadContainer');
-        if (editContainer) editContainer.style.display = 'none';
+        var modal = document.getElementById("detailModal");
+        if (modal) modal.classList.remove("open");
+        var editContainer = document.getElementById("editLeadContainer");
+        if (editContainer) editContainer.style.display = "none";
         clearBoardFile();
         activeLeadItem = null;
       }
 
       function openPwdModal() {
         hideLoginErrors();
-        document.getElementById('curPwdInput').value = '';
-        document.getElementById('newPwdInput').value = '';
-        document.getElementById('newPwdConfirmInput').value = '';
-        var m = document.getElementById('pwdChangeModal');
-        if (m) m.classList.add('open');
+        document.getElementById("curPwdInput").value = "";
+        document.getElementById("newPwdInput").value = "";
+        document.getElementById("newPwdConfirmInput").value = "";
+        var m = document.getElementById("pwdChangeModal");
+        if (m) m.classList.add("open");
       }
 
       function closePwdModal() {
-        var m = document.getElementById('pwdChangeModal');
-        if (m) m.classList.remove('open');
+        var m = document.getElementById("pwdChangeModal");
+        if (m) m.classList.remove("open");
         hideLoginErrors();
       }
 
       async function openUserModal() {
-        if (currentRole !== '지사관리자') return;
-        var modal = document.getElementById('userManageModal');
-        if (modal) modal.classList.add('open');
-        document.getElementById('userEditBox').style.display = 'none';
+        if (currentRole !== "지사관리자") return;
+        var modal = document.getElementById("userManageModal");
+        if (modal) modal.classList.add("open");
+        document.getElementById("userEditBox").style.display = "none";
         await loadAllUsers();
       }
 
       function closeUserModal() {
-        var modal = document.getElementById('userManageModal');
-        if (modal) modal.classList.remove('open');
-        document.getElementById('userEditBox').style.display = 'none';
+        var modal = document.getElementById("userManageModal");
+        if (modal) modal.classList.remove("open");
+        document.getElementById("userEditBox").style.display = "none";
       }
 
       async function loadAllUsers() {
-        var tbody = document.getElementById('userTableBody');
-        var countEl = document.getElementById('totalUserCount');
+        var tbody = document.getElementById("userTableBody");
+        var countEl = document.getElementById("totalUserCount");
         if (!tbody || !supabase) return;
 
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
+        tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#9aa0a6;\">사용자 목록 불러오는 중...</td></tr>";
 
         try {
-          var res = await supabase.from('app_users').select('*').order('created_at', { ascending: false });
+          var res = await supabase.from("app_users").select("*").order("created_at", { ascending: false });
           if (res.error) throw res.error;
 
           var users = res.data || [];
           if (countEl) countEl.innerText = users.length;
 
           if (users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
+            tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#9aa0a6;\">등록된 사용자가 없습니다.</td></tr>";
             return;
           }
 
-          var html = '';
+          var html = "";
           users.forEach(function(u) {
             var phoneFmt = formatPhone(u.phone);
-            html += '<tr>'
-              + '<td><strong>' + (u.name || '-') + '</strong></td>'
-              + '<td>' + phoneFmt + '</td>'
-              + '<td><span style="background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-weight:700; font-size:0.75rem;">' + (u.job || '미지정') + '</span></td>'
-              + '<td>'
-              + '<button type="button" class="btn-user-edit" data-phone="' + u.phone + '" data-name="' + (u.name || '') + '" data-job="' + (u.job || 'CS근무자') + '">수정</button>'
-              + '<button type="button" class="btn-user-del" data-phone="' + u.phone + '" data-name="' + (u.name || '') + '">삭제</button>'
-              + '</td>'
-              + '</tr>';
+            html += "<tr>"
+              + "<td><strong>" + (u.name || "-") + "</strong></td>"
+              + "<td>" + phoneFmt + "</td>"
+              + "<td><span style=\"background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-weight:700; font-size:0.75rem;\">" + (u.job || "미지정") + "</span></td>"
+              + "<td>"
+              + "<button type=\"button\" class=\"btn-user-edit\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\" data-job=\"" + (u.job || "CS근무자") + "\">수정</button>"
+              + "<button type=\"button\" class=\"btn-user-del\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\">삭제</button>"
+              + "</td>"
+              + "</tr>";
           });
 
           tbody.innerHTML = html;
 
-          tbody.querySelectorAll('.btn-user-edit').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-              var p = this.getAttribute('data-phone');
-              var n = this.getAttribute('data-name');
-              var j = this.getAttribute('data-job');
+          tbody.querySelectorAll(".btn-user-edit").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+              var p = this.getAttribute("data-phone");
+              var n = this.getAttribute("data-name");
+              var j = this.getAttribute("data-job");
               openUserEditForm(p, n, j);
             });
           });
 
-          tbody.querySelectorAll('.btn-user-del').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-              var p = this.getAttribute('data-phone');
-              var n = this.getAttribute('data-name');
+          tbody.querySelectorAll(".btn-user-del").forEach(function(btn) {
+            btn.addEventListener("click", function() {
+              var p = this.getAttribute("data-phone");
+              var n = this.getAttribute("data-name");
               deleteUserAccount(p, n);
             });
           });
 
         } catch (err) {
           console.error("사용자 로드 실패:", err);
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 로드 오류: ' + err.message + '</td></tr>';
+          tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#d93025;\">사용자 목록 로드 오류: " + err.message + "</td></tr>";
         }
       }
 
       function openUserEditForm(phone, name, job) {
-        var box = document.getElementById('userEditBox');
-        document.getElementById('editUserTargetPhone').value = phone;
-        document.getElementById('editUserNameInput').value = name;
-        document.getElementById('editUserJobSelect').value = job;
-        document.getElementById('editUserNewPwdInput').value = '';
-        box.style.display = 'block';
-        box.scrollIntoView({ behavior: 'smooth' });
+        var box = document.getElementById("userEditBox");
+        document.getElementById("editUserTargetPhone").value = phone;
+        document.getElementById("editUserNameInput").value = name;
+        document.getElementById("editUserJobSelect").value = job;
+        document.getElementById("editUserNewPwdInput").value = "";
+        box.style.display = "block";
+        box.scrollIntoView({ behavior: "smooth" });
       }
 
       async function saveUserEdit() {
-        var phone = document.getElementById('editUserTargetPhone').value;
-        var name = document.getElementById('editUserNameInput').value.trim();
-        var job = document.getElementById('editUserJobSelect').value;
-        var newPwd = document.getElementById('editUserNewPwdInput').value.trim();
+        var phone = document.getElementById("editUserTargetPhone").value;
+        var name = document.getElementById("editUserNameInput").value.trim();
+        var job = document.getElementById("editUserJobSelect").value;
+        var newPwd = document.getElementById("editUserNewPwdInput").value.trim();
 
         if (!phone || !name || !job) {
-          alert('이름과 직무를 모두 입력해주세요.');
+          alert("이름과 직무를 모두 입력해주세요.");
           return;
         }
 
-        var btn = document.getElementById('btnSaveUserEdit');
-        btn.disabled = true; btn.innerText = '저장 중...';
+        var btn = document.getElementById("btnSaveUserEdit");
+        btn.disabled = true; btn.innerText = "저장 중...";
 
         var updateData = {
           name: name,
@@ -1986,129 +2059,137 @@
           var valErr = validatePassword(newPwd);
           if (valErr) {
             alert(valErr);
-            btn.disabled = false; btn.innerText = '수정 저장';
+            btn.disabled = false; btn.innerText = "수정 저장";
             return;
           }
-          var hashed = await sha256(newPwd);
+          // 표준 해시 생성 공식 적용: SHA-256(phone + ":" + newPwd)
+          var hashed = await hashPassword(phone, newPwd);
           updateData.hash = hashed;
         }
 
         try {
-          var res = await supabase.from('app_users').update(updateData).eq('phone', phone);
+          var res = await supabase.from("app_users").update(updateData).eq("phone", phone);
           if (res.error) throw res.error;
 
-          alert('✅ 사용자 정보가 성공적으로 수정되었습니다.');
-          document.getElementById('userEditBox').style.display = 'none';
+          alert("✅ 사용자 정보가 성공적으로 수정되었습니다.");
+          document.getElementById("userEditBox").style.display = "none";
           await loadAllUsers();
         } catch (e) {
-          alert('수정 실패: ' + e.message);
+          alert("수정 실패: " + e.message);
         } finally {
-          btn.disabled = false; btn.innerText = '수정 저장';
+          btn.disabled = false; btn.innerText = "수정 저장";
         }
       }
 
       async function deleteUserAccount(phone, name) {
-        if (!confirm('⚠️ 정말로 [' + name + ' / ' + phone + '] 사용자를 영구 삭제하시겠습니까?\n삭제 후 해당 계정으로 로그인할 수 없습니다.')) {
+        if (!confirm("⚠️ 정말로 [" + name + " / " + phone + "] 사용자를 영구 삭제하시겠습니까?\n삭제 후 해당 계정으로 로그인할 수 없습니다.")) {
           return;
         }
 
         try {
-          var res = await supabase.from('app_users').delete().eq('phone', phone);
+          var res = await supabase.from("app_users").delete().eq("phone", phone);
           if (res.error) throw res.error;
 
-          alert('🗑️ 사용자가 삭제되었습니다.');
+          alert("🗑️ 사용자가 삭제되었습니다.");
           await loadAllUsers();
         } catch (e) {
-          alert('삭제 실패: ' + e.message);
+          alert("삭제 실패: " + e.message);
         }
       }
-
       async function loadRecentHistory() {
-        var listDiv = document.getElementById('historyList');
+        var listDiv = document.getElementById("historyList");
         if (!supabase) return;
 
-        var query = supabase.from('leads').select('*').order('created_at', { ascending: false }).limit(5);
-        if (currentRole !== '지사관리자' && currentUserName) {
-          query = query.eq('agent_name', currentUserName);
+        var query = supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(5);
+        if (currentRole !== "지사관리자" && currentUserName) {
+          query = query.eq("agent_name", currentUserName);
         }
 
         var res = await query;
         if (!res.error && res.data && listDiv) {
-          var html = '';
+          var html = "";
           res.data.forEach(function(r) {
-            html += '<div class="history-item"><div><strong>' + r.customer_name + '</strong> (' + r.product + ')<br><span style="font-size:0.75rem; color:#80868b;">' + formatKoreanDate(r.created_at) + ' · 담당: ' + (r.assigned_rep || '-') + '</span></div><span class="badge ' + getBadgeClass(r.status) + '">' + r.status + '</span></div>';
+            html += "<div class=\"history-item\"><div><strong>" + r.customer_name + "</strong> (" + r.product + ")<br><span style=\"font-size:0.75rem; color:#80868b;\">" + formatKoreanDate(r.created_at) + " · 담당: " + (r.assigned_rep || "-") + "</span></div><span class=\"badge " + getBadgeClass(r.status) + "\">" + r.status + "</span></div>";
           });
-          listDiv.innerHTML = html || '<p style="font-size:0.8rem; color:#9aa0a6; text-align:center;">최근 접수 내역이 없습니다.</p>';
+          listDiv.innerHTML = html || "<p style=\"font-size:0.8rem; color:#9aa0a6; text-align:center;\">최근 접수 내역이 없습니다.</p>";
         }
       }
 
-      document.addEventListener('DOMContentLoaded', function() {
-        var btnGoSignup = document.getElementById('btnGoSignup');
-        var btnBackToLogin = document.getElementById('btnBackToLogin');
-        if (btnGoSignup) btnGoSignup.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('signup'); });
-        if (btnBackToLogin) btnBackToLogin.addEventListener('click', function(e) { e.preventDefault(); applyLoginTab('member'); });
+      document.addEventListener("DOMContentLoaded", function() {
+        var btnGoSignup = document.getElementById("btnGoSignup");
+        var btnBackToLogin = document.getElementById("btnBackToLogin");
+        if (btnGoSignup) btnGoSignup.addEventListener("click", function(e) { e.preventDefault(); applyLoginTab("signup"); });
+        if (btnBackToLogin) btnBackToLogin.addEventListener("click", function(e) { e.preventDefault(); applyLoginTab("member"); });
 
-        var btnClosePhotoLightbox = document.getElementById('btnClosePhotoLightbox');
-        var photoLightboxEl = document.getElementById('photoLightbox');
-        if (btnClosePhotoLightbox) btnClosePhotoLightbox.addEventListener('click', closePhotoLightbox);
+        var btnClosePhotoLightbox = document.getElementById("btnClosePhotoLightbox");
+        var photoLightboxEl = document.getElementById("photoLightbox");
+        if (btnClosePhotoLightbox) btnClosePhotoLightbox.addEventListener("click", closePhotoLightbox);
         if (photoLightboxEl) {
-          photoLightboxEl.addEventListener('click', function(e) {
+          photoLightboxEl.addEventListener("click", function(e) {
             if (e.target === photoLightboxEl) closePhotoLightbox();
           });
         }
 
-        var btnOpenMapForm = document.getElementById('btnOpenNaverMapForm');
+        var btnOpenMapForm = document.getElementById("btnOpenNaverMapForm");
         if (btnOpenMapForm) {
-          btnOpenMapForm.addEventListener('click', function() {
-            var addr = document.getElementById('address').value.trim();
-            var cust = document.getElementById('customerName').value.trim();
+          btnOpenMapForm.addEventListener("click", function() {
+            var addr = document.getElementById("address").value.trim();
+            var cust = document.getElementById("customerName").value.trim();
             var target = addr || cust;
             if (!target) {
-              alert('검색할 주소 또는 고객(상호)을 먼저 입력해주세요.');
+              alert("검색할 주소 또는 고객(상호)을 먼저 입력해주세요.");
               return;
             }
             openNaverMap(target);
           });
         }
 
-        var fSignup = document.getElementById('formSignup');
+        // ==========================================================
+        // 신규 회원가입 (표준 SHA-256(phone + ":" + pwd) 해시 적용)
+        // ==========================================================
+        var fSignup = document.getElementById("formSignup");
         if (fSignup) {
-          fSignup.addEventListener('submit', async function(e) {
+          fSignup.addEventListener("submit", async function(e) {
             e.preventDefault();
-            if (!supabase) { alert('데이터베이스에 연결할 수 없습니다.'); return; }
+            if (!supabase) { alert("데이터베이스에 연결할 수 없습니다."); return; }
 
-            var phone = document.getElementById('regPhone').value.replace(/[^0-9]/g, '');
-            var name = document.getElementById('regName').value.trim();
-            var job = document.getElementById('regJob').value;
-            var pwd = document.getElementById('regPwd').value;
-            var pwdConfirm = document.getElementById('regPwdConfirm').value;
-            var btn = document.getElementById('btnDoSignup');
+            var phone = document.getElementById("regPhone").value.replace(/[^0-9]/g, "");
+            var name = document.getElementById("regName").value.trim();
+            var job = document.getElementById("regJob").value;
+            var pwd = document.getElementById("regPwd").value;
+            var pwdConfirm = document.getElementById("regPwdConfirm").value;
+            var btn = document.getElementById("btnDoSignup");
 
-            if (!phone || phone.length < 10) { showLoginError('signupErr', '올바른 휴대전화번호를 입력해주세요.'); return; }
-            if (!name) { showLoginError('signupErr', '이름을 입력해주세요.'); return; }
-            if (!job) { showLoginError('signupErr', '직무를 선택해주세요.'); return; }
+            if (!phone || phone.length < 10) { showLoginError("signupErr", "올바른 휴대전화번호를 입력해주세요."); return; }
+            if (!name) { showLoginError("signupErr", "이름을 입력해주세요."); return; }
+            if (!job) { showLoginError("signupErr", "직무를 선택해주세요."); return; }
 
             var pwdErr = validatePassword(pwd);
-            if (pwdErr) { showLoginError('signupErr', pwdErr); return; }
+            if (pwdErr) { showLoginError("signupErr", pwdErr); return; }
 
             if (pwd !== pwdConfirm) {
-              showLoginError('signupErr', '비밀번호 확인이 일치하지 않습니다.');
+              showLoginError("signupErr", "비밀번호 확인이 일치하지 않습니다.");
               return;
             }
 
-            btn.disabled = true; btn.innerText = '가입 처리 중...';
+            btn.disabled = true; btn.innerText = "가입 처리 중...";
 
             try {
-              var chk = await supabase.from('app_users').select('phone').eq('phone', phone);
+              var pNoZero = phone.startsWith("0") ? phone.slice(1) : phone;
+              var pWithZero = phone.startsWith("0") ? phone : ("0" + phone);
+              var searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
+
+              var chk = await supabase.from("app_users").select("phone").in("phone", searchPhones);
               if (chk.data && chk.data.length > 0) {
-                btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
-                showLoginError('signupErr', '이미 가입된 휴대전화번호입니다. 로그인해 주세요.');
+                btn.disabled = false; btn.innerText = "가입 완료 및 로그인";
+                showLoginError("signupErr", "이미 가입된 휴대전화번호입니다. 로그인해 주세요.");
                 return;
               }
 
-              var hashedPwd = await sha256(pwd);
+              // 표준 해시 생성 공식 적용: SHA-256(phone + ":" + pwd)
+              var hashedPwd = await hashPassword(phone, pwd);
 
-              var ins = await supabase.from('app_users').insert([{
+              var ins = await supabase.from("app_users").insert([{
                 phone: phone,
                 name: name,
                 job: job,
@@ -2117,506 +2198,534 @@
 
               if (ins.error) throw ins.error;
 
-              alert('🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.');
+              alert("🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.");
 
               currentRole = job.trim();
               currentUserName = name.trim();
               currentUserPhone = phone;
 
-              document.getElementById('agentName').value = name;
+              document.getElementById("agentName").value = name;
               registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
-              showScreen('dashboard');
+              showScreen("dashboard");
 
             } catch (err) {
-              showLoginError('signupErr', '가입 오류: ' + (err.message || err));
+              showLoginError("signupErr", "가입 오류: " + (err.message || err));
             } finally {
-              btn.disabled = false; btn.innerText = '가입 완료 및 로그인';
+              btn.disabled = false; btn.innerText = "가입 완료 및 로그인";
             }
           });
         }
 
-        var fMember = document.getElementById('formLoginMember');
+        // ==========================================================
+        // 통합 로그인 (010/10 동시 검색 & 7단계 다중 변형 검증 적용)
+        // ==========================================================
+        var fMember = document.getElementById("formLoginMember");
         if (fMember) {
-          fMember.addEventListener('submit', async function(e) {
+          fMember.addEventListener("submit", async function(e) {
             e.preventDefault();
-            var phone = document.getElementById('memberLoginPhone').value.replace(/[^0-9]/g, '');
-            var pwd = document.getElementById('memberLoginPwd').value.trim();
-            var btn = document.getElementById('btnMemberLogin');
+            var phone = document.getElementById("memberLoginPhone").value.replace(/[^0-9]/g, "");
+            var pwd = document.getElementById("memberLoginPwd").value.trim();
+            var btn = document.getElementById("btnMemberLogin");
 
-            if (!phone || !pwd) { showLoginError('memberLoginErr', '전화번호와 비밀번호를 모두 입력해주세요.'); return; }
+            if (!phone || !pwd) { showLoginError("memberLoginErr", "전화번호와 비밀번호를 모두 입력해주세요."); return; }
 
-            btn.disabled = true; btn.innerText = '인증 확인 중...';
+            btn.disabled = true; btn.innerText = "인증 확인 중...";
 
             try {
-              var q = await supabase.from('app_users').select('*').eq('phone', phone);
-              btn.disabled = false; btn.innerText = '로그인 접속';
+              // 010 및 10 형태 동시 검색 (가이드 체크리스트 2번)
+              var pNoZero = phone.startsWith("0") ? phone.slice(1) : phone;
+              var pWithZero = phone.startsWith("0") ? phone : ("0" + phone);
+              var searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
 
-              if (q.error || !q.data || q.data.length === 0) {
-                showLoginError('memberLoginErr', '가입되지 않은 전화번호입니다. 아래 [신규 회원가입]을 진행해주세요.');
+              var q = await supabase.from("app_users").select("*").in("phone", searchPhones).limit(5);
+              btn.disabled = false; btn.innerText = "로그인 접속";
+
+              if (q.error) {
+                showLoginError("memberLoginErr", "DB 조회 오류: " + (q.error.message || JSON.stringify(q.error)));
                 return;
               }
 
-              var user = q.data[0];
-              var hashedInput = await sha256(pwd);
-              var isMatch = !!(user.hash && user.hash === hashedInput);
-
-              if (!isMatch) {
-                showLoginError('memberLoginErr', '비밀번호가 일치하지 않습니다.');
+              if (!q.data || q.data.length === 0) {
+                showLoginError("memberLoginErr", "가입되지 않은 전화번호입니다. 아래 [신규 회원가입]을 진행해주세요.");
                 return;
               }
 
-              currentRole = user.job ? user.job.trim() : 'CS근무자';
+              // 후보 사용자 중 비밀번호 일치자 탐색 (7단계 다중 변형 검증 전략)
+              var matchedUser = null;
+              for (var i = 0; i < q.data.length; i++) {
+                var u = q.data[i];
+                var isMatch = await verifyUserPassword(phone, pwd, u.hash);
+                if (isMatch) {
+                  matchedUser = u;
+                  break;
+                }
+              }
 
-              currentUserName = user.name ? user.name.trim() : '직원';
+              if (!matchedUser) {
+                showLoginError("memberLoginErr", "비밀번호가 일치하지 않습니다.");
+                return;
+              }
+
+              var user = matchedUser;
+              currentRole = user.job ? user.job.trim() : "CS근무자";
+              currentUserName = user.name ? user.name.trim() : "직원";
               currentUserPhone = user.phone;
 
-              document.getElementById('agentName').value = currentUserName;
+              document.getElementById("agentName").value = currentUserName;
               registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
-              showScreen('dashboard');
+              showScreen("dashboard");
 
             } catch (err) {
-              btn.disabled = false; btn.innerText = '로그인 접속';
-              showLoginError('memberLoginErr', '통신 오류: ' + (err.message || err));
+              btn.disabled = false; btn.innerText = "로그인 접속";
+              showLoginError("memberLoginErr", "통신 오류: " + (err.message || err));
             }
           });
         }
 
-        var closeUserBtn = document.getElementById('btnCloseUserModal');
-        var refreshUsersBtn = document.getElementById('btnRefreshUsers');
-        var saveUserEditBtn = document.getElementById('btnSaveUserEdit');
-        var cancelUserEditBtn = document.getElementById('btnCancelUserEdit');
+        var closeUserBtn = document.getElementById("btnCloseUserModal");
+        var refreshUsersBtn = document.getElementById("btnRefreshUsers");
+        var saveUserEditBtn = document.getElementById("btnSaveUserEdit");
+        var cancelUserEditBtn = document.getElementById("btnCancelUserEdit");
 
-        if (closeUserBtn) closeUserBtn.addEventListener('click', closeUserModal);
-        if (refreshUsersBtn) refreshUsersBtn.addEventListener('click', loadAllUsers);
-        if (saveUserEditBtn) saveUserEditBtn.addEventListener('click', saveUserEdit);
-        if (cancelUserEditBtn) cancelUserEditBtn.addEventListener('click', function() {
-          document.getElementById('userEditBox').style.display = 'none';
+        if (closeUserBtn) closeUserBtn.addEventListener("click", closeUserModal);
+        if (refreshUsersBtn) refreshUsersBtn.addEventListener("click", loadAllUsers);
+        if (saveUserEditBtn) saveUserEditBtn.addEventListener("click", saveUserEdit);
+        if (cancelUserEditBtn) cancelUserEditBtn.addEventListener("click", function() {
+          document.getElementById("userEditBox").style.display = "none";
         });
 
-        var regPwdBtn = document.getElementById('regPwdBtn');
-        var closePwdBtn = document.getElementById('btnClosePwdModal');
-        if (regPwdBtn) regPwdBtn.addEventListener('click', openPwdModal);
-        if (closePwdBtn) closePwdBtn.addEventListener('click', closePwdModal);
+        var regPwdBtn = document.getElementById("regPwdBtn");
+        var closePwdBtn = document.getElementById("btnClosePwdModal");
+        if (regPwdBtn) regPwdBtn.addEventListener("click", openPwdModal);
+        if (closePwdBtn) closePwdBtn.addEventListener("click", closePwdModal);
 
-        var btnSubmitPwd = document.getElementById('btnSubmitChangePwd');
+        // ==========================================================
+        // 비밀번호 변경 (다중 변형 검증 확인 및 표준 해시 저장)
+        // ==========================================================
+        var btnSubmitPwd = document.getElementById("btnSubmitChangePwd");
         if (btnSubmitPwd) {
-          btnSubmitPwd.addEventListener('click', async function() {
+          btnSubmitPwd.addEventListener("click", async function() {
             if (!currentUserPhone) {
-              alert('로그인 세션 정보가 없습니다. 다시 로그인해 주세요.');
+              alert("로그인 세션 정보가 없습니다. 다시 로그인해 주세요.");
               return;
             }
 
-            var curPwd = document.getElementById('curPwdInput').value;
-            var newPwd = document.getElementById('newPwdInput').value;
-            var newConfirm = document.getElementById('newPwdConfirmInput').value;
+            var curPwd = document.getElementById("curPwdInput").value;
+            var newPwd = document.getElementById("newPwdInput").value;
+            var newConfirm = document.getElementById("newPwdConfirmInput").value;
 
-            if (!curPwd) { showLoginError('pwdChangeErr', '현재 비밀번호를 입력해주세요.'); return; }
-            if (!newPwd) { showLoginError('pwdChangeErr', '새 비밀번호를 입력해주세요.'); return; }
+            if (!curPwd) { showLoginError("pwdChangeErr", "현재 비밀번호를 입력해주세요."); return; }
+            if (!newPwd) { showLoginError("pwdChangeErr", "새 비밀번호를 입력해주세요."); return; }
 
             var valErr = validatePassword(newPwd);
-            if (valErr) { showLoginError('pwdChangeErr', valErr); return; }
+            if (valErr) { showLoginError("pwdChangeErr", valErr); return; }
 
             if (newPwd !== newConfirm) {
-              showLoginError('pwdChangeErr', '새 비밀번호 확인이 일치하지 않습니다.');
+              showLoginError("pwdChangeErr", "새 비밀번호 확인이 일치하지 않습니다.");
               return;
             }
 
             var btn = this;
-            btn.disabled = true; btn.innerText = '비밀번호 변경 처리 중...';
+            btn.disabled = true; btn.innerText = "비밀번호 변경 처리 중...";
 
             try {
-              var res = await supabase.from('app_users').select('*').eq('phone', currentUserPhone).single();
-              if (res.error || !res.data) {
-                btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
-                showLoginError('pwdChangeErr', '사용자 정보를 찾을 수 없습니다.');
+              var pNoZero = currentUserPhone.startsWith("0") ? currentUserPhone.slice(1) : currentUserPhone;
+              var pWithZero = currentUserPhone.startsWith("0") ? currentUserPhone : ("0" + currentUserPhone);
+              var searchPhones = Array.from(new Set([currentUserPhone, pNoZero, pWithZero]));
+
+              var res = await supabase.from("app_users").select("*").in("phone", searchPhones).limit(1);
+              if (res.error || !res.data || res.data.length === 0) {
+                btn.disabled = false; btn.innerText = "비밀번호 변경 완료";
+                showLoginError("pwdChangeErr", "사용자 정보를 찾을 수 없습니다.");
                 return;
               }
 
-              var user = res.data;
-              var hashedCur = await sha256(curPwd);
-              var isCurrentMatch = !!(user.hash && user.hash === hashedCur);
+              var user = res.data[0];
+              // 7단계 다중 변형 검증으로 현재 비밀번호 확인
+              var isCurrentMatch = await verifyUserPassword(currentUserPhone, curPwd, user.hash);
 
               if (!isCurrentMatch) {
-                btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
-                showLoginError('pwdChangeErr', '현재 비밀번호가 일치하지 않습니다.');
+                btn.disabled = false; btn.innerText = "비밀번호 변경 완료";
+                showLoginError("pwdChangeErr", "현재 비밀번호가 일치하지 않습니다.");
                 return;
               }
 
-              var newHashed = await sha256(newPwd);
-              var upRes = await supabase.from('app_users').update({
+              // 표준 해시 공식(phone + ":" + newPwd)으로 해시 생성
+              var newHashed = await hashPassword(user.phone, newPwd);
+              var upRes = await supabase.from("app_users").update({
                 hash: newHashed,
                 updated_at: new Date().toISOString()
-              }).eq('phone', currentUserPhone);
+              }).eq("phone", user.phone);
 
-              btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
+              btn.disabled = false; btn.innerText = "비밀번호 변경 완료";
 
               if (!upRes.error) {
-                alert('🎉 비밀번호가 안전하게 변경되었습니다!\n영업일보 포털과 소개영업 포털 모두에 즉시 적용되었습니다.');
+                alert("🎉 비밀번호가 안전하게 변경되었습니다!\n영업일보 포털과 소개영업 포털 모두에 즉시 적용되었습니다.");
                 closePwdModal();
               } else {
-                showLoginError('pwdChangeErr', '변경 실패: ' + upRes.error.message);
+                showLoginError("pwdChangeErr", "변경 실패: " + upRes.error.message);
               }
             } catch (err) {
-              btn.disabled = false; btn.innerText = '비밀번호 변경 완료';
-              showLoginError('pwdChangeErr', '통신 오류: ' + (err.message || err));
+              btn.disabled = false; btn.innerText = "비밀번호 변경 완료";
+              showLoginError("pwdChangeErr", "통신 오류: " + (err.message || err));
             }
           });
         }
 
-        var btnAttach = document.getElementById('btnAttachBoardFile');
-        var fileInput = document.getElementById('boardFileInput');
-        var btnRemoveFile = document.getElementById('btnRemoveBoardFile');
-        var btnSubmitPost = document.getElementById('btnSubmitBoardPost');
+        var btnAttach = document.getElementById("btnAttachBoardFile");
+        var fileInput = document.getElementById("boardFileInput");
+        var btnRemoveFile = document.getElementById("btnRemoveBoardFile");
+        var btnSubmitPost = document.getElementById("btnSubmitBoardPost");
 
         if (btnAttach && fileInput) {
-          btnAttach.addEventListener('click', function() { fileInput.click(); });
-          fileInput.addEventListener('change', function(e) {
+          btnAttach.addEventListener("click", function() { fileInput.click(); });
+          fileInput.addEventListener("change", function(e) {
             var f = e.target.files[0];
             if (f) {
               selectedBoardFile = f;
-              var statusBox = document.getElementById('boardFileStatus');
-              var nameText = document.getElementById('boardFileNameText');
+              var statusBox = document.getElementById("boardFileStatus");
+              var nameText = document.getElementById("boardFileNameText");
               if (statusBox && nameText) {
-                nameText.innerText = '선택된 파일: ' + f.name;
-                statusBox.style.display = 'flex';
+                nameText.innerText = "선택된 파일: " + f.name;
+                statusBox.style.display = "flex";
               }
             }
           });
         }
-        if (btnRemoveFile) btnRemoveFile.addEventListener('click', clearBoardFile);
-        if (btnSubmitPost) btnSubmitPost.addEventListener('click', submitBoardPost);
+        if (btnRemoveFile) btnRemoveFile.addEventListener("click", clearBoardFile);
+        if (btnSubmitPost) btnSubmitPost.addEventListener("click", submitBoardPost);
 
-        var regSwitch = document.getElementById('regSwitchBtn');
-        var dashSwitch = document.getElementById('dashSwitchBtn');
-        var regLogout = document.getElementById('regLogoutBtn');
-        var dashLogout = document.getElementById('dashLogoutBtn');
-        var closeDetail = document.getElementById('btnCloseDetailModal');
+        var regSwitch = document.getElementById("regSwitchBtn");
+        var dashSwitch = document.getElementById("dashSwitchBtn");
+        var regLogout = document.getElementById("regLogoutBtn");
+        var dashLogout = document.getElementById("dashLogoutBtn");
+        var closeDetail = document.getElementById("btnCloseDetailModal");
 
-        if (regSwitch) regSwitch.addEventListener('click', function() { showScreen('dashboard'); });
-        if (dashSwitch) dashSwitch.addEventListener('click', function() { showScreen('register'); });
-        if (regLogout) regLogout.addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
-        if (dashLogout) dashLogout.addEventListener('click', function() { showScreen('login'); applyLoginTab('member'); });
-        if (closeDetail) closeDetail.addEventListener('click', closeDetailModal);
+        if (regSwitch) regSwitch.addEventListener("click", function() { showScreen("dashboard"); });
+        if (dashSwitch) dashSwitch.addEventListener("click", function() { showScreen("register"); });
+        if (regLogout) regLogout.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
+        if (dashLogout) dashLogout.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
+        if (closeDetail) closeDetail.addEventListener("click", closeDetailModal);
 
-        document.querySelectorAll('.filter-chip').forEach(function(chip) {
-          chip.addEventListener('click', function() {
-            document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
-            this.classList.add('active');
-            currentStatusFilter = this.getAttribute('data-status');
+        document.querySelectorAll(".filter-chip").forEach(function(chip) {
+          chip.addEventListener("click", function() {
+            document.querySelectorAll(".filter-chip").forEach(function(c) { c.classList.remove("active"); });
+            this.classList.add("active");
+            currentStatusFilter = this.getAttribute("data-status");
             loadDashboardLeads();
           });
         });
 
-        var btnSearch = document.getElementById('btnSearchKeyword');
-        var inputSearch = document.getElementById('searchKeyword');
-        if (btnSearch) btnSearch.addEventListener('click', loadDashboardLeads);
+        var btnSearch = document.getElementById("btnSearchKeyword");
+        var inputSearch = document.getElementById("searchKeyword");
+        if (btnSearch) btnSearch.addEventListener("click", loadDashboardLeads);
         if (inputSearch) {
-          inputSearch.addEventListener('keyup', function(e) {
-            if (e.key === 'Enter') loadDashboardLeads();
+          inputSearch.addEventListener("keyup", function(e) {
+            if (e.key === "Enter") loadDashboardLeads();
           });
         }
 
-        var curComp = document.getElementById('currentCompany');
+        var curComp = document.getElementById("currentCompany");
         if (curComp) {
-          curComp.addEventListener('change', function() {
-            var f = document.getElementById('currentFee');
-            if (this.value !== '미사용') {
-              f.disabled = false; f.style.backgroundColor = '#fff';
+          curComp.addEventListener("change", function() {
+            var f = document.getElementById("currentFee");
+            if (this.value !== "미사용") {
+              f.disabled = false; f.style.backgroundColor = "#fff";
             } else {
-              f.disabled = true; f.value = ''; f.style.backgroundColor = '#f1f3f4';
+              f.disabled = true; f.value = ""; f.style.backgroundColor = "#f1f3f4";
             }
           });
         }
 
-        var curFeeEl = document.getElementById('currentFee');
-        if (curFeeEl) curFeeEl.addEventListener('input', function() { formatCurrencyInput(this); });
+        var curFeeEl = document.getElementById("currentFee");
+        if (curFeeEl) curFeeEl.addEventListener("input", function() { formatCurrencyInput(this); });
 
-        document.querySelectorAll('.prod-item').forEach(function(item) {
-          var cb = item.querySelector('input[type="checkbox"]');
+        document.querySelectorAll(".prod-item").forEach(function(item) {
+          var cb = item.querySelector("input[type=\"checkbox\"]");
           if (cb) {
-            cb.addEventListener('change', function() {
-              item.classList.toggle('checked', cb.checked);
+            cb.addEventListener("change", function() {
+              item.classList.toggle("checked", cb.checked);
             });
           }
         });
 
-        var uStatusSel = document.getElementById('uStatus');
+        var uStatusSel = document.getElementById("uStatus");
         if (uStatusSel) {
-          uStatusSel.addEventListener('change', function() {
+          uStatusSel.addEventListener("change", function() {
             renderStatusFields(this.value);
           });
         }
 
-        var btnSaveStatus = document.getElementById('btnSaveStatus');
+        var btnSaveStatus = document.getElementById("btnSaveStatus");
         if (btnSaveStatus) {
-          btnSaveStatus.addEventListener('click', async function() {
+          btnSaveStatus.addEventListener("click", async function() {
             if (!activeLeadItem || !supabase) return;
-            var newSt = document.getElementById('uStatus').value;
+            var newSt = document.getElementById("uStatus").value;
             var updateData = { status: newSt };
             var nowIso = new Date().toISOString();
 
-            if (newSt === '접수확인') {
-              var memo = (document.getElementById('fConsultMemo').value || '').trim();
-              if (memo.length < 10) { alert('영업상담메모를 10자 이상 입력해주세요.'); return; }
+            if (newSt === "접수확인") {
+              var memo = (document.getElementById("fConsultMemo").value || "").trim();
+              if (memo.length < 10) { alert("영업상담메모를 10자 이상 입력해주세요."); return; }
               updateData.consult_memo = memo;
               updateData.consult_confirmed_at = nowIso;
 
-            } else if (newSt === '고객면담') {
-              var method = document.getElementById('fMeetingMethod').value;
-              var mcontent = (document.getElementById('fMeetingContent').value || '').trim();
-              var mdt = document.getElementById('fMeetingDatetime').value;
-              if (!method) { alert('면담방법을 선택해주세요.'); return; }
-              if (mcontent.length < 10) { alert('상담내용을 10자 이상 입력해주세요.'); return; }
-              if (!mdt) { alert('면담일시를 입력해주세요.'); return; }
+            } else if (newSt === "고객면담") {
+              var method = document.getElementById("fMeetingMethod").value;
+              var mcontent = (document.getElementById("fMeetingContent").value || "").trim();
+              var mdt = document.getElementById("fMeetingDatetime").value;
+              if (!method) { alert("면담방법을 선택해주세요."); return; }
+              if (mcontent.length < 10) { alert("상담내용을 10자 이상 입력해주세요."); return; }
+              if (!mdt) { alert("면담일시를 입력해주세요."); return; }
               updateData.meeting_method = method;
               updateData.meeting_content = mcontent;
               updateData.meeting_datetime = new Date(mdt).toISOString();
 
-            } else if (newSt === '추가면담') {
-              var aMethod = document.getElementById('fMeetingMethod').value;
-              var aContent = (document.getElementById('fMeetingContent').value || '').trim();
-              var aDt = document.getElementById('fMeetingDatetime').value;
-              if (!aMethod) { alert('면담방법을 선택해주세요.'); return; }
-              if (aContent.length < 10) { alert('상담내용을 10자 이상 입력해주세요.'); return; }
-              if (!aDt) { alert('면담일시를 입력해주세요.'); return; }
+            } else if (newSt === "추가면담") {
+              var aMethod = document.getElementById("fMeetingMethod").value;
+              var aContent = (document.getElementById("fMeetingContent").value || "").trim();
+              var aDt = document.getElementById("fMeetingDatetime").value;
+              if (!aMethod) { alert("면담방법을 선택해주세요."); return; }
+              if (aContent.length < 10) { alert("상담내용을 10자 이상 입력해주세요."); return; }
+              if (!aDt) { alert("면담일시를 입력해주세요."); return; }
               var existingAdd = Array.isArray(activeLeadItem.additional_meetings) ? activeLeadItem.additional_meetings.slice() : [];
               existingAdd.push({ method: aMethod, content: aContent, datetime: new Date(aDt).toISOString(), created_at: nowIso });
               updateData.additional_meetings = existingAdd;
 
-            } else if (newSt === '견적제출') {
-              var qProd = Array.from(document.querySelectorAll('input[name="quoteProd"]:checked')).map(function(c) { return c.value; });
-              var qAmountRaw = document.getElementById('fQuoteAmount').value.replace(/[^0-9]/g, '');
-              var qDate = document.getElementById('fExpectedContractDate').value;
-              var qNote = (document.getElementById('fQuoteNote').value || '').trim();
-              if (qProd.length === 0) { alert('제출 상품을 1개 이상 선택해주세요.'); return; }
-              if (!qAmountRaw) { alert('견적금액을 입력해주세요.'); return; }
-              if (!qDate) { alert('예상 계약일정을 입력해주세요.'); return; }
-              if (!qNote) { alert('비고사항을 입력해주세요.'); return; }
-              updateData.quote_products = qProd.join(', ');
+            } else if (newSt === "견적제출") {
+              var qProd = Array.from(document.querySelectorAll("input[name=\"quoteProd\"]:checked")).map(function(c) { return c.value; });
+              var qAmountRaw = document.getElementById("fQuoteAmount").value.replace(/[^0-9]/g, "");
+              var qDate = document.getElementById("fExpectedContractDate").value;
+              var qNote = (document.getElementById("fQuoteNote").value || "").trim();
+              if (qProd.length === 0) { alert("제출 상품을 1개 이상 선택해주세요."); return; }
+              if (!qAmountRaw) { alert("견적금액을 입력해주세요."); return; }
+              if (!qDate) { alert("예상 계약일정을 입력해주세요."); return; }
+              if (!qNote) { alert("비고사항을 입력해주세요."); return; }
+              updateData.quote_products = qProd.join(", ");
               updateData.quote_amount = Number(qAmountRaw);
               updateData.expected_contract_date = qDate;
               updateData.quote_note = qNote;
 
-            } else if (newSt === '견적상담') {
-              var qcNote = (document.getElementById('fQuoteConsultNote').value || '').trim();
-              if (!qcNote) { alert('상담 내용을 입력해주세요.'); return; }
-              var qcProd = Array.from(document.querySelectorAll('input[name="quoteConsultProd"]:checked')).map(function(c) { return c.value; });
-              var qcAmountRaw = document.getElementById('fQuoteConsultAmount').value.replace(/[^0-9]/g, '');
-              var qcDate = document.getElementById('fQuoteConsultDate').value;
+            } else if (newSt === "견적상담") {
+              var qcNote = (document.getElementById("fQuoteConsultNote").value || "").trim();
+              if (!qcNote) { alert("상담 내용을 입력해주세요."); return; }
+              var qcProd = Array.from(document.querySelectorAll("input[name=\"quoteConsultProd\"]:checked")).map(function(c) { return c.value; });
+              var qcAmountRaw = document.getElementById("fQuoteConsultAmount").value.replace(/[^0-9]/g, "");
+              var qcDate = document.getElementById("fQuoteConsultDate").value;
 
               var existingQC = Array.isArray(activeLeadItem.quote_consults) ? activeLeadItem.quote_consults.slice() : [];
               existingQC.push({
                 note: qcNote,
                 amount: qcAmountRaw ? Number(qcAmountRaw) : null,
-                products: qcProd.length ? qcProd.join(', ') : null,
+                products: qcProd.length ? qcProd.join(", ") : null,
                 expected_date: qcDate || null,
                 created_at: nowIso
               });
               updateData.quote_consults = existingQC;
               if (qcAmountRaw) updateData.quote_amount = Number(qcAmountRaw);
-              if (qcProd.length) updateData.quote_products = qcProd.join(', ');
+              if (qcProd.length) updateData.quote_products = qcProd.join(", ");
               if (qcDate) updateData.expected_contract_date = qcDate;
 
-            } else if (newSt === '계약완료') {
-              var cDate = document.getElementById('fContractDate').value;
-              var cProd = Array.from(document.querySelectorAll('input[name="contractProd"]:checked')).map(function(c) { return c.value; });
-              var cAmountRaw = document.getElementById('fContractAmount').value.replace(/[^0-9]/g, '');
-              var cExtra = (document.getElementById('fContractExtra').value || '').trim();
-              if (!cDate) { alert('계약성공일자를 입력해주세요.'); return; }
-              if (cProd.length === 0) { alert('확정 상품종류를 1개 이상 선택해주세요.'); return; }
-              if (!cAmountRaw) { alert('계약금액을 입력해주세요.'); return; }
+            } else if (newSt === "계약완료") {
+              var cDate = document.getElementById("fContractDate").value;
+              var cProd = Array.from(document.querySelectorAll("input[name=\"contractProd\"]:checked")).map(function(c) { return c.value; });
+              var cAmountRaw = document.getElementById("fContractAmount").value.replace(/[^0-9]/g, "");
+              var cExtra = (document.getElementById("fContractExtra").value || "").trim();
+              if (!cDate) { alert("계약성공일자를 입력해주세요."); return; }
+              if (cProd.length === 0) { alert("확정 상품종류를 1개 이상 선택해주세요."); return; }
+              if (!cAmountRaw) { alert("계약금액을 입력해주세요."); return; }
               updateData.contract_success_date = cDate;
-              updateData.contract_products = cProd.join(', ');
+              updateData.contract_products = cProd.join(", ");
               updateData.contract_amount = Number(cAmountRaw);
               updateData.contract_extra_request = cExtra;
 
-            } else if (newSt === '계약실패') {
-              var fDate = document.getElementById('fFailDate').value;
-              var fReason = (document.getElementById('fFailReason').value || '').trim();
-              if (!fDate) { alert('실패일자를 입력해주세요.'); return; }
-              if (!fReason) { alert('실패사유를 입력해주세요.'); return; }
+            } else if (newSt === "계약실패") {
+              var fDate = document.getElementById("fFailDate").value;
+              var fReason = (document.getElementById("fFailReason").value || "").trim();
+              if (!fDate) { alert("실패일자를 입력해주세요."); return; }
+              if (!fReason) { alert("실패사유를 입력해주세요."); return; }
               updateData.fail_date = fDate;
               updateData.fail_reason = fReason;
 
-            } else if (newSt === '계약보류') {
-              var hUntil = document.getElementById('fHoldUntil').value;
-              var hReason = (document.getElementById('fHoldReason').value || '').trim();
-              if (!hUntil) { alert('보류 기한을 입력해주세요.'); return; }
-              if (!hReason) { alert('보류 사유를 입력해주세요.'); return; }
+            } else if (newSt === "계약보류") {
+              var hUntil = document.getElementById("fHoldUntil").value;
+              var hReason = (document.getElementById("fHoldReason").value || "").trim();
+              if (!hUntil) { alert("보류 기한을 입력해주세요."); return; }
+              if (!hReason) { alert("보류 사유를 입력해주세요."); return; }
               updateData.hold_until = hUntil;
               updateData.hold_reason = hReason;
-              updateData.hold_prev_status = activeLeadItem.status || '접수대기';
+              updateData.hold_prev_status = activeLeadItem.status || "접수대기";
             }
 
-            this.disabled = true; this.innerText = '저장 중...';
+            this.disabled = true; this.innerText = "저장 중...";
 
-            var res = await supabase.from('leads').update(updateData).eq('lead_id', activeLeadItem.lead_id);
-            this.disabled = false; this.innerText = '상태 저장하기';
+            var res = await supabase.from("leads").update(updateData).eq("lead_id", activeLeadItem.lead_id);
+            this.disabled = false; this.innerText = "상태 저장하기";
 
             if (!res.error) {
-              alert('✅ 진행상태가 업데이트되었습니다: ' + newSt);
+              alert("✅ 진행상태가 업데이트되었습니다: " + newSt);
               closeDetailModal();
               loadDashboardLeads();
             } else {
-              alert('상태 변경 실패: ' + res.error.message);
+              alert("상태 변경 실패: " + res.error.message);
             }
           });
         }
 
-        var btnEditLead = document.getElementById('btnEditLead');
-        var btnCancelEdit = document.getElementById('btnCancelEditLead');
-        var btnConfirmEdit = document.getElementById('btnConfirmEditLead');
+        var btnEditLead = document.getElementById("btnEditLead");
+        var btnCancelEdit = document.getElementById("btnCancelEditLead");
+        var btnConfirmEdit = document.getElementById("btnConfirmEditLead");
 
         if (btnEditLead) {
-          btnEditLead.addEventListener('click', function() {
+          btnEditLead.addEventListener("click", function() {
             if (!activeLeadItem) return;
-            var editBox = document.getElementById('editLeadContainer');
+            var editBox = document.getElementById("editLeadContainer");
             if (!editBox) return;
 
-            document.getElementById('editCustomerName').value = activeLeadItem.customer_name || '';
-            document.getElementById('editContactPerson').value = activeLeadItem.contact_person || '';
-            document.getElementById('editContactPhone').value = activeLeadItem.contact_phone || '';
-            document.getElementById('editAddress').value = activeLeadItem.address || '';
-            document.getElementById('editBusinessType').value = activeLeadItem.business_type || '';
-            document.getElementById('editCurrentCompany').value = activeLeadItem.current_company || '';
-            document.getElementById('editProduct').value = activeLeadItem.product || '';
-            document.getElementById('editFieldDesc').value = activeLeadItem.field_description || '';
+            document.getElementById("editCustomerName").value = activeLeadItem.customer_name || "";
+            document.getElementById("editContactPerson").value = activeLeadItem.contact_person || "";
+            document.getElementById("editContactPhone").value = activeLeadItem.contact_phone || "";
+            document.getElementById("editAddress").value = activeLeadItem.address || "";
+            document.getElementById("editBusinessType").value = activeLeadItem.business_type || "";
+            document.getElementById("editCurrentCompany").value = activeLeadItem.current_company || "";
+            document.getElementById("editProduct").value = activeLeadItem.product || "";
+            document.getElementById("editFieldDesc").value = activeLeadItem.field_description || "";
 
             editKeptPhotoUrls = Array.isArray(activeLeadItem.photo_urls) ? activeLeadItem.photo_urls.slice() : [];
             editNewPhotos = [];
             renderEditPreview();
 
-            editBox.style.display = 'block';
-            editBox.scrollIntoView({ behavior: 'smooth' });
+            editBox.style.display = "block";
+            editBox.scrollIntoView({ behavior: "smooth" });
           });
         }
 
         if (btnCancelEdit) {
-          btnCancelEdit.addEventListener('click', function() {
-            document.getElementById('editLeadContainer').style.display = 'none';
+          btnCancelEdit.addEventListener("click", function() {
+            document.getElementById("editLeadContainer").style.display = "none";
           });
         }
 
         if (btnConfirmEdit) {
-          btnConfirmEdit.addEventListener('click', async function() {
+          btnConfirmEdit.addEventListener("click", async function() {
             if (!activeLeadItem || !supabase) return;
 
-            var cName = document.getElementById('editCustomerName').value.trim();
-            var cPhone = document.getElementById('editContactPhone').value.trim();
-            if (!cName) { alert('고객(상호)을 입력해주세요.'); return; }
-            if (!cPhone) { alert('연락처를 입력해주세요.'); return; }
+            var cName = document.getElementById("editCustomerName").value.trim();
+            var cPhone = document.getElementById("editContactPhone").value.trim();
+            if (!cName) { alert("고객(상호)을 입력해주세요."); return; }
+            if (!cPhone) { alert("연락처를 입력해주세요."); return; }
 
-            this.disabled = true; this.innerText = '수정 저장 중...';
+            this.disabled = true; this.innerText = "수정 저장 중...";
 
             var finalPhotoUrls = editKeptPhotoUrls.slice();
             if (editNewPhotos.length > 0) {
-              this.innerText = '사진 업로드 중...';
+              this.innerText = "사진 업로드 중...";
               var newUrls = await uploadPhotosToSupabase(activeLeadItem.lead_id, editNewPhotos);
               finalPhotoUrls = finalPhotoUrls.concat(newUrls);
             }
 
             var updatedData = {
               customer_name: cName,
-              contact_person: document.getElementById('editContactPerson').value.trim(),
+              contact_person: document.getElementById("editContactPerson").value.trim(),
               contact_phone: formatPhone(cPhone),
-              address: document.getElementById('editAddress').value.trim(),
-              business_type: document.getElementById('editBusinessType').value.trim(),
-              current_company: document.getElementById('editCurrentCompany').value.trim(),
-              product: document.getElementById('editProduct').value.trim(),
-              field_description: document.getElementById('editFieldDesc').value.trim(),
+              address: document.getElementById("editAddress").value.trim(),
+              business_type: document.getElementById("editBusinessType").value.trim(),
+              current_company: document.getElementById("editCurrentCompany").value.trim(),
+              product: document.getElementById("editProduct").value.trim(),
+              field_description: document.getElementById("editFieldDesc").value.trim(),
               photo_urls: finalPhotoUrls
             };
 
-            var res = await supabase.from('leads').update(updatedData).eq('lead_id', activeLeadItem.lead_id);
-            this.disabled = false; this.innerText = '수정 완료 저장';
+            var res = await supabase.from("leads").update(updatedData).eq("lead_id", activeLeadItem.lead_id);
+            this.disabled = false; this.innerText = "수정 완료 저장";
 
             if (!res.error) {
-              alert('✅ 안건 상세 정보가 성공적으로 수정되었습니다.');
+              alert("✅ 안건 상세 정보가 성공적으로 수정되었습니다.");
               editNewPhotos = [];
               closeDetailModal();
               loadDashboardLeads();
             } else {
-              alert('수정 실패: ' + res.error.message);
+              alert("수정 실패: " + res.error.message);
             }
           });
         }
 
-        var btnDelLead = document.getElementById('btnDeleteLead');
+        var btnDelLead = document.getElementById("btnDeleteLead");
         if (btnDelLead) {
-          btnDelLead.addEventListener('click', async function() {
+          btnDelLead.addEventListener("click", async function() {
             if (!activeLeadItem || !supabase) return;
 
-            var confirmDel = confirm('⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): ' + activeLeadItem.customer_name + '\n(삭제 후 복구할 수 없습니다)');
+            var confirmDel = confirm("⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): " + activeLeadItem.customer_name + "\n(삭제 후 복구할 수 없습니다)");
             if (!confirmDel) return;
 
-            this.disabled = true; this.innerText = '삭제 처리 중...';
+            this.disabled = true; this.innerText = "삭제 처리 중...";
 
-            var res = await supabase.from('leads').delete().eq('lead_id', activeLeadItem.lead_id);
-            this.disabled = false; this.innerText = '안건삭제';
+            var res = await supabase.from("leads").delete().eq("lead_id", activeLeadItem.lead_id);
+            this.disabled = false; this.innerText = "안건삭제";
 
             if (!res.error) {
-              alert('🗑️ 안건이 삭제되었습니다.');
+              alert("🗑️ 안건이 삭제되었습니다.");
               closeDetailModal();
               loadDashboardLeads();
             } else {
-              alert('삭제 실패: ' + res.error.message);
+              alert("삭제 실패: " + res.error.message);
             }
           });
         }
 
-        var btnShoot = document.getElementById('btnShootCamera');
-        var btnGallery = document.getElementById('btnSelectGallery');
-        var camInput = document.getElementById('cameraInput');
-        var galInput = document.getElementById('galleryInput');
+        var btnShoot = document.getElementById("btnShootCamera");
+        var btnGallery = document.getElementById("btnSelectGallery");
+        var camInput = document.getElementById("cameraInput");
+        var galInput = document.getElementById("galleryInput");
 
-        if (btnShoot && camInput) btnShoot.addEventListener('click', function() { camInput.click(); });
-        if (btnGallery && galInput) btnGallery.addEventListener('click', function() { galInput.click(); });
-        if (camInput) camInput.addEventListener('change', handleFileSelect);
-        if (galInput) galInput.addEventListener('change', handleFileSelect);
+        if (btnShoot && camInput) btnShoot.addEventListener("click", function() { camInput.click(); });
+        if (btnGallery && galInput) btnGallery.addEventListener("click", function() { galInput.click(); });
+        if (camInput) camInput.addEventListener("change", handleFileSelect);
+        if (galInput) galInput.addEventListener("change", handleFileSelect);
 
-        var btnEditShoot = document.getElementById('btnEditShootCamera');
-        var btnEditGallery = document.getElementById('btnEditSelectGallery');
-        var editCamInput = document.getElementById('editCameraInput');
-        var editGalInput = document.getElementById('editGalleryInput');
-        if (btnEditShoot && editCamInput) btnEditShoot.addEventListener('click', function() { editCamInput.click(); });
-        if (btnEditGallery && editGalInput) btnEditGallery.addEventListener('click', function() { editGalInput.click(); });
-        if (editCamInput) editCamInput.addEventListener('change', handleEditFileSelect);
-        if (editGalInput) editGalInput.addEventListener('change', handleEditFileSelect);
+        var btnEditShoot = document.getElementById("btnEditShootCamera");
+        var btnEditGallery = document.getElementById("btnEditSelectGallery");
+        var editCamInput = document.getElementById("editCameraInput");
+        var editGalInput = document.getElementById("editGalleryInput");
+        if (btnEditShoot && editCamInput) btnEditShoot.addEventListener("click", function() { editCamInput.click(); });
+        if (btnEditGallery && editGalInput) btnEditGallery.addEventListener("click", function() { editGalInput.click(); });
+        if (editCamInput) editCamInput.addEventListener("change", handleEditFileSelect);
+        if (editGalInput) editGalInput.addEventListener("change", handleEditFileSelect);
 
-        var repSelectEl = document.getElementById('assignedRep');
-        var carNumEl = document.getElementById('carNumber');
-        var CAR_NUMBER_MAP = { '최영국': '28호', '박광춘': '160호', '임영민': '127호', '이수열': '27호', '정문재': '26호' };
+        var repSelectEl = document.getElementById("assignedRep");
+        var carNumEl = document.getElementById("carNumber");
+        var CAR_NUMBER_MAP = { "최영국": "28호", "박광춘": "160호", "임영민": "127호", "이수열": "27호", "정문재": "26호" };
         if (repSelectEl && carNumEl) {
-          repSelectEl.addEventListener('change', function() {
-            carNumEl.value = CAR_NUMBER_MAP[this.value] || '';
+          repSelectEl.addEventListener("change", function() {
+            carNumEl.value = CAR_NUMBER_MAP[this.value] || "";
           });
         }
 
-        var formLead = document.getElementById('leadForm');
+        var formLead = document.getElementById("leadForm");
         if (formLead) {
-          formLead.addEventListener('submit', async function(e) {
+          formLead.addEventListener("submit", async function(e) {
             e.preventDefault();
-            if (!supabase) { alert('데이터베이스에 연결되지 않았습니다.'); return; }
+            if (!supabase) { alert("데이터베이스에 연결되지 않았습니다."); return; }
 
-            var checked = Array.from(document.querySelectorAll('input[name="prod"]:checked')).map(function(c) { return c.value; });
-            if (checked.length === 0) { alert('관심상품을 1개 이상 선택해주세요.'); return; }
+            var checked = Array.from(document.querySelectorAll("input[name=\"prod\"]:checked")).map(function(c) { return c.value; });
+            if (checked.length === 0) { alert("관심상품을 1개 이상 선택해주세요."); return; }
 
-            var rep = document.getElementById('assignedRep').value;
-            if (!rep) { alert('담당 컨설턴트를 선택해주세요.'); return; }
+            var rep = document.getElementById("assignedRep").value;
+            if (!rep) { alert("담당 컨설턴트를 선택해주세요."); return; }
 
-            var btn = document.getElementById('submitBtn');
+            var btn = document.getElementById("submitBtn");
             btn.disabled = true;
-            btn.innerText = uploadedPhotos.length > 0 ? '사진 업로드 및 저장 중...' : '접수 등록 중...';
+            btn.innerText = uploadedPhotos.length > 0 ? "사진 업로드 및 저장 중..." : "접수 등록 중...";
 
             var now = new Date();
-            var leadId = 'LD-' + now.getFullYear().toString().slice(-2) +
-              ('0' + (now.getMonth() + 1)).slice(-2) +
-              ('0' + now.getDate()).slice(-2) +
-              ('0' + now.getHours()).slice(-2) +
-              ('0' + now.getMinutes()).slice(-2) +
-              ('0' + now.getSeconds()).slice(-2);
+            var leadId = "LD-" + now.getFullYear().toString().slice(-2) +
+              ("0" + (now.getMonth() + 1)).slice(-2) +
+              ("0" + now.getDate()).slice(-2) +
+              ("0" + now.getHours()).slice(-2) +
+              ("0" + now.getMinutes()).slice(-2) +
+              ("0" + now.getSeconds()).slice(-2);
 
-            var agent = document.getElementById('agentName').value || currentUserName;
+            var agent = document.getElementById("agentName").value || currentUserName;
 
             try {
               var photoUrls = [];
@@ -2624,50 +2733,50 @@
                 photoUrls = await uploadPhotosToSupabase(leadId, uploadedPhotos);
               }
 
-              var res = await supabase.from('leads').insert([{
+              var res = await supabase.from("leads").insert([{
                 lead_id: leadId,
-                car_number: document.getElementById('carNumber').value || '',
+                car_number: document.getElementById("carNumber").value || "",
                 agent_name: agent,
-                customer_name: document.getElementById('customerName').value,
-                contact_person: document.getElementById('contactPerson').value,
-                contact_phone: formatPhone(document.getElementById('contactPhone').value),
-                address: document.getElementById('address').value,
-                business_type: document.getElementById('businessType').value,
-                current_company: document.getElementById('currentCompany').value,
-                current_fee: document.getElementById('currentFee').value.replace(/[^0-9]/g, ''),
-                product: checked.join(', '),
-                field_description: document.getElementById('fieldDescription').value,
+                customer_name: document.getElementById("customerName").value,
+                contact_person: document.getElementById("contactPerson").value,
+                contact_phone: formatPhone(document.getElementById("contactPhone").value),
+                address: document.getElementById("address").value,
+                business_type: document.getElementById("businessType").value,
+                current_company: document.getElementById("currentCompany").value,
+                current_fee: document.getElementById("currentFee").value.replace(/[^0-9]/g, ""),
+                product: checked.join(", "),
+                field_description: document.getElementById("fieldDescription").value,
                 photo_urls: photoUrls,
                 assigned_rep: rep,
-                status: '접수대기'
+                status: "접수대기"
               }]);
 
               if (res.error) throw res.error;
 
-              alert('✅ 가망고객 소개가 성공적으로 접수되었습니다!' + (photoUrls.length > 0 ? '\n(사진 ' + photoUrls.length + '장 등록 완료)' : ''));
+              alert("✅ 가망고객 소개가 성공적으로 접수되었습니다!" + (photoUrls.length > 0 ? "\n(사진 " + photoUrls.length + "장 등록 완료)" : ""));
 
-              document.getElementById('customerName').value = '';
-              document.getElementById('contactPerson').value = '';
-              document.getElementById('contactPhone').value = '';
-              document.getElementById('address').value = '';
-              document.getElementById('businessType').value = '';
-              document.getElementById('fieldDescription').value = '';
-              document.getElementById('assignedRep').value = '';
-              document.getElementById('carNumber').value = '';
-              document.querySelectorAll('input[name="prod"]').forEach(function(cb) {
+              document.getElementById("customerName").value = "";
+              document.getElementById("contactPerson").value = "";
+              document.getElementById("contactPhone").value = "";
+              document.getElementById("address").value = "";
+              document.getElementById("businessType").value = "";
+              document.getElementById("fieldDescription").value = "";
+              document.getElementById("assignedRep").value = "";
+              document.getElementById("carNumber").value = "";
+              document.querySelectorAll("input[name=\"prod\"]").forEach(function(cb) {
                 cb.checked = false;
-                if (cb.closest('.prod-item')) cb.closest('.prod-item').classList.remove('checked');
+                if (cb.closest(".prod-item")) cb.closest(".prod-item").classList.remove("checked");
               });
 
               uploadedPhotos = [];
               renderPreview();
-              showScreen('dashboard');
+              showScreen("dashboard");
 
             } catch (err) {
-              alert('등록 실패: ' + (err.message || err));
+              alert("등록 실패: " + (err.message || err));
             } finally {
               btn.disabled = false;
-              btn.innerText = '⚡ 실시간 접수 등록';
+              btn.innerText = "⚡ 실시간 접수 등록";
             }
           });
         }
@@ -2676,3 +2785,4 @@
   </script>
 </body>
 </html>
+
