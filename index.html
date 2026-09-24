@@ -853,13 +853,13 @@
     <div class="modal-card" style="max-width: 680px;">
       <div class="modal-header">
         <div class="modal-header-left">
-          <h3>👥 등록된 사용자 관리</h3>
+          <h3>👥 사용자 관리</h3>
         </div>
         <button type="button" class="btn-close" id="btnCloseUserModal">×</button>
       </div>
       <div class="modal-body">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <span style="font-size:0.84rem; color:#5f6368;">총 등록된 사용자: <strong id="totalUserCount" style="color:#1a73e8;">0</strong>명</span>
+          <span style="font-size:0.84rem; color:#5f6368;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;">0</strong>명</span>
           <button type="button" class="btn-inner btn-switch" id="btnRefreshUsers" style="padding:5px 10px; font-size:0.75rem;">🔄 새로고침</button>
         </div>
 
@@ -1999,7 +1999,7 @@
             html += "<tr>"
               + "<td><strong>" + (u.name || "-") + "</strong></td>"
               + "<td>" + phoneFmt + "</td>"
-              + "<td>" + (function(j) { var bg = "#e8f0fe", col = "#1a73e8"; if (j === "본사관리자") { bg = "#f3e8fd"; col = "#7627bb"; } else if (j === "지사관리자") { bg = "#fef7e0"; col = "#b06000"; } else if (j === "컨설턴트") { bg = "#e8f0fe"; col = "#1a73e8"; } else if (j === "기술사원") { bg = "#e6f4ea"; col = "#137333"; } return "<span style=\"background:" + bg + "; color:" + col + "; padding:2px 7px; border-radius:4px; font-weight:700; font-size:0.75rem;\">" + (j || "미지정") + "</span>"; })(u.job) + "</td>"
+              + "<td>" + (function(j) { var bg = "#e8f0fe", col = "#1a73e8", border = "#aecbfa"; if (j === "본사관리자") { bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb"; } else if (j === "지사관리자") { bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2"; } else if (j === "컨설턴트") { bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa"; } else if (j === "기술사원") { bg = "#e6f4ea"; col = "#137333"; border = "#ceead6"; } else if (j === "CS근무자") { bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf"; } else if (j === "CS관리자") { bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0"; } return "<span style=\"background:" + bg + "; color:" + col + "; border:1px solid " + border + "; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;\">" + (j || "미지정") + "</span>"; })(u.job) + "</td>"
               + "<td>"
               + "<button type=\"button\" class=\"btn-user-edit\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\" data-job=\"" + (u.job || "CS근무자") + "\">수정</button>"
               + "<button type=\"button\" class=\"btn-user-del\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\">삭제</button>"
