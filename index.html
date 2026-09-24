@@ -426,6 +426,8 @@
                 <option value="CS관리자">CS관리자</option>
                 <option value="컨설턴트">컨설턴트</option>
                 <option value="기술사원">기술사원</option>
+                <option value="지사관리자">지사관리자</option>
+                <option value="본사관리자">본사관리자</option>
               </select>
             </div>
 
@@ -894,6 +896,7 @@
                 <option value="컨설턴트">컨설턴트</option>
                 <option value="기술사원">기술사원</option>
                 <option value="지사관리자">지사관리자</option>
+                <option value="본사관리자">본사관리자</option>
               </select>
             </div>
           </div>
@@ -990,6 +993,10 @@
       var editKeptPhotoUrls = [];
       var editNewPhotos = [];
       var selectedBoardFile = null;
+
+      function isAdminRole(role) {
+        return role === '지사관리자' || role === '본사관리자';
+      }
 
       function openNaverMap(query) {
         if (!query) return;
@@ -1143,7 +1150,7 @@
         var btnContainer = document.getElementById("dashHeaderButtons");
         if (btnContainer) {
           var htmlBtns = "";
-          if (currentRole === "지사관리자") {
+          if (isAdminRole(currentRole)) {
             htmlBtns += "<button type=\"button\" class=\"btn-inner btn-users\" id=\"dashUsersBtn\">👥 사용자</button>";
           }
           htmlBtns += "<button type=\"button\" class=\"btn-inner btn-pwd\" id=\"dashPwdBtn\">🔑 비밀번호 변경</button>";
@@ -1164,7 +1171,7 @@
           if (loBtn) loBtn.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
         }
 
-        var displayName = (currentRole === "지사관리자") ? "👑 관리자" : "👤 " + currentUserName + " (" + currentRole + ")";
+        var displayName = isAdminRole(currentRole) ? ("👑 " + currentRole) : ("👤 " + currentUserName + " (" + currentRole + ")");
         var regUserTitle = document.getElementById("regUserTitle");
         var dashUserTitle = document.getElementById("dashUserTitle");
         if (regUserTitle) regUserTitle.innerText = displayName;
@@ -1558,7 +1565,7 @@
 
           if (currentRole === "컨설턴트") {
             query = query.eq("assigned_rep", currentUserName);
-          } else if (currentRole !== "지사관리자") {
+          } else if (!isAdminRole(currentRole)) {
             query = query.eq("agent_name", currentUserName);
           }
 
@@ -1626,7 +1633,7 @@
         var pcBody = document.getElementById("pcTableBody");
         var mList = document.getElementById("mobileCardList");
 
-        var emptyMsg = (currentRole === "컨설턴트") ? "나에게 배당된 안건이 없습니다." : (currentRole === "지사관리자" ? "조회된 소개 내역이 없습니다." : "내가 소개한 안건이 아직 없습니다.");
+        var emptyMsg = (currentRole === "컨설턴트") ? "나에게 배당된 안건이 없습니다." : (isAdminRole(currentRole) ? "조회된 소개 내역이 없습니다." : "내가 소개한 안건이 아직 없습니다.");
 
         if (!list || list.length === 0) {
           if (pcBody) pcBody.innerHTML = "<tr><td colspan=\"11\" style=\"text-align:center; padding:35px; color:#9aa0a6;\">" + emptyMsg + "</td></tr>";
@@ -1717,7 +1724,7 @@
 
           var html = "";
           posts.forEach(function(p) {
-            var canDelete = (currentRole === "지사관리자") || (p.author === currentUserName);
+            var canDelete = isAdminRole(currentRole) || (p.author === currentUserName);
             var delBtnHtml = canDelete ? "<button type=\"button\" class=\"board-del-btn\" data-delid=\"" + p.post_id + "\">삭제</button>" : "";
 
             var rawText = (p.content || "").trim();
@@ -1813,7 +1820,7 @@
           var titleSnippet = firstLine.length > 30 ? firstLine.substring(0, 30) + "..." : firstLine;
 
           var postId = "B-" + Date.now();
-          var authorRole = (currentRole === "지사관리자") ? "지사 관리자" : currentRole;
+          var authorRole = isAdminRole(currentRole) ? currentRole : currentRole;
 
           var res = await supabase.from("lead_board").insert([{
             post_id: postId,
@@ -1901,13 +1908,13 @@
         var editContainer = document.getElementById("editLeadContainer");
         if (editContainer) editContainer.style.display = "none";
 
-        var canModify = (currentRole === "지사관리자") || (currentUserName && item.agent_name && currentUserName.trim() === item.agent_name.trim());
+        var canModify = isAdminRole(currentRole) || (currentUserName && item.agent_name && currentUserName.trim() === item.agent_name.trim());
         if (actionsBox) {
           actionsBox.style.display = canModify ? "block" : "none";
         }
 
         var statusBox = document.getElementById("statusUpdateBox");
-        var canChangeStatus = (currentRole === "지사관리자") || (currentRole === "컨설턴트" && item.assigned_rep === currentUserName);
+        var canChangeStatus = isAdminRole(currentRole) || (currentRole === "컨설턴트" && item.assigned_rep === currentUserName);
 
         if (statusBox) {
           var btnSave = document.getElementById("btnSaveStatus");
@@ -1954,7 +1961,7 @@
       }
 
       async function openUserModal() {
-        if (currentRole !== "지사관리자") return;
+        if (!isAdminRole(currentRole)) return;
         var modal = document.getElementById("userManageModal");
         if (modal) modal.classList.add("open");
         document.getElementById("userEditBox").style.display = "none";
@@ -1975,7 +1982,7 @@
         tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#9aa0a6;\">사용자 목록 불러오는 중...</td></tr>";
 
         try {
-          var res = await supabase.from("app_users").select("*").order("created_at", { ascending: false });
+          var res = await supabase.from("app_users").select("*").order("name", { ascending: true });
           if (res.error) throw res.error;
 
           var users = res.data || [];
@@ -1992,7 +1999,7 @@
             html += "<tr>"
               + "<td><strong>" + (u.name || "-") + "</strong></td>"
               + "<td>" + phoneFmt + "</td>"
-              + "<td><span style=\"background:#e8f0fe; color:#1a73e8; padding:2px 6px; border-radius:4px; font-weight:700; font-size:0.75rem;\">" + (u.job || "미지정") + "</span></td>"
+              + "<td>" + (function(j) { var bg = "#e8f0fe", col = "#1a73e8"; if (j === "본사관리자") { bg = "#f3e8fd"; col = "#7627bb"; } else if (j === "지사관리자") { bg = "#fef7e0"; col = "#b06000"; } else if (j === "컨설턴트") { bg = "#e8f0fe"; col = "#1a73e8"; } else if (j === "기술사원") { bg = "#e6f4ea"; col = "#137333"; } return "<span style=\"background:" + bg + "; color:" + col + "; padding:2px 7px; border-radius:4px; font-weight:700; font-size:0.75rem;\">" + (j || "미지정") + "</span>"; })(u.job) + "</td>"
               + "<td>"
               + "<button type=\"button\" class=\"btn-user-edit\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\" data-job=\"" + (u.job || "CS근무자") + "\">수정</button>"
               + "<button type=\"button\" class=\"btn-user-del\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\">삭제</button>"
@@ -2029,7 +2036,16 @@
         var box = document.getElementById("userEditBox");
         document.getElementById("editUserTargetPhone").value = phone;
         document.getElementById("editUserNameInput").value = name;
-        document.getElementById("editUserJobSelect").value = job;
+        
+        var normalizedJob = job || 'CS근무자';
+        if (normalizedJob.indexOf('본사') !== -1) normalizedJob = '본사관리자';
+        else if (normalizedJob.indexOf('영업') !== -1 || normalizedJob.indexOf('컨설턴트') !== -1) normalizedJob = '컨설턴트';
+        else if (normalizedJob.indexOf('기술') !== -1 || normalizedJob.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
+        else if (normalizedJob.indexOf('서비스') !== -1 || normalizedJob.indexOf('CS근무자') !== -1) normalizedJob = 'CS근무자';
+        else if (normalizedJob.indexOf('Staff') !== -1 || normalizedJob.indexOf('지원') !== -1 || normalizedJob.indexOf('CS관리자') !== -1) normalizedJob = 'CS관리자';
+        else if (normalizedJob.indexOf('관리자') !== -1 || normalizedJob.indexOf('지사') !== -1) normalizedJob = '지사관리자';
+        
+        document.getElementById("editUserJobSelect").value = normalizedJob;
         document.getElementById("editUserNewPwdInput").value = "";
         box.style.display = "block";
         box.scrollIntoView({ behavior: "smooth" });
@@ -2101,7 +2117,7 @@
         if (!supabase) return;
 
         var query = supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(5);
-        if (currentRole !== "지사관리자" && currentUserName) {
+        if (!isAdminRole(currentRole) && currentUserName) {
           query = query.eq("agent_name", currentUserName);
         }
 
