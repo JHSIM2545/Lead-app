@@ -1491,17 +1491,34 @@
         el.value = digits ? Number(digits).toLocaleString("ko-KR") : "";
       }
 
+      var modalHistoryStack = [];
+
       function openPhotoLightbox(url) {
         var box = document.getElementById("photoLightbox");
         var img = document.getElementById("photoLightboxImg");
         if (!box || !img || !url) return;
         img.src = url;
         box.style.display = "flex";
+
+        // 안드로이드 폰 뒤로가기 버튼 지원을 위한 히스토리 상태 푸시
+        try {
+          history.pushState({ modalId: "photoLightbox" }, "");
+          modalHistoryStack.push("photoLightbox");
+        } catch (e) {}
       }
 
-      function closePhotoLightbox() {
+      function closePhotoLightbox(fromPopstate) {
+        var idx = modalHistoryStack.indexOf("photoLightbox");
+        if (!fromPopstate && idx !== -1) {
+          // X버튼이나 배경 클릭 시 history.back()을 호출하여 popstate 이벤트로 단일 처리
+          history.back();
+          return;
+        }
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
         var box = document.getElementById("photoLightbox");
         if (box) box.style.display = "none";
+        var img = document.getElementById("photoLightboxImg");
+        if (img) img.src = "";
       }
 
       window.openPhotoLightbox = openPhotoLightbox;
@@ -2251,10 +2268,23 @@
         if (bInput) bInput.value = "";
 
         var modal = document.getElementById("detailModal");
-        if (modal) modal.classList.add("open");
+        if (modal) {
+          modal.classList.add("open");
+          try {
+            history.pushState({ modalId: "detailModal" }, "");
+            modalHistoryStack.push("detailModal");
+          } catch (e) {}
+        }
       }
 
-      function closeDetailModal() {
+      function closeDetailModal(fromPopstate) {
+        var idx = modalHistoryStack.indexOf("detailModal");
+        if (!fromPopstate && idx !== -1) {
+          history.back();
+          return;
+        }
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
+
         var modal = document.getElementById("detailModal");
         if (modal) modal.classList.remove("open");
         var editContainer = document.getElementById("editLeadContainer");
@@ -2270,10 +2300,22 @@
         document.getElementById("newPwdInput").value = "";
         document.getElementById("newPwdConfirmInput").value = "";
         var m = document.getElementById("pwdChangeModal");
-        if (m) m.classList.add("open");
+        if (m) {
+          m.classList.add("open");
+          try {
+            history.pushState({ modalId: "pwdChangeModal" }, "");
+            modalHistoryStack.push("pwdChangeModal");
+          } catch (e) {}
+        }
       }
 
-      function closePwdModal() {
+      function closePwdModal(fromPopstate) {
+        var idx = modalHistoryStack.indexOf("pwdChangeModal");
+        if (!fromPopstate && idx !== -1) {
+          history.back();
+          return;
+        }
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
         var m = document.getElementById("pwdChangeModal");
         if (m) m.classList.remove("open");
         hideLoginErrors();
@@ -2282,12 +2324,24 @@
       async function openUserModal() {
         if (!isAdminRole(currentRole)) return;
         var modal = document.getElementById("userManageModal");
-        if (modal) modal.classList.add("open");
+        if (modal) {
+          modal.classList.add("open");
+          try {
+            history.pushState({ modalId: "userManageModal" }, "");
+            modalHistoryStack.push("userManageModal");
+          } catch (e) {}
+        }
         document.getElementById("userEditBox").style.display = "none";
         await loadAllUsers();
       }
 
-      function closeUserModal() {
+      function closeUserModal(fromPopstate) {
+        var idx = modalHistoryStack.indexOf("userManageModal");
+        if (!fromPopstate && idx !== -1) {
+          history.back();
+          return;
+        }
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
         var modal = document.getElementById("userManageModal");
         if (modal) modal.classList.remove("open");
         document.getElementById("userEditBox").style.display = "none";
@@ -2450,6 +2504,37 @@
           listDiv.innerHTML = html || "<p style=\"font-size:0.8rem; color:#9aa0a6; text-align:center;\">최근 접수 내역이 없습니다.</p>";
         }
       }
+
+            // 폰의 물리/제스처 뒤로가기 버튼 처리 (사진 및 모달 닫기)
+      window.addEventListener("popstate", function(e) {
+        // 1. 사진 확대 라이트박스가 열려있는 경우 -> 사진만 닫기 (상세 화면 유지!)
+        var photoBox = document.getElementById("photoLightbox");
+        if (photoBox && photoBox.style.display !== "none") {
+          closePhotoLightbox(true);
+          return;
+        }
+
+        // 2. 고객 상세정보 모달이 열려있는 경우 -> 상세 모달 닫기 (목록 복귀)
+        var detailModal = document.getElementById("detailModal");
+        if (detailModal && detailModal.classList.contains("open")) {
+          closeDetailModal(true);
+          return;
+        }
+
+        // 3. 비밀번호 변경 모달이 열려있는 경우 -> 모달 닫기
+        var pwdModal = document.getElementById("pwdChangeModal");
+        if (pwdModal && pwdModal.classList.contains("open")) {
+          closePwdModal(true);
+          return;
+        }
+
+        // 4. 사용자 관리 모달이 열려있는 경우 -> 모달 닫기
+        var userModal = document.getElementById("userManageModal");
+        if (userModal && userModal.classList.contains("open")) {
+          closeUserModal(true);
+          return;
+        }
+      });
 
       document.addEventListener("DOMContentLoaded", function() {
         // 앱으로 다시 돌아오거나 새로고침 시 로그인 세션 및 화면 상태 자동 복원
