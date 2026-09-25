@@ -3,12 +3,12 @@
 <head>
   <base target="_top">
   <meta charset="utf-8">
-  <title>북서울 소개영업 포털</title>
+  <title>소개영업 등록관리 포털 - 에스원 북서울지사</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="북서울 소개영업">
+  <meta name="apple-mobile-web-app-title" content="소개영업 등록관리">
   <meta name="theme-color" content="#1a73e8">
 
   <!-- Supabase CDN -->
@@ -374,14 +374,14 @@
     <div id="viewLogin">
       <div class="login-card">
         <div class="login-header">
-          <h2>소개영업 포털</h2>
-          <p id="loginGuideText">휴대전화번호와 비밀번호로 로그인해 주세요</p>
+          <div style="font-size:0.88rem; font-weight:700; color:#1a73e8; margin-bottom:5px; letter-spacing:-0.2px;">에스원 북서울지사</div>
+          <h1 style="margin:0; font-size:1.45rem; color:#0b1f3a; font-weight:800; letter-spacing:-0.5px;">소개영업 등록관리 포털</h1>
         </div>
 
         <!-- 1. 통합 로그인 폼 (일반 직원 / 지사관리자 공용) - 웹 표준 자동저장 및 눈 아이콘 탑재 -->
         <div id="loginFormMember" style="display:block;">
           <form id="formLoginMember" action="javascript:void(0);" method="post" autocomplete="on">
-            <div style="background:#e8f0fe; color:#1a73e8; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #aecbfa;">💼 북서울지사 직원 로그인 (전화번호+비밀번호)</div>
+            
             <div class="form-group">
               <label class="form-label" for="memberLoginPhone">아이디 (휴대전화번호) <span class="req">*</span></label>
               <input type="tel" id="memberLoginPhone" name="username" placeholder="010-0000-0000 (숫자만 입력)" autocomplete="username tel" required>
@@ -406,7 +406,7 @@
         <!-- 2. 신규 회원가입 폼 -->
         <div id="loginFormSignup" style="display:none;">
           <form id="formSignup" action="javascript:void(0);" method="post" autocomplete="on">
-            <div style="background:#e6f4ea; color:#137333; font-size:0.85rem; font-weight:700; padding:9px 12px; border-radius:8px; margin-bottom:14px; text-align:center; border:1px solid #ceead6;">📝 신규 직원 회원가입</div>
+            
             
             <div class="form-group">
               <label class="form-label">아이디 (휴대전화번호) <span class="req">*</span></label>
@@ -472,15 +472,9 @@
         </div>
       </div>
 
-      <div class="intro-card">
-        <div class="intro-hero">
-          <div class="intro-hero-gradient"></div>
-          <div class="intro-hero-content">
-            <div class="intro-badge">북서울</div>
-            <h1 class="intro-title">고객소개 현장등록</h1>
-            <p class="intro-subtitle">"당신의 관심과 소개가 우리 지사에 큰 힘이 됩니다."</p>
-          </div>
-        </div>
+      <div style="background:#ffffff; border-radius:14px; padding:18px 20px; margin-bottom:16px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.04); text-align:center;">
+        <div style="font-size:0.85rem; font-weight:700; color:#1a73e8; margin-bottom:4px; letter-spacing:-0.2px;">에스원 북서울지사</div>
+        <h2 style="margin:0; font-size:1.35rem; color:#0b1f3a; font-weight:800; letter-spacing:-0.5px;">소개영업 등록관리 포털</h2>
       </div>
 
       <div class="form-card">
