@@ -261,15 +261,52 @@
     .search-box { display: flex; gap: 6px; flex: 1; max-width: 320px; min-width: 220px; }
     .search-box input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 8px; width: 100%; font-size: 0.9rem; }
 
-    .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
-    .badge-wait { background: #fef7e0; color: #b06000; border: 1px solid #fce8b2; }
-    .badge-ing { background: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa; }
-    .badge-meet { background: #f3e8fd; color: #7627bb; border: 1px solid #d7bdfb; }
-    .badge-quote { background: #fef3e0; color: #b8590a; border: 1px solid #fcd9a6; }
-    .badge-done { background: #e6f4ea; color: #137333; border: 1px solid #ceead6; }
-    .badge-fail { background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
-    .badge-hold { background: #eeeeee; color: #5f6368; border: 1px solid #dadce0; }
-    .badge-cancel { background: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;
+      font-weight: 700; white-space: nowrap; border: 1.5px solid transparent;
+    }
+
+    /* 단계별 안건 카드 테두리 및 우측상단 뱃지 스타일 (필터 버튼과 100% 동일 규격) */
+    .mobile-lead-card {
+      background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 2px solid #e2e8f0; transition: border-color 0.2s ease;
+    }
+
+    /* 1. 접수대기 (주황/앰버) */
+    .mobile-lead-card.stage-wait { border-color: #f59e0b !important; }
+    .badge.stage-wait, .badge-wait { background: #fef3c7; color: #b45309; border-color: #f59e0b !important; }
+
+    /* 2. 접수확인 (스카이블루) */
+    .mobile-lead-card.stage-confirm { border-color: #0284c7 !important; }
+    .badge.stage-confirm, .badge-ing { background: #e0f2fe; color: #0284c7; border-color: #0284c7 !important; }
+
+    /* 3. 고객면담 (퍼플) */
+    .mobile-lead-card.stage-consult { border-color: #7c3aed !important; }
+    .badge.stage-consult, .badge-meet { background: #ede9fe; color: #7c3aed; border-color: #7c3aed !important; }
+
+    /* 4. 추가면담 (인디고) */
+    .mobile-lead-card.stage-moreconsult { border-color: #6366f1 !important; }
+    .badge.stage-moreconsult { background: #e0e7ff; color: #6366f1; border-color: #6366f1 !important; }
+
+    /* 5. 견적제출 (진한 오렌지/앰버) */
+    .mobile-lead-card.stage-quote { border-color: #ea580c !important; }
+    .badge.stage-quote, .badge-quote { background: #ffedd5; color: #ea580c; border-color: #ea580c !important; }
+
+    /* 6. 견적상담 (브론즈/웜앰버) */
+    .mobile-lead-card.stage-quoteconsult { border-color: #b45309 !important; }
+    .badge.stage-quoteconsult { background: #fef3c7; color: #b45309; border-color: #b45309 !important; }
+
+    /* 7. 계약완료 (초록/성공) */
+    .mobile-lead-card.stage-done { border-color: #16a34a !important; }
+    .badge.stage-done, .badge-done { background: #dcfce7; color: #16a34a; border-color: #16a34a !important; }
+
+    /* 8. 계약실패 (빨강/실패) */
+    .mobile-lead-card.stage-fail { border-color: #dc2626 !important; }
+    .badge.stage-fail, .badge-fail { background: #fee2e2; color: #dc2626; border-color: #dc2626 !important; }
+
+    /* 9. 계약보류 (슬레이트 그레이) */
+    .mobile-lead-card.stage-hold, .mobile-lead-card.stage-cancel { border-color: #64748b !important; }
+    .badge.stage-hold, .badge.stage-cancel, .badge-hold, .badge-cancel { background: #f1f5f9; color: #475569; border-color: #64748b !important; }
 
     .pc-table-wrapper {
       background: #fff; border-radius: 12px; overflow-x: auto;
@@ -301,10 +338,7 @@
       .pc-table-wrapper { display: none !important; }
       .mobile-card-list { display: block !important; }
     }
-    .mobile-lead-card {
-      background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
-    }
+    
     .m-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .m-agent-tag { background: #e8f0fe; color: #1a73e8; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
     .m-customer-name { font-size: 1.15rem; font-weight: 800; color: #1a73e8; margin-bottom: 4px; }
@@ -1417,13 +1451,20 @@
         return list;
       }
 
+      function getStageClass(status) {
+        if (status === "접수확인") return "stage-confirm";
+        if (status === "고객면담") return "stage-consult";
+        if (status === "추가면담") return "stage-moreconsult";
+        if (status === "견적제출") return "stage-quote";
+        if (status === "견적상담") return "stage-quoteconsult";
+        if (status === "계약완료") return "stage-done";
+        if (status === "계약실패") return "stage-fail";
+        if (status === "계약보류" || status === "취소/보류") return "stage-hold";
+        return "stage-wait";
+      }
+
       function getBadgeClass(status) {
-        if (status === "계약완료") return "badge-done";
-        if (status === "계약실패") return "badge-fail";
-        if (status === "계약보류" || status === "취소/보류") return "badge-cancel";
-        if (status === "견적제출" || status === "견적상담") return "badge-quote";
-        if (status === "접수확인" || status === "고객면담" || status === "추가면담") return "badge-ing";
-        return "badge-wait";
+        return getStageClass(status);
       }
 
       function compressImage(file, maxDim, quality, callback) {
@@ -1718,7 +1759,8 @@
             + "<td><button type=\"button\" class=\"btn-detail\" data-idx=\"" + idx + "\">상세보기</button></td>"
             + "</tr>";
 
-          mHtml += "<div class=\"mobile-lead-card\">"
+          var stClass = getStageClass(r.status);
+          mHtml += "<div class=\"mobile-lead-card " + stClass + "\">"
             + "<div class=\"m-card-header\"><span class=\"m-agent-tag\">소개자: " + (r.agent_name || "-") + "</span><span class=\"badge " + getBadgeClass(r.status) + "\">" + (r.status || "접수대기") + "</span></div>"
             + "<div class=\"m-customer-name\" data-idx=\"" + idx + "\" style=\"cursor:pointer;\">" + r.customer_name + "</div>"
             + "<a href=\"tel:" + phoneFmt + "\" class=\"m-phone-link\">" + PHONE_ICON_SVG + " " + phoneFmt + "</a>"
