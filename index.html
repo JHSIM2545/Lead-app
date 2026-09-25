@@ -1077,6 +1077,70 @@
       var editNewPhotos = [];
       var selectedBoardFile = null;
 
+      var SESSION_KEY = 'S1_PORTAL_AUTH_SESSION';
+      var SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7일간 로그인 세션 유지
+
+      function saveUserSession(user, screen) {
+        if (!user || !user.phone) return;
+        try {
+          var data = {
+            phone: user.phone,
+            name: user.name || '',
+            job: user.job || 'CS근무자',
+            screen: screen || 'dashboard',
+            savedAt: Date.now()
+          };
+          localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.warn('세션 저장 실패:', e);
+        }
+      }
+
+      function clearUserSession() {
+        try {
+          localStorage.removeItem(SESSION_KEY);
+        } catch (e) {}
+        currentRole = '';
+        currentUserName = '';
+        currentUserPhone = '';
+      }
+
+      function restoreUserSession() {
+        try {
+          var raw = localStorage.getItem(SESSION_KEY);
+          if (!raw) return false;
+          var data = JSON.parse(raw);
+          if (!data || !data.phone || !data.name) return false;
+
+          // 세션 만료 시간 체크
+          if (Date.now() - (data.savedAt || 0) > SESSION_DURATION_MS) {
+            clearUserSession();
+            return false;
+          }
+
+          currentRole = data.job ? data.job.trim() : 'CS근무자';
+          currentUserName = data.name ? data.name.trim() : '직원';
+          currentUserPhone = data.phone;
+
+          var agentEl = document.getElementById('agentName');
+          if (agentEl) agentEl.value = currentUserName;
+
+          var targetScreen = (data.screen === 'register') ? 'register' : 'dashboard';
+          showScreen(targetScreen);
+          registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
+          return true;
+        } catch (e) {
+          console.warn('세션 복원 실패:', e);
+          return false;
+        }
+      }
+
+      function doLogout() {
+        clearUserSession();
+        showScreen('login');
+        applyLoginTab('member');
+      }
+
       function isAdminRole(role) {
         return role === '지사관리자' || role === '본사관리자';
       }
@@ -1251,7 +1315,7 @@
           if (swBtn) swBtn.addEventListener("click", function() { showScreen("register"); });
 
           var loBtn = document.getElementById("dashLogoutBtn");
-          if (loBtn) loBtn.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
+          if (loBtn) loBtn.addEventListener("click", doLogout);
         }
 
         var displayName = isAdminRole(currentRole) ? ("👑 " + currentRole) : ("👤 " + currentUserName + " (" + currentRole + ")");
@@ -1260,11 +1324,15 @@
         if (regUserTitle) regUserTitle.innerText = displayName;
         if (dashUserTitle) dashUserTitle.innerText = displayName;
 
+        if (screenId !== "login" && currentUserPhone) {
+          saveUserSession({ phone: currentUserPhone, name: currentUserName, job: currentRole }, screenId);
+        }
+
         if (screenId === "register") {
           var regSwitch = document.getElementById("regSwitchBtn");
           if (regSwitch) regSwitch.addEventListener("click", function() { showScreen("dashboard"); });
           var regLogout = document.getElementById("regLogoutBtn");
-          if (regLogout) regLogout.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
+          if (regLogout) regLogout.addEventListener("click", doLogout);
           var regPwd = document.getElementById("regPwdBtn");
           if (regPwd) regPwd.addEventListener("click", openPwdModal);
           loadRecentHistory();
@@ -2247,6 +2315,25 @@
       }
 
       document.addEventListener("DOMContentLoaded", function() {
+        // 앱으로 다시 돌아오거나 새로고침 시 로그인 세션 및 화면 상태 자동 복원
+        var hasRestored = restoreUserSession();
+        // 다른 앱으로 전환 후 다시 돌아왔을 때 세션 유지 및 데이터 갱신
+        document.addEventListener('visibilitychange', function() {
+          if (document.visibilityState === 'visible') {
+            if (currentUserPhone) {
+              var vDash = document.getElementById('viewDashboard');
+              if (vDash && vDash.style.display !== 'none') {
+                loadDashboardLeads();
+              }
+            } else {
+              restoreUserSession();
+            }
+          }
+        });
+        if (!hasRestored) {
+          showScreen("login");
+          applyLoginTab("member");
+        }
         var btnGoSignup = document.getElementById("btnGoSignup");
         var btnBackToLogin = document.getElementById("btnBackToLogin");
         if (btnGoSignup) btnGoSignup.addEventListener("click", function(e) { e.preventDefault(); applyLoginTab("signup"); });
@@ -2402,6 +2489,7 @@
               currentUserName = user.name ? user.name.trim() : "직원";
               currentUserPhone = user.phone;
 
+              saveUserSession({ phone: currentUserPhone, name: currentUserName, job: currentRole }, "dashboard");
               document.getElementById("agentName").value = currentUserName;
               registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
               showScreen("dashboard");
@@ -2533,8 +2621,8 @@
 
         if (regSwitch) regSwitch.addEventListener("click", function() { showScreen("dashboard"); });
         if (dashSwitch) dashSwitch.addEventListener("click", function() { showScreen("register"); });
-        if (regLogout) regLogout.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
-        if (dashLogout) dashLogout.addEventListener("click", function() { showScreen("login"); applyLoginTab("member"); });
+        if (regLogout) regLogout.addEventListener("click", doLogout);
+        if (dashLogout) dashLogout.addEventListener("click", doLogout);
         if (closeDetail) closeDetail.addEventListener("click", closeDetailModal);
 
         document.querySelectorAll(".filter-chip").forEach(function(chip) {
