@@ -356,13 +356,35 @@
     .btn-user-del { padding: 4px 8px; background: #fce8e6; color: #d93025; border: 1px solid #fad2cf; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-left: 4px; }
     .user-edit-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 8px; padding: 12px; margin-top: 12px; display: none; }
 
-    body.on-login { background: #ffffff; }
-    body.on-login .main-container { max-width: 100%; padding: 0; margin: 0; }
-    body.on-login #viewLogin { margin: 0 auto; width: 100%; max-width: 420px; }
-    body.on-login .login-card { border-radius: 0; box-shadow: none; border: none; }
-    @media (min-width: 480px) {
-      body.on-login #viewLogin { margin: 24px auto; }
-      body.on-login .login-card { border-radius: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+    body.on-login {
+      background-color: #f4f6f9 !important;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    body.on-login .main-container {
+      max-width: 100%;
+      width: 100%;
+      padding: 16px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    body.on-login #viewLogin {
+      margin: 20px auto;
+      width: 100%;
+      max-width: 390px;
+    }
+    body.on-login .login-card {
+      background: #ffffff !important;
+      border-radius: 20px !important;
+      padding: 36px 26px !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+      border: 1px solid #e2e8f0 !important;
+      box-sizing: border-box;
+      width: 100%;
     }
   </style>
 </head>
@@ -370,35 +392,37 @@
 
   <div class="main-container">
 
-    <!-- [화면 1] 통합 로그인 / 회원가입 화면 -->
+    <!-- [화면 1] 통합 로그인 / 회원가입 화면 (TA 관리 포털 스타일) -->
     <div id="viewLogin">
       <div class="login-card">
-        <div class="login-header">
-          <div style="font-size:0.88rem; font-weight:700; color:#1a73e8; margin-bottom:5px; letter-spacing:-0.2px;">에스원 북서울지사</div>
-          <h1 style="margin:0; font-size:1.45rem; color:#0b1f3a; font-weight:800; letter-spacing:-0.5px;">소개영업 등록관리 포털</h1>
+        
+        <!-- 로그인 헤더 (작은 글자: 에스원 북서울지사 / 큰 글자: 소개영업 등록관리 포털) -->
+        <div class="login-header" style="text-align:center; margin-bottom:28px;">
+          <div style="font-size:0.92rem; font-weight:600; color:#64748b; margin-bottom:6px; letter-spacing:-0.2px;">에스원 북서울지사</div>
+          <h1 style="margin:0; font-size:1.55rem; color:#0f172a; font-weight:800; letter-spacing:-0.5px;">소개영업 등록관리 포털</h1>
         </div>
 
-        <!-- 1. 통합 로그인 폼 (일반 직원 / 지사관리자 공용) - 웹 표준 자동저장 및 눈 아이콘 탑재 -->
+        <!-- 1. 로그인 폼 (Image 2 TA관리 포털 100% 동일 규격) -->
         <div id="loginFormMember" style="display:block;">
           <form id="formLoginMember" action="javascript:void(0);" method="post" autocomplete="on">
-            
-            <div class="form-group">
-              <label class="form-label" for="memberLoginPhone">아이디 (휴대전화번호) <span class="req">*</span></label>
-              <input type="tel" id="memberLoginPhone" name="username" placeholder="010-0000-0000 (숫자만 입력)" autocomplete="username tel" required>
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-label" for="memberLoginPhone" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">전화번호</label>
+              <input type="tel" id="memberLoginPhone" name="username" placeholder="01012345678" autocomplete="username tel" required style="width:100%; padding:13px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
             </div>
-            <div class="form-group">
-              <label class="form-label" for="memberLoginPwd">비밀번호 <span class="req">*</span></label>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label class="form-label" for="memberLoginPwd" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">비밀번호</label>
               <div style="position:relative; width:100%;">
-                <input type="password" id="memberLoginPwd" name="password" placeholder="비밀번호 입력" autocomplete="current-password" required style="width:100%; padding-right:45px;">
-                <button type="button" onclick="togglePasswordVisibility('memberLoginPwd', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+                <input type="password" id="memberLoginPwd" name="password" placeholder="" autocomplete="current-password" required style="width:100%; padding:13px 45px 13px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
+                <button type="button" onclick="togglePasswordVisibility('memberLoginPwd', this)" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
               </div>
             </div>
-            <button type="submit" class="btn-login-action" id="btnMemberLogin">로그인 접속</button>
+            
+            <button type="submit" class="btn-login-action" id="btnMemberLogin" style="width:100%; padding:14px; background:#1a73e8; color:#ffffff; border:none; border-radius:10px; font-size:1.05rem; font-weight:700; cursor:pointer; margin-top:22px; box-shadow:0 4px 12px rgba(26,115,232,0.25);">로그인</button>
             <div class="login-error-msg" id="memberLoginErr"></div>
 
-            <div class="signup-toggle-box">
-              아직 계정이 없으신가요? 
-              <button type="button" class="signup-toggle-btn" id="btnGoSignup">신규 회원가입</button>
+            <div style="border-top:1px dotted #cbd5e1; margin-top:28px; padding-top:22px; text-align:center;">
+              <div style="font-size:0.9rem; color:#64748b; margin-bottom:8px;">아직 계정이 없으신가요?</div>
+              <button type="button" id="btnGoSignup" style="background:none; border:none; font-size:0.98rem; font-weight:700; color:#1a73e8; cursor:pointer; text-decoration:underline; padding:4px 8px;">신규 회원가입</button>
             </div>
           </form>
         </div>
@@ -406,21 +430,19 @@
         <!-- 2. 신규 회원가입 폼 -->
         <div id="loginFormSignup" style="display:none;">
           <form id="formSignup" action="javascript:void(0);" method="post" autocomplete="on">
-            
-            
-            <div class="form-group">
-              <label class="form-label">아이디 (휴대전화번호) <span class="req">*</span></label>
-              <input type="tel" id="regPhone" name="username" placeholder="010-0000-0000 (숫자만)" autocomplete="username tel" required>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">전화번호</label>
+              <input type="tel" id="regPhone" name="username" placeholder="01012345678" autocomplete="username tel" required style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
             </div>
 
-            <div class="form-group">
-              <label class="form-label">이름 (실명) <span class="req">*</span></label>
-              <input type="text" id="regName" placeholder="예: 홍길동" required>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">이름 (실명)</label>
+              <input type="text" id="regName" placeholder="예: 홍길동" required style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
             </div>
 
-            <div class="form-group">
-              <label class="form-label">직무 구분 선택 <span class="req">*</span></label>
-              <select id="regJob" required>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">직무 구분</label>
+              <select id="regJob" required style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
                 <option value="">직무를 선택해주세요</option>
                 <option value="CS근무자">CS근무자</option>
                 <option value="CS관리자">CS관리자</option>
@@ -431,34 +453,35 @@
               </select>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">비밀번호 <span class="req">*</span> <span class="opt">(영문+숫자+특수문자 포함 8~10자)</span></label>
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">비밀번호 <span style="font-size:0.75rem; color:#64748b; font-weight:normal;">(영문+숫자+특수문자 8~10자)</span></label>
               <div style="position:relative; width:100%;">
-                <input type="password" id="regPwd" name="new-password" placeholder="영문, 숫자, 특수문자 조합 8~10자" autocomplete="new-password" required maxlength="10" style="width:100%; padding-right:45px;">
-                <button type="button" onclick="togglePasswordVisibility('regPwd', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+                <input type="password" id="regPwd" name="new-password" placeholder="비밀번호 입력" autocomplete="new-password" required maxlength="10" style="width:100%; padding:12px 45px 12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
+                <button type="button" onclick="togglePasswordVisibility('regPwd', this)" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">비밀번호 확인 <span class="req">*</span></label>
+            <div class="form-group" style="margin-bottom:6px;">
+              <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">비밀번호 확인</label>
               <div style="position:relative; width:100%;">
-                <input type="password" id="regPwdConfirm" name="new-password-confirm" placeholder="비밀번호 재입력" autocomplete="new-password" required maxlength="10" style="width:100%; padding-right:45px;">
-                <button type="button" onclick="togglePasswordVisibility('regPwdConfirm', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
+                <input type="password" id="regPwdConfirm" name="new-password-confirm" placeholder="비밀번호 재입력" autocomplete="new-password" required maxlength="10" style="width:100%; padding:12px 45px 12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
+                <button type="button" onclick="togglePasswordVisibility('regPwdConfirm', this)" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#64748b;" title="비밀번호 보기/숨기기">👁️</button>
               </div>
             </div>
 
-            <button type="submit" class="btn-login-action" id="btnDoSignup">가입 완료 및 로그인</button>
+            <button type="submit" class="btn-login-action" id="btnDoSignup" style="width:100%; padding:14px; background:#1a73e8; color:#ffffff; border:none; border-radius:10px; font-size:1.05rem; font-weight:700; cursor:pointer; margin-top:20px; box-shadow:0 4px 12px rgba(26,115,232,0.25);">가입 완료 및 로그인</button>
             <div class="login-error-msg" id="signupErr"></div>
 
-            <div class="signup-toggle-box">
-              이미 계정이 있으신가요? 
-              <button type="button" class="signup-toggle-btn" id="btnBackToLogin">로그인 화면으로</button>
+            <div style="border-top:1px dotted #cbd5e1; margin-top:26px; padding-top:20px; text-align:center;">
+              <div style="font-size:0.9rem; color:#64748b; margin-bottom:8px;">이미 계정이 있으신가요?</div>
+              <button type="button" id="btnBackToLogin" style="background:none; border:none; font-size:0.98rem; font-weight:700; color:#1a73e8; cursor:pointer; text-decoration:underline; padding:4px 8px;">로그인 화면으로</button>
             </div>
           </form>
         </div>
 
       </div>
     </div>
+
     <!-- [화면 2] 현장 등록 화면 -->
     <div id="viewRegister">
       <div class="inner-header-bar">
@@ -2249,7 +2272,7 @@
               var searchPhones = Array.from(new Set([phone, pNoZero, pWithZero]));
 
               var q = await supabase.from("app_users").select("*").in("phone", searchPhones).limit(5);
-              btn.disabled = false; btn.innerText = "로그인 접속";
+              btn.disabled = false; btn.innerText = "로그인";
 
               if (q.error) {
                 showLoginError("memberLoginErr", "DB 조회 오류: " + (q.error.message || JSON.stringify(q.error)));
@@ -2287,7 +2310,7 @@
               showScreen("dashboard");
 
             } catch (err) {
-              btn.disabled = false; btn.innerText = "로그인 접속";
+              btn.disabled = false; btn.innerText = "로그인";
               showLoginError("memberLoginErr", "통신 오류: " + (err.message || err));
             }
           });
