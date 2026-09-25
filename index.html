@@ -179,36 +179,84 @@
 
     /* 대시보드 화면 */
     #viewDashboard { display: none; position: relative; z-index: 20; }
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .stat-card {
-      background: #fff; padding: 16px; border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-left: 4px solid #dadce0;
-      cursor: pointer; transition: transform 0.1s ease;
-    }
-    .stat-card:active { transform: scale(0.98); }
-    .stat-card.total { border-left-color: #1a73e8; }
-    .stat-card.wait { border-left-color: #f29900; }
-    .stat-card.ing { border-left-color: #1a73e8; }
-    .stat-card.done { border-left-color: #137333; }
-    .stat-card.cancel { border-left-color: #d93025; }
-    .stat-card.quote { border-left-color: #9c27b0; }
-    .stat-label { font-size: 0.8rem; font-weight: 600; color: #5f6368; }
-    .stat-value { font-size: 1.5rem; font-weight: 800; color: #202124; margin-top: 4px; }
+
 
     .toolbar-card {
       background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; flex-wrap: wrap; gap: 12px;
       justify-content: space-between; align-items: center;
     }
-    .status-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+    .status-filters { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
     .filter-chip {
-      padding: 7px 14px; border-radius: 16px; font-size: 0.82rem; font-weight: 600;
-      border: 1px solid #dadce0; background: #fff; color: #5f6368; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 20px; font-size: 0.84rem; font-weight: 700;
+      background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.15s ease; user-select: none; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      border-width: 2px; border-style: solid; white-space: nowrap; outline: none;
     }
-    .filter-chip.active { background: #e8f0fe; color: #1a73e8; border-color: #1a73e8; font-weight: 700; }
-    .chip-count { background: rgba(0,0,0,0.08); padding: 1px 6px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
-    .filter-chip.active .chip-count { background: #1a73e8; color: #fff; }
+    .filter-chip:active { transform: scale(0.97); }
+    .chip-count {
+      padding: 2px 7px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; transition: all 0.15s ease;
+    }
+
+    /* 1. 전체 (블루) */
+    .filter-chip.chip-total { border-color: #1a73e8; color: #1a73e8; }
+    .filter-chip.chip-total .chip-count { background: #e8f0fe; color: #1a73e8; }
+    .filter-chip.chip-total.active { background: #1a73e8 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(26,115,232,0.35); }
+    .filter-chip.chip-total.active .chip-count { background: #ffffff !important; color: #1a73e8 !important; }
+
+    /* 2. 1.접수대기 (주황/앰버) */
+    .filter-chip.chip-wait { border-color: #f59e0b; color: #d97706; }
+    .filter-chip.chip-wait .chip-count { background: #fef3c7; color: #b45309; }
+    .filter-chip.chip-wait.active { background: #f59e0b !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(245,158,11,0.35); }
+    .filter-chip.chip-wait.active .chip-count { background: #ffffff !important; color: #d97706 !important; }
+
+    /* 3. 2.접수확인 (스카이블루) */
+    .filter-chip.chip-confirm { border-color: #0284c7; color: #0284c7; }
+    .filter-chip.chip-confirm .chip-count { background: #e0f2fe; color: #0369a1; }
+    .filter-chip.chip-confirm.active { background: #0284c7 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(2,132,199,0.35); }
+    .filter-chip.chip-confirm.active .chip-count { background: #ffffff !important; color: #0284c7 !important; }
+
+    /* 4. 3.고객면담 (퍼플) */
+    .filter-chip.chip-consult { border-color: #7c3aed; color: #7c3aed; }
+    .filter-chip.chip-consult .chip-count { background: #ede9fe; color: #6d28d9; }
+    .filter-chip.chip-consult.active { background: #7c3aed !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(124,58,237,0.35); }
+    .filter-chip.chip-consult.active .chip-count { background: #ffffff !important; color: #7c3aed !important; }
+
+    /* 5. 4.추가면담 (인디고) */
+    .filter-chip.chip-moreconsult { border-color: #6366f1; color: #6366f1; }
+    .filter-chip.chip-moreconsult .chip-count { background: #e0e7ff; color: #4338ca; }
+    .filter-chip.chip-moreconsult.active { background: #6366f1 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(99,102,241,0.35); }
+    .filter-chip.chip-moreconsult.active .chip-count { background: #ffffff !important; color: #6366f1 !important; }
+
+    /* 6. 5.견적제출 (진한 오렌지/앰버) */
+    .filter-chip.chip-quote { border-color: #ea580c; color: #ea580c; }
+    .filter-chip.chip-quote .chip-count { background: #ffedd5; color: #c2410c; }
+    .filter-chip.chip-quote.active { background: #ea580c !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(234,88,12,0.35); }
+    .filter-chip.chip-quote.active .chip-count { background: #ffffff !important; color: #ea580c !important; }
+
+    /* 7. 6.견적상담 (브론즈/웜앰버) */
+    .filter-chip.chip-quoteconsult { border-color: #b45309; color: #b45309; }
+    .filter-chip.chip-quoteconsult .chip-count { background: #fef3c7; color: #92400e; }
+    .filter-chip.chip-quoteconsult.active { background: #b45309 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(180,83,9,0.35); }
+    .filter-chip.chip-quoteconsult.active .chip-count { background: #ffffff !important; color: #b45309 !important; }
+
+    /* 8. 7.계약완료 (초록/성공) */
+    .filter-chip.chip-done { border-color: #16a34a; color: #16a34a; }
+    .filter-chip.chip-done .chip-count { background: #dcfce7; color: #15803d; }
+    .filter-chip.chip-done.active { background: #16a34a !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(22,163,74,0.35); }
+    .filter-chip.chip-done.active .chip-count { background: #ffffff !important; color: #16a34a !important; }
+
+    /* 9. 8.계약실패 (빨강/실패) */
+    .filter-chip.chip-fail { border-color: #dc2626; color: #dc2626; }
+    .filter-chip.chip-fail .chip-count { background: #fee2e2; color: #b91c1c; }
+    .filter-chip.chip-fail.active { background: #dc2626 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(220,38,38,0.35); }
+    .filter-chip.chip-fail.active .chip-count { background: #ffffff !important; color: #dc2626 !important; }
+
+    /* 10. 9.계약보류 (슬레이트 그레이) */
+    .filter-chip.chip-hold { border-color: #64748b; color: #475569; }
+    .filter-chip.chip-hold .chip-count { background: #f1f5f9; color: #475569; }
+    .filter-chip.chip-hold.active { background: #64748b !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(100,116,139,0.35); }
+    .filter-chip.chip-hold.active .chip-count { background: #ffffff !important; color: #64748b !important; }
 
     .search-box { display: flex; gap: 6px; flex: 1; max-width: 320px; min-width: 220px; }
     .search-box input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 8px; width: 100%; font-size: 0.9rem; }
@@ -241,10 +289,7 @@
       .user-badge-title { font-size: 0.95rem; }
       .btn-inner { padding: 6px 10px; font-size: 0.75rem; }
 
-      .stat-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; margin-bottom: 10px !important; }
-      .stat-card { padding: 8px 6px 7px 8px !important; border-left-width: 3px !important; border-radius: 9px !important; }
-      .stat-label { font-size: 0.72rem !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; letter-spacing: -0.5px !important; }
-      .stat-value { font-size: 1.25rem !important; margin-top: 2px !important; line-height: 1.2 !important; }
+
 
       .toolbar-card { padding: 10px 12px !important; margin-bottom: 10px !important; gap: 8px !important; border-radius: 12px !important; }
       .status-filters { display: flex !important; flex-wrap: nowrap !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; gap: 5px !important; padding-bottom: 4px !important; scrollbar-width: none !important; width: 100% !important; }
@@ -647,31 +692,18 @@
         </div>
       </div>
 
-      <div class="stat-grid">
-        <div class="stat-card total" id="cardStatTotal"><div class="stat-label">조회 안건</div><div class="stat-value" id="cntTotal">0</div></div>
-        <div class="stat-card wait" id="cardStatWait"><div class="stat-label">1.접수대기</div><div class="stat-value" id="cntWait">0</div></div>
-        <div class="stat-card ing" id="cardStatConfirm"><div class="stat-label">2.접수확인</div><div class="stat-value" id="cntConfirm">0</div></div>
-        <div class="stat-card ing" id="cardStatConsult"><div class="stat-label">3.고객면담</div><div class="stat-value" id="cntConsult">0</div></div>
-        <div class="stat-card ing" id="cardStatMoreConsult"><div class="stat-label">4.추가면담</div><div class="stat-value" id="cntMoreConsult">0</div></div>
-        <div class="stat-card quote" id="cardStatQuote"><div class="stat-label">5.견적제출</div><div class="stat-value" id="cntQuote">0</div></div>
-        <div class="stat-card quote" id="cardStatQuoteConsult"><div class="stat-label">6.견적상담</div><div class="stat-value" id="cntQuoteConsult">0</div></div>
-        <div class="stat-card done" id="cardStatDone"><div class="stat-label">7.계약완료</div><div class="stat-value" id="cntDone">0</div></div>
-        <div class="stat-card cancel" id="cardStatFail"><div class="stat-label">8.계약실패</div><div class="stat-value" id="cntFail">0</div></div>
-        <div class="stat-card cancel" id="cardStatHold"><div class="stat-label">9.계약보류</div><div class="stat-value" id="cntHold">0</div></div>
-      </div>
-
       <div class="toolbar-card">
         <div class="status-filters" id="statusFilterBar">
-          <button type="button" class="filter-chip active" data-status="전체">전체 <span class="chip-count" id="cCntTotal">0</span></button>
-          <button type="button" class="filter-chip" data-status="접수대기">1.접수대기 <span class="chip-count" id="cCntWait">0</span></button>
-          <button type="button" class="filter-chip" data-status="접수확인">2.접수확인 <span class="chip-count" id="cCntConfirm">0</span></button>
-          <button type="button" class="filter-chip" data-status="고객면담">3.고객면담 <span class="chip-count" id="cCntConsult">0</span></button>
-          <button type="button" class="filter-chip" data-status="추가면담">4.추가면담 <span class="chip-count" id="cCntMoreConsult">0</span></button>
-          <button type="button" class="filter-chip" data-status="견적제출">5.견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
-          <button type="button" class="filter-chip" data-status="견적상담">6.견적상담 <span class="chip-count" id="cCntQuoteConsult">0</span></button>
-          <button type="button" class="filter-chip" data-status="계약완료">7.계약완료 <span class="chip-count" id="cCntDone">0</span></button>
-          <button type="button" class="filter-chip" data-status="계약실패">8.계약실패 <span class="chip-count" id="cCntFail">0</span></button>
-          <button type="button" class="filter-chip" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
+          <button type="button" class="filter-chip chip-total active" data-status="전체">전체 <span class="chip-count" id="cCntTotal">0</span></button>
+          <button type="button" class="filter-chip chip-wait" data-status="접수대기">1.접수대기 <span class="chip-count" id="cCntWait">0</span></button>
+          <button type="button" class="filter-chip chip-confirm" data-status="접수확인">2.접수확인 <span class="chip-count" id="cCntConfirm">0</span></button>
+          <button type="button" class="filter-chip chip-consult" data-status="고객면담">3.고객면담 <span class="chip-count" id="cCntConsult">0</span></button>
+          <button type="button" class="filter-chip chip-moreconsult" data-status="추가면담">4.추가면담 <span class="chip-count" id="cCntMoreConsult">0</span></button>
+          <button type="button" class="filter-chip chip-quote" data-status="견적제출">5.견적제출 <span class="chip-count" id="cCntQuote">0</span></button>
+          <button type="button" class="filter-chip chip-quoteconsult" data-status="견적상담">6.견적상담 <span class="chip-count" id="cCntQuoteConsult">0</span></button>
+          <button type="button" class="filter-chip chip-done" data-status="계약완료">7.계약완료 <span class="chip-count" id="cCntDone">0</span></button>
+          <button type="button" class="filter-chip chip-fail" data-status="계약실패">8.계약실패 <span class="chip-count" id="cCntFail">0</span></button>
+          <button type="button" class="filter-chip chip-hold" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
           <input type="text" id="searchKeyword" placeholder="고객(상호), 연락처, 주소 검색">
@@ -1607,16 +1639,17 @@
             else counts.wait++;
           });
 
-          document.getElementById("cntTotal").innerText = counts.total;
-          document.getElementById("cntWait").innerText = counts.wait;
-          document.getElementById("cntConfirm").innerText = counts.confirm;
-          document.getElementById("cntConsult").innerText = counts.consult;
-          document.getElementById("cntMoreConsult").innerText = counts.moreConsult;
-          document.getElementById("cntQuote").innerText = counts.quote;
-          document.getElementById("cntQuoteConsult").innerText = counts.quoteConsult;
-          document.getElementById("cntDone").innerText = counts.done;
-          document.getElementById("cntFail").innerText = counts.fail;
-          document.getElementById("cntHold").innerText = counts.hold;
+          var setVal = function(id, val) { var el = document.getElementById(id); if (el) el.innerText = val; };
+          setVal("cntTotal", counts.total);
+          setVal("cntWait", counts.wait);
+          setVal("cntConfirm", counts.confirm);
+          setVal("cntConsult", counts.consult);
+          setVal("cntMoreConsult", counts.moreConsult);
+          setVal("cntQuote", counts.quote);
+          setVal("cntQuoteConsult", counts.quoteConsult);
+          setVal("cntDone", counts.done);
+          setVal("cntFail", counts.fail);
+          setVal("cntHold", counts.hold);
 
           document.getElementById("cCntTotal").innerText = counts.total;
           document.getElementById("cCntWait").innerText = counts.wait;
