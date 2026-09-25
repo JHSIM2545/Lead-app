@@ -1078,7 +1078,6 @@
       var selectedBoardFile = null;
 
       var SESSION_KEY = 'S1_PORTAL_AUTH_SESSION';
-      var SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7일간 로그인 세션 유지
 
       function saveUserSession(user, screen) {
         if (!user || !user.phone) return;
@@ -1090,14 +1089,20 @@
             screen: screen || 'dashboard',
             savedAt: Date.now()
           };
-          localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+          // 앱 실행 중 및 다른 앱 전환 시에는 세션 유지(sessionStorage)
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
         } catch (e) {
           console.warn('세션 저장 실패:', e);
         }
       }
 
       function clearUserSession() {
+        clearFormDraft();
         try {
+          sessionStorage.removeItem(SESSION_KEY);
+        } catch (e) {}
+        try {
+          // 기존 localStorage 영구 세션도 완전 제거
           localStorage.removeItem(SESSION_KEY);
         } catch (e) {}
         currentRole = '';
@@ -1107,16 +1112,14 @@
 
       function restoreUserSession() {
         try {
-          var raw = localStorage.getItem(SESSION_KEY);
+          // 이전 영구 세션이 남아있다면 초기화
+          try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+
+          // 현재 세션(sessionStorage) 확인 - 앱 완전 종료 시 자동 소멸됨
+          var raw = sessionStorage.getItem(SESSION_KEY);
           if (!raw) return false;
           var data = JSON.parse(raw);
           if (!data || !data.phone || !data.name) return false;
-
-          // 세션 만료 시간 체크
-          if (Date.now() - (data.savedAt || 0) > SESSION_DURATION_MS) {
-            clearUserSession();
-            return false;
-          }
 
           currentRole = data.job ? data.job.trim() : 'CS근무자';
           currentUserName = data.name ? data.name.trim() : '직원';
@@ -1133,6 +1136,51 @@
           console.warn('세션 복원 실패:', e);
           return false;
         }
+      }
+
+            var DRAFT_KEY = 'S1_PORTAL_FORM_DRAFT';
+
+      function saveFormDraft() {
+        try {
+          var draft = {
+            customerName: document.getElementById('customerName') ? document.getElementById('customerName').value : '',
+            contactPerson: document.getElementById('contactPerson') ? document.getElementById('contactPerson').value : '',
+            contactPhone: document.getElementById('contactPhone') ? document.getElementById('contactPhone').value : '',
+            address: document.getElementById('address') ? document.getElementById('address').value : '',
+            businessType: document.getElementById('businessType') ? document.getElementById('businessType').value : '',
+            currentCompany: document.getElementById('currentCompany') ? document.getElementById('currentCompany').value : '',
+            currentFee: document.getElementById('currentFee') ? document.getElementById('currentFee').value : '',
+            fieldDescription: document.getElementById('fieldDescription') ? document.getElementById('fieldDescription').value : '',
+            assignedRep: document.getElementById('assignedRep') ? document.getElementById('assignedRep').value : '',
+            carNumber: document.getElementById('carNumber') ? document.getElementById('carNumber').value : ''
+          };
+          sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) {}
+      }
+
+      function restoreFormDraft() {
+        try {
+          var raw = sessionStorage.getItem(DRAFT_KEY);
+          if (!raw) return;
+          var draft = JSON.parse(raw);
+          if (!draft) return;
+          if (draft.customerName && document.getElementById('customerName')) document.getElementById('customerName').value = draft.customerName;
+          if (draft.contactPerson && document.getElementById('contactPerson')) document.getElementById('contactPerson').value = draft.contactPerson;
+          if (draft.contactPhone && document.getElementById('contactPhone')) document.getElementById('contactPhone').value = draft.contactPhone;
+          if (draft.address && document.getElementById('address')) document.getElementById('address').value = draft.address;
+          if (draft.businessType && document.getElementById('businessType')) document.getElementById('businessType').value = draft.businessType;
+          if (draft.currentCompany && document.getElementById('currentCompany')) document.getElementById('currentCompany').value = draft.currentCompany;
+          if (draft.currentFee && document.getElementById('currentFee')) document.getElementById('currentFee').value = draft.currentFee;
+          if (draft.fieldDescription && document.getElementById('fieldDescription')) document.getElementById('fieldDescription').value = draft.fieldDescription;
+          if (draft.assignedRep && document.getElementById('assignedRep')) document.getElementById('assignedRep').value = draft.assignedRep;
+          if (draft.carNumber && document.getElementById('carNumber')) document.getElementById('carNumber').value = draft.carNumber;
+        } catch (e) {}
+      }
+
+      function clearFormDraft() {
+        try {
+          sessionStorage.removeItem(DRAFT_KEY);
+        } catch (e) {}
       }
 
       function doLogout() {
@@ -1336,6 +1384,7 @@
           var regPwd = document.getElementById("regPwdBtn");
           if (regPwd) regPwd.addEventListener("click", openPwdModal);
           loadRecentHistory();
+          restoreFormDraft();
         } else if (screenId === "dashboard") {
           loadDashboardLeads();
         }
@@ -2921,6 +2970,8 @@
 
         var formLead = document.getElementById("leadForm");
         if (formLead) {
+          formLead.addEventListener("input", saveFormDraft);
+          formLead.addEventListener("change", saveFormDraft);
           formLead.addEventListener("submit", async function(e) {
             e.preventDefault();
             if (!supabase) { alert("데이터베이스에 연결되지 않았습니다."); return; }
@@ -2973,6 +3024,7 @@
 
               alert("✅ 가망고객 소개가 성공적으로 접수되었습니다!" + (photoUrls.length > 0 ? "\n(사진 " + photoUrls.length + "장 등록 완료)" : ""));
 
+              clearFormDraft();
               document.getElementById("customerName").value = "";
               document.getElementById("contactPerson").value = "";
               document.getElementById("contactPhone").value = "";
