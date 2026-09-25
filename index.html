@@ -1078,71 +1078,14 @@
       var selectedBoardFile = null;
 
       var SESSION_KEY = 'S1_PORTAL_AUTH_SESSION';
+      var FOLD_BRIDGE_KEY = 'S1_FOLD_CONTINUITY_BRIDGE';
+      var DRAFT_KEY = 'S1_PORTAL_FORM_DRAFT';
+      var currentActiveScreen = 'dashboard';
+      var pendingLeadIdToOpen = null;
 
-      function saveUserSession(user, screen) {
-        if (!user || !user.phone) return;
+      function getFormDraftObject() {
         try {
-          var data = {
-            phone: user.phone,
-            name: user.name || '',
-            job: user.job || 'CS근무자',
-            screen: screen || 'dashboard',
-            savedAt: Date.now()
-          };
-          // 앱 실행 중 및 다른 앱 전환 시에는 세션 유지(sessionStorage)
-          sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
-        } catch (e) {
-          console.warn('세션 저장 실패:', e);
-        }
-      }
-
-      function clearUserSession() {
-        clearFormDraft();
-        try {
-          sessionStorage.removeItem(SESSION_KEY);
-        } catch (e) {}
-        try {
-          // 기존 localStorage 영구 세션도 완전 제거
-          localStorage.removeItem(SESSION_KEY);
-        } catch (e) {}
-        currentRole = '';
-        currentUserName = '';
-        currentUserPhone = '';
-      }
-
-      function restoreUserSession() {
-        try {
-          // 이전 영구 세션이 남아있다면 초기화
-          try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
-
-          // 현재 세션(sessionStorage) 확인 - 앱 완전 종료 시 자동 소멸됨
-          var raw = sessionStorage.getItem(SESSION_KEY);
-          if (!raw) return false;
-          var data = JSON.parse(raw);
-          if (!data || !data.phone || !data.name) return false;
-
-          currentRole = data.job ? data.job.trim() : 'CS근무자';
-          currentUserName = data.name ? data.name.trim() : '직원';
-          currentUserPhone = data.phone;
-
-          var agentEl = document.getElementById('agentName');
-          if (agentEl) agentEl.value = currentUserName;
-
-          var targetScreen = (data.screen === 'register') ? 'register' : 'dashboard';
-          showScreen(targetScreen);
-          registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
-          return true;
-        } catch (e) {
-          console.warn('세션 복원 실패:', e);
-          return false;
-        }
-      }
-
-            var DRAFT_KEY = 'S1_PORTAL_FORM_DRAFT';
-
-      function saveFormDraft() {
-        try {
-          var draft = {
+          return {
             customerName: document.getElementById('customerName') ? document.getElementById('customerName').value : '',
             contactPerson: document.getElementById('contactPerson') ? document.getElementById('contactPerson').value : '',
             contactPhone: document.getElementById('contactPhone') ? document.getElementById('contactPhone').value : '',
@@ -1154,7 +1097,15 @@
             assignedRep: document.getElementById('assignedRep') ? document.getElementById('assignedRep').value : '',
             carNumber: document.getElementById('carNumber') ? document.getElementById('carNumber').value : ''
           };
-          sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function saveFormDraft() {
+        try {
+          var draft = getFormDraftObject();
+          if (draft) sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
         } catch (e) {}
       }
 
@@ -1178,9 +1129,135 @@
       }
 
       function clearFormDraft() {
+        try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) {}
+      }
+
+      // 폴더블폰(갤럭시 Z 폴드 등) 펼침/접힘 및 화면 전환 시 상태 연속성 브릿지
+      function updateFoldBridge() {
+        if (!currentUserPhone || currentActiveScreen === 'login') {
+          try { localStorage.removeItem(FOLD_BRIDGE_KEY); } catch (e) {}
+          return;
+        }
         try {
-          sessionStorage.removeItem(DRAFT_KEY);
+          var state = {
+            user: {
+              phone: currentUserPhone,
+              name: currentUserName,
+              job: currentRole
+            },
+            screen: currentActiveScreen,
+            activeLeadId: (activeLeadItem && activeLeadItem.lead_id) ? activeLeadItem.lead_id : null,
+            formDraft: (currentActiveScreen === 'register') ? getFormDraftObject() : null,
+            scrollPos: window.scrollY || document.documentElement.scrollTop || 0,
+            screenWidth: window.innerWidth,
+            screenHeight: window.innerHeight,
+            timestamp: Date.now()
+          };
+          localStorage.setItem(FOLD_BRIDGE_KEY, JSON.stringify(state));
         } catch (e) {}
+      }
+
+      // 주기적 및 화면/창 이벤트 발생 시 실시간 상태 동기화
+      setInterval(updateFoldBridge, 1000);
+      window.addEventListener('pagehide', updateFoldBridge);
+      window.addEventListener('beforeunload', updateFoldBridge);
+      window.addEventListener('resize', updateFoldBridge);
+
+      function saveUserSession(user, screen) {
+        if (!user || !user.phone) return;
+        try {
+          var data = {
+            phone: user.phone,
+            name: user.name || '',
+            job: user.job || 'CS근무자',
+            screen: screen || 'dashboard',
+            savedAt: Date.now()
+          };
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+          updateFoldBridge();
+        } catch (e) {
+          console.warn('세션 저장 실패:', e);
+        }
+      }
+
+      function clearUserSession() {
+        clearFormDraft();
+        try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+        try { localStorage.removeItem(FOLD_BRIDGE_KEY); } catch (e) {}
+        try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+        currentRole = '';
+        currentUserName = '';
+        currentUserPhone = '';
+        currentActiveScreen = 'login';
+        pendingLeadIdToOpen = null;
+      }
+
+      function restoreUserSession() {
+        try {
+          // 1. sessionStorage 세션 확인
+          var sessionData = null;
+          var raw = sessionStorage.getItem(SESSION_KEY);
+          if (raw) {
+            try { sessionData = JSON.parse(raw); } catch (e) {}
+          }
+
+          // 2. 만약 sessionStorage가 비어있다면, 폴더블폰 펼침/접힘 전환(Fold Continuity Bridge)인지 확인
+          var bridgeRaw = null;
+          try { bridgeRaw = localStorage.getItem(FOLD_BRIDGE_KEY); } catch (e) {}
+
+          if (bridgeRaw) {
+            try {
+              var bridge = JSON.parse(bridgeRaw);
+              var timeDiff = Date.now() - (bridge.timestamp || 0);
+              var isScreenChanged = Math.abs(window.innerWidth - (bridge.screenWidth || 0)) > 50 ||
+                                    Math.abs(window.innerHeight - (bridge.screenHeight || 0)) > 50;
+
+              // 폴더블폰 열기/닫기(화면 크기 급변) 또는 20초 이내의 핸드오버인 경우 세션 자동 승계
+              if (bridge.user && bridge.user.phone && timeDiff < 20000 && (isScreenChanged || timeDiff < 6000)) {
+                if (!sessionData) {
+                  sessionData = {
+                    phone: bridge.user.phone,
+                    name: bridge.user.name,
+                    job: bridge.user.job,
+                    screen: bridge.screen || 'dashboard',
+                    savedAt: Date.now()
+                  };
+                  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+                }
+                if (bridge.formDraft) {
+                  sessionStorage.setItem(DRAFT_KEY, JSON.stringify(bridge.formDraft));
+                }
+                if (bridge.activeLeadId) {
+                  pendingLeadIdToOpen = bridge.activeLeadId;
+                }
+                if (bridge.scrollPos) {
+                  setTimeout(function() { window.scrollTo(0, bridge.scrollPos); }, 250);
+                }
+              }
+            } catch (e) {
+              console.warn('폴더블 브릿지 복원 처리 중 오류:', e);
+            }
+          }
+
+          if (!sessionData || !sessionData.phone || !sessionData.name) {
+            return false;
+          }
+
+          currentRole = sessionData.job ? sessionData.job.trim() : 'CS근무자';
+          currentUserName = sessionData.name ? sessionData.name.trim() : '직원';
+          currentUserPhone = sessionData.phone;
+
+          var agentEl = document.getElementById('agentName');
+          if (agentEl) agentEl.value = currentUserName;
+
+          var targetScreen = (sessionData.screen === 'register') ? 'register' : 'dashboard';
+          showScreen(targetScreen);
+          registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
+          return true;
+        } catch (e) {
+          console.warn('세션 복원 실패:', e);
+          return false;
+        }
       }
 
       function doLogout() {
@@ -1324,6 +1401,7 @@
       }
 
       function showScreen(screenId) {
+        currentActiveScreen = screenId;
         closeDetailModal();
         closePwdModal();
         closeUserModal();
@@ -1917,6 +1995,14 @@
         if (pcBody) pcBody.innerHTML = pcHtml;
         if (mList) mList.innerHTML = mHtml;
 
+        if (pendingLeadIdToOpen && list && list.length > 0) {
+          var targetIdx = list.findIndex(function(it) { return it.lead_id === pendingLeadIdToOpen; });
+          if (targetIdx !== -1) {
+            openDetailModal(targetIdx);
+          }
+          pendingLeadIdToOpen = null;
+        }
+
         document.querySelectorAll(".btn-detail, .customer-cell, .m-customer-name").forEach(function(el) {
           el.addEventListener("click", function() {
             var i = this.getAttribute("data-idx");
@@ -2086,6 +2172,7 @@
         var item = currentLeadsData[idx];
         if (!item) return;
         activeLeadItem = item;
+        updateFoldBridge();
 
         document.getElementById("mTitle").innerText = item.customer_name || "";
         document.getElementById("mLeadId").innerText = item.lead_id || "";
@@ -2174,6 +2261,7 @@
         if (editContainer) editContainer.style.display = "none";
         clearBoardFile();
         activeLeadItem = null;
+        updateFoldBridge();
       }
 
       function openPwdModal() {
