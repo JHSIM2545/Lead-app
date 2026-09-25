@@ -1451,16 +1451,34 @@
         return list;
       }
 
+      var STAGE_THEMES = {
+        'stage-wait': { border: '#f59e0b', bg: '#fef3c7', text: '#b45309' },
+        'stage-confirm': { border: '#0284c7', bg: '#e0f2fe', text: '#0284c7' },
+        'stage-consult': { border: '#7c3aed', bg: '#ede9fe', text: '#7c3aed' },
+        'stage-moreconsult': { border: '#6366f1', bg: '#e0e7ff', text: '#6366f1' },
+        'stage-quote': { border: '#ea580c', bg: '#ffedd5', text: '#ea580c' },
+        'stage-quoteconsult': { border: '#b45309', bg: '#fef3c7', text: '#b45309' },
+        'stage-done': { border: '#16a34a', bg: '#dcfce7', text: '#16a34a' },
+        'stage-fail': { border: '#dc2626', bg: '#fee2e2', text: '#dc2626' },
+        'stage-hold': { border: '#64748b', bg: '#f1f5f9', text: '#475569' }
+      };
+
       function getStageClass(status) {
-        if (status === "접수확인") return "stage-confirm";
-        if (status === "고객면담") return "stage-consult";
-        if (status === "추가면담") return "stage-moreconsult";
-        if (status === "견적제출") return "stage-quote";
-        if (status === "견적상담") return "stage-quoteconsult";
-        if (status === "계약완료") return "stage-done";
-        if (status === "계약실패") return "stage-fail";
-        if (status === "계약보류" || status === "취소/보류") return "stage-hold";
-        return "stage-wait";
+        var s = String(status || '').trim();
+        if (s.indexOf('확인') !== -1) return 'stage-confirm';
+        if (s.indexOf('추가') !== -1) return 'stage-moreconsult';
+        if (s.indexOf('면담') !== -1) return 'stage-consult';
+        if (s.indexOf('견적상담') !== -1) return 'stage-quoteconsult';
+        if (s.indexOf('견적') !== -1) return 'stage-quote';
+        if (s.indexOf('완료') !== -1 || s.indexOf('성공') !== -1) return 'stage-done';
+        if (s.indexOf('실패') !== -1) return 'stage-fail';
+        if (s.indexOf('보류') !== -1 || s.indexOf('취소') !== -1) return 'stage-hold';
+        return 'stage-wait';
+      }
+
+      function getStageTheme(status) {
+        var cls = getStageClass(status);
+        return STAGE_THEMES[cls] || STAGE_THEMES['stage-wait'];
       }
 
       function getBadgeClass(status) {
@@ -1760,8 +1778,12 @@
             + "</tr>";
 
           var stClass = getStageClass(r.status);
-          mHtml += "<div class=\"mobile-lead-card " + stClass + "\">"
-            + "<div class=\"m-card-header\"><span class=\"m-agent-tag\">소개자: " + (r.agent_name || "-") + "</span><span class=\"badge " + getBadgeClass(r.status) + "\">" + (r.status || "접수대기") + "</span></div>"
+          var theme = getStageTheme(r.status);
+          var cardBorder = 'border: 2px solid ' + theme.border + ' !important;';
+          var badgeStyle = 'border: 1.5px solid ' + theme.border + ' !important; background: ' + theme.bg + ' !important; color: ' + theme.text + ' !important;';
+
+          mHtml += "<div class=\"mobile-lead-card " + stClass + "\" style=\"" + cardBorder + "\">"
+            + "<div class=\"m-card-header\"><span class=\"m-agent-tag\">소개자: " + (r.agent_name || "-") + "</span><span class=\"badge " + stClass + "\" style=\"" + badgeStyle + "\">" + (r.status || "접수대기") + "</span></div>"
             + "<div class=\"m-customer-name\" data-idx=\"" + idx + "\" style=\"cursor:pointer;\">" + r.customer_name + "</div>"
             + "<a href=\"tel:" + phoneFmt + "\" class=\"m-phone-link\">" + PHONE_ICON_SVG + " " + phoneFmt + "</a>"
             + "<div class=\"m-info-row\">"
