@@ -318,6 +318,46 @@
     table.data-table tr:hover { background-color: #f8fbff; }
     .customer-cell { font-weight: 700; color: #1a73e8; cursor: pointer; white-space: nowrap; }
 
+    .user-badge-title {
+      font-size: 1.05rem; font-weight: 800; color: #202124;
+      cursor: pointer !important; padding: 6px 12px; border-radius: 8px;
+      transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid transparent; user-select: none;
+    }
+    .user-badge-title:hover {
+      background-color: #e8f0fe !important; color: #1a73e8 !important; border-color: #aecbfa !important;
+    }
+    .user-badge-title:active {
+      background-color: #d2e3fc !important;
+    }
+
+    /* 본인 소개 안건 하이라이트 (연한 바탕색) */
+    table.data-table tr.my-lead-row {
+      background-color: #f0f7ff !important;
+    }
+    table.data-table tr.my-lead-row:hover {
+      background-color: #e1effe !important;
+    }
+    table.data-table tr.my-lead-row td:first-child {
+      border-left: 4px solid #1a73e8 !important;
+    }
+    .my-lead-tag {
+      display: inline-block;
+      background: #1a73e8;
+      color: #ffffff;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 5px;
+      vertical-align: middle;
+      letter-spacing: -0.2px;
+    }
+    .mobile-lead-card.my-lead-card {
+      background: #f0f7ff !important;
+      box-shadow: 0 3px 12px rgba(26, 115, 232, 0.15) !important;
+    }
+
     .mobile-card-list { display: none; }
 
     @media (max-width: 768px) {
@@ -566,10 +606,9 @@
     <div id="viewRegister">
       <div class="inner-header-bar">
         <div class="user-badge-group">
-          <span class="user-badge-title" id="regUserTitle">👤 사용자 이름</span>
+          <span class="user-badge-title" id="regUserTitle" title="클릭 시 비밀번호 변경">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns">
-          <button type="button" class="btn-inner btn-pwd" id="regPwdBtn">🔑 비밀번호 변경</button>
           <button type="button" class="btn-inner btn-switch" id="regSwitchBtn">📋 안건 목록</button>
           <button type="button" class="btn-inner btn-logout" id="regLogoutBtn">로그아웃</button>
         </div>
@@ -717,12 +756,11 @@
     <div id="viewDashboard">
       <div class="inner-header-bar">
         <div class="user-badge-group">
-          <span class="user-badge-title" id="dashUserTitle">👤 사용자 이름</span>
+          <span class="user-badge-title" id="dashUserTitle" title="클릭 시 비밀번호 변경">👤 사용자 이름</span>
         </div>
         <div class="inner-header-btns" id="dashHeaderButtons">
           <button type="button" class="btn-inner btn-users" id="dashUsersBtn" style="display:none;">👥 사용자</button>
-          <button type="button" class="btn-inner btn-pwd" id="dashPwdBtn">🔑 비밀번호 변경</button>
-          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff;">➕ 새 안건 등록</button>
+          <button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff; font-weight:800;">+ 소개하기</button>
           <button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>
         </div>
       </div>
@@ -1537,26 +1575,24 @@
         if (vReg) vReg.style.display = (screenId === "register" ? "block" : "none");
         if (vDash) vDash.style.display = (screenId === "dashboard" ? "block" : "none");
 
-        var regPwdBtn = document.getElementById("regPwdBtn");
-        var showPwdBtn = (screenId !== "login");
-        if (regPwdBtn) regPwdBtn.style.display = showPwdBtn ? "inline-block" : "none";
+        // 비밀번호 변경 버튼 대신 사용자 이름 클릭 시 비밀번호 변경창으로 진입
+        var regUserTitle = document.getElementById("regUserTitle");
+        var dashUserTitle = document.getElementById("dashUserTitle");
+        if (regUserTitle) { regUserTitle.onclick = openPwdModal; regUserTitle.title = "클릭 시 비밀번호 변경"; }
+        if (dashUserTitle) { dashUserTitle.onclick = openPwdModal; dashUserTitle.title = "클릭 시 비밀번호 변경"; }
 
         var btnContainer = document.getElementById("dashHeaderButtons");
         if (btnContainer) {
           var htmlBtns = "";
           if (isAdminRole(currentRole)) {
-            htmlBtns += "<button type=\"button\" class=\"btn-inner btn-users\" id=\"dashUsersBtn\">👥 사용자</button>";
+            htmlBtns += '<button type="button" class="btn-inner btn-users" id="dashUsersBtn">👥 사용자</button>';
           }
-          htmlBtns += "<button type=\"button\" class=\"btn-inner btn-pwd\" id=\"dashPwdBtn\">🔑 비밀번호 변경</button>";
-          htmlBtns += "<button type=\"button\" class=\"btn-inner btn-switch\" id=\"dashSwitchBtn\" style=\"background:#1a73e8; color:#fff;\">➕ 새 안건 등록</button>";
-          htmlBtns += "<button type=\"button\" class=\"btn-inner btn-logout\" id=\"dashLogoutBtn\">로그아웃</button>";
+          htmlBtns += '<button type="button" class="btn-inner btn-switch" id="dashSwitchBtn" style="background:#1a73e8; color:#fff; font-weight:800;">+ 소개하기</button>';
+          htmlBtns += '<button type="button" class="btn-inner btn-logout" id="dashLogoutBtn">로그아웃</button>';
           btnContainer.innerHTML = htmlBtns;
 
           var uBtn = document.getElementById("dashUsersBtn");
           if (uBtn) uBtn.addEventListener("click", openUserModal);
-
-          var pBtn = document.getElementById("dashPwdBtn");
-          if (pBtn) pBtn.addEventListener("click", openPwdModal);
 
           var swBtn = document.getElementById("dashSwitchBtn");
           if (swBtn) swBtn.addEventListener("click", function() { showScreen("register"); });
@@ -1568,8 +1604,8 @@
         var displayName = isAdminRole(currentRole) ? ("👑 " + currentRole) : ("👤 " + currentUserName + " (" + currentRole + ")");
         var regUserTitle = document.getElementById("regUserTitle");
         var dashUserTitle = document.getElementById("dashUserTitle");
-        if (regUserTitle) regUserTitle.innerText = displayName;
-        if (dashUserTitle) dashUserTitle.innerText = displayName;
+        if (regUserTitle) { regUserTitle.innerText = displayName; regUserTitle.onclick = openPwdModal; }
+        if (dashUserTitle) { dashUserTitle.innerText = displayName; dashUserTitle.onclick = openPwdModal; }
 
         if (screenId !== "login" && currentUserPhone) {
           saveUserSession({ phone: currentUserPhone, name: currentUserName, job: currentRole }, screenId);
@@ -1580,9 +1616,7 @@
           if (regSwitch) regSwitch.addEventListener("click", function() { showScreen("dashboard"); });
           var regLogout = document.getElementById("regLogoutBtn");
           if (regLogout) regLogout.addEventListener("click", doLogout);
-          var regPwd = document.getElementById("regPwdBtn");
-          if (regPwd) regPwd.addEventListener("click", openPwdModal);
-          loadRecentHistory();
+                    loadRecentHistory();
           restoreFormDraft();
         } else if (screenId === "dashboard") {
           loadDashboardLeads();
@@ -2105,43 +2139,48 @@
           var phoneFmt = formatPhone(r.contact_phone);
           var addr = r.address || "";
 
-          pcHtml += "<tr>"
-            + "<td style=\"font-size:0.8rem; color:#5f6368;\">" + formatKoreanDate(r.created_at) + "</td>"
-            + "<td><strong>" + (r.agent_name || "-") + "</strong></td>"
-            + "<td style=\"font-weight:700; color:#1a73e8;\">" + (r.assigned_rep || "-") + "</td>"
-            + "<td class=\"customer-cell\" data-idx=\"" + idx + "\">" + r.customer_name + "</td>"
-            + "<td><a href=\"tel:" + phoneFmt + "\" style=\"color:#202124; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;\">" + PHONE_ICON_SVG + phoneFmt + "</a></td>"
-            + "<td>"
-            + "<div style=\"display:flex; align-items:center; gap:6px;\">"
-            + "<span style=\"max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;\">" + (addr || "-") + "</span>"
-            + (addr ? "<button type=\"button\" class=\"map-pin-btn btn-table-map\" data-addr=\"" + addr + "\" title=\"네이버 지도\">" + MAP_PIN_ICON_SVG + "</button>" : "")
-            + "</div>"
-            + "</td>"
-            + "<td style=\"font-size:0.8rem;\">" + r.current_company + "</td>"
-            + "<td style=\"font-size:0.8rem; color:#1a73e8;\">" + (r.product || "-") + "</td>"
-            + "<td style=\"text-align:center;\">" + (pCount > 0 ? "📷 " + pCount + "장" : "-") + "</td>"
-            + "<td><span class=\"badge " + getBadgeClass(r.status) + "\">" + (r.status || "접수대기") + "</span></td>"
-            + "<td><button type=\"button\" class=\"btn-detail\" data-idx=\"" + idx + "\">상세보기</button></td>"
-            + "</tr>";
+          var isMyLead = Boolean(currentUserName && r.agent_name && currentUserName.trim() === r.agent_name.trim());
+          var trClass = isMyLead ? ' class="my-lead-row"' : '';
+          var myTagHtml = isMyLead ? '<span class="my-lead-tag">내 소개</span>' : '';
+
+          pcHtml += '<tr' + trClass + '>'
+            + '<td style="font-size:0.8rem; color:#5f6368;">' + formatKoreanDate(r.created_at) + '</td>'
+            + '<td><strong>' + (r.agent_name || '-') + '</strong>' + myTagHtml + '</td>'
+            + '<td style="font-weight:700; color:#1a73e8;">' + (r.assigned_rep || '-') + '</td>'
+            + '<td class="customer-cell" data-idx="' + idx + '">' + r.customer_name + '</td>'
+            + '<td><a href="tel:' + phoneFmt + '" style="color:#202124; text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:4px;">' + PHONE_ICON_SVG + phoneFmt + '</a></td>'
+            + '<td>'
+            + '<div style="display:flex; align-items:center; gap:6px;">'
+            + '<span style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' + (addr || '-') + '</span>'
+            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" title="네이버 지도">' + MAP_PIN_ICON_SVG + '</button>' : '')
+            + '</div>'
+            + '</td>'
+            + '<td style="font-size:0.8rem;">' + (r.current_company || '-') + '</td>'
+            + '<td style="font-size:0.8rem; color:#1a73e8;">' + (r.product || '-') + '</td>'
+            + '<td style="text-align:center;">' + (pCount > 0 ? '📷 ' + pCount + '장' : '-') + '</td>'
+            + '<td><span class="badge ' + getBadgeClass(r.status) + '">' + (r.status || '접수대기') + '</span></td>'
+            + '<td><button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button></td>'
+            + '</tr>';
 
           var stClass = getStageClass(r.status);
           var theme = getStageTheme(r.status);
           var cardBorder = 'border: 2px solid ' + theme.border + ' !important;';
           var badgeStyle = 'border: 1.5px solid ' + theme.border + ' !important; background: ' + theme.bg + ' !important; color: ' + theme.text + ' !important;';
+          var mCardClasses = 'mobile-lead-card ' + stClass + (isMyLead ? ' my-lead-card' : '');
 
-          mHtml += "<div class=\"mobile-lead-card " + stClass + "\" style=\"" + cardBorder + "\">"
-            + "<div class=\"m-card-header\"><span class=\"m-agent-tag\">소개자: " + (r.agent_name || "-") + "</span><span class=\"badge " + stClass + "\" style=\"" + badgeStyle + "\">" + (r.status || "접수대기") + "</span></div>"
-            + "<div class=\"m-customer-name\" data-idx=\"" + idx + "\" style=\"cursor:pointer;\">" + r.customer_name + "</div>"
-            + "<a href=\"tel:" + phoneFmt + "\" class=\"m-phone-link\">" + PHONE_ICON_SVG + " " + phoneFmt + "</a>"
-            + "<div class=\"m-info-row\">"
-            + "<span>" + MAP_PIN_ICON_SVG + " " + (addr || "주소 없음") + "</span>"
-            + (addr ? "<button type=\"button\" class=\"map-pin-btn btn-table-map\" data-addr=\"" + addr + "\" style=\"padding:1px 6px;\">지도</button>" : "")
-            + "</div>"
-            + "<div class=\"m-info-row\">📦 " + (r.product || "-") + "</div>"
-            + "<div class=\"m-footer-actions\">"
-            + "<span style=\"font-size:0.75rem; color:#5f6368;\">담당: <strong>" + (r.assigned_rep || "-") + "</strong></span>"
-            + "<button type=\"button\" class=\"btn-detail\" data-idx=\"" + idx + "\">상세보기</button>"
-            + "</div></div>";
+          mHtml += '<div class="' + mCardClasses + '" style="' + cardBorder + '">'
+            + '<div class="m-card-header"><span class="m-agent-tag">소개자: <strong>' + (r.agent_name || '-') + '</strong>' + myTagHtml + '</span><span class="badge ' + stClass + '" style="' + badgeStyle + '">' + (r.status || '접수대기') + '</span></div>'
+            + '<div class="m-customer-name" data-idx="' + idx + '" style="cursor:pointer;">' + r.customer_name + '</div>'
+            + '<a href="tel:' + phoneFmt + '" class="m-phone-link">' + PHONE_ICON_SVG + ' ' + phoneFmt + '</a>'
+            + '<div class="m-info-row">'
+            + '<span>' + MAP_PIN_ICON_SVG + ' ' + (addr || '주소 없음') + '</span>'
+            + (addr ? '<button type="button" class="map-pin-btn btn-table-map" data-addr="' + addr + '" style="padding:1px 6px;">지도</button>' : '')
+            + '</div>'
+            + '<div class="m-info-row">📦 ' + (r.product || '-') + '</div>'
+            + '<div class="m-footer-actions">'
+            + '<span style="font-size:0.75rem; color:#5f6368;">담당: <strong>' + (r.assigned_rep || '-') + '</strong></span>'
+            + '<button type="button" class="btn-detail" data-idx="' + idx + '">상세보기</button>'
+            + '</div></div>';
         });
 
         if (pcBody) pcBody.innerHTML = pcHtml;
@@ -2953,10 +2992,12 @@
           document.getElementById("userEditBox").style.display = "none";
         });
 
-        var regPwdBtn = document.getElementById("regPwdBtn");
         var closePwdBtn = document.getElementById("btnClosePwdModal");
-        if (regPwdBtn) regPwdBtn.addEventListener("click", openPwdModal);
         if (closePwdBtn) closePwdBtn.addEventListener("click", closePwdModal);
+        var regUserTitle = document.getElementById("regUserTitle");
+        var dashUserTitle = document.getElementById("dashUserTitle");
+        if (regUserTitle) regUserTitle.addEventListener("click", openPwdModal);
+        if (dashUserTitle) dashUserTitle.addEventListener("click", openPwdModal);
 
         // ==========================================================
         // 비밀번호 변경 (다중 변형 검증 확인 및 표준 해시 저장)
