@@ -741,7 +741,7 @@
           <button type="button" class="filter-chip chip-hold" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객(상호), 연락처, 주소 검색">
+          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -2002,14 +2002,8 @@
         var kw = document.getElementById("searchKeyword") ? document.getElementById("searchKeyword").value.trim().toLowerCase() : "";
 
         try {
+          // [권한 변경]: 모든 사용자는 로그인 후 모든 안건을 조회 가능
           var query = supabase.from("leads").select("*").order("created_at", { ascending: false });
-
-          if (currentRole === "컨설턴트") {
-            query = query.eq("assigned_rep", currentUserName);
-          } else if (!isAdminRole(currentRole)) {
-            query = query.eq("agent_name", currentUserName);
-          }
-
           var res = await query;
           if (res.error) throw res.error;
 
@@ -2058,7 +2052,21 @@
             var st = r.status || "접수대기";
             if (currentStatusFilter !== "전체" && st !== currentStatusFilter) return false;
             if (kw) {
-              var txt = [r.customer_name, r.contact_phone, r.address, r.agent_name, r.assigned_rep].join(" ").toLowerCase();
+              var searchTargets = [
+                r.customer_name,
+                r.contact_person,
+                r.contact_phone,
+                r.address,
+                r.agent_name,
+                r.assigned_rep,
+                r.business_type,
+                r.product,
+                r.current_company,
+                r.field_description,
+                r.car_number,
+                r.lead_id
+              ];
+              var txt = searchTargets.filter(Boolean).join(" ").toLowerCase();
               if (txt.indexOf(kw) === -1) return false;
             }
             return true;
@@ -2075,7 +2083,13 @@
         var pcBody = document.getElementById("pcTableBody");
         var mList = document.getElementById("mobileCardList");
 
-        var emptyMsg = (currentRole === "컨설턴트") ? "나에게 배당된 안건이 없습니다." : (isAdminRole(currentRole) ? "조회된 소개 내역이 없습니다." : "내가 소개한 안건이 아직 없습니다.");
+        var kw = document.getElementById("searchKeyword") ? document.getElementById("searchKeyword").value.trim() : "";
+        var emptyMsg = "조회된 소개 내역이 없습니다.";
+        if (kw) {
+          emptyMsg = "'" + kw + "' 검색 조건에 일치하는 안건이 없습니다.";
+        } else if (currentStatusFilter !== "전체") {
+          emptyMsg = "'" + currentStatusFilter + "' 상태의 안건이 없습니다.";
+        }
 
         if (!list || list.length === 0) {
           if (pcBody) pcBody.innerHTML = "<tr><td colspan=\"11\" style=\"text-align:center; padding:35px; color:#9aa0a6;\">" + emptyMsg + "</td></tr>";
@@ -2364,22 +2378,42 @@
         var editContainer = document.getElementById("editLeadContainer");
         if (editContainer) editContainer.style.display = "none";
 
-        var canModify = isAdminRole(currentRole) || (currentUserName && item.agent_name && currentUserName.trim() === item.agent_name.trim());
+        // [권한 설정]: 본인이 작성한 안건만 수정/삭제 가능, 마스터는 모든 안건 수정/삭제 가능
+        var isMaster = isAdminRole(currentRole);
+        var isAuthor = Boolean(currentUserName && item.agent_name && currentUserName.trim() === item.agent_name.trim());
+        var canModify = isMaster || isAuthor;
+
         if (actionsBox) {
           actionsBox.style.display = canModify ? "block" : "none";
         }
 
-        var statusBox = document.getElementById("statusUpdateBox");
-        var canChangeStatus = isAdminRole(currentRole) || (currentRole === "컨설턴트" && item.assigned_rep === currentUserName);
+        // [권한 설정]: 담당 컨설턴트 및 마스터만 영업진행 단계 수정 가능
+        var isAssignedConsultant = Boolean(item.assigned_rep && currentUserName && item.assigned_rep.trim() === currentUserName.trim());
+        var canChangeStatus = isMaster || isAssignedConsultant;
 
+        var statusBox = document.getElementById("statusUpdateBox");
         if (statusBox) {
           var btnSave = document.getElementById("btnSaveStatus");
+          var hintEl = document.getElementById("statusAuthHint");
+          if (!hintEl) {
+            hintEl = document.createElement("div");
+            hintEl.id = "statusAuthHint";
+            hintEl.style.fontSize = "0.76rem";
+            hintEl.style.marginTop = "6px";
+            hintEl.style.fontWeight = "600";
+            statusBox.appendChild(hintEl);
+          }
+
           if (canChangeStatus) {
             uSel.disabled = false;
             if (btnSave) btnSave.style.display = "block";
+            hintEl.style.display = "none";
           } else {
             uSel.disabled = true;
             if (btnSave) btnSave.style.display = "none";
+            hintEl.style.display = "block";
+            hintEl.style.color = "#64748b";
+            hintEl.innerText = "🔒 영업진행 단계는 담당 컨설턴트(" + (item.assigned_rep || "미지정") + ") 및 마스터만 변경할 수 있습니다.";
           }
         }
 
@@ -3047,6 +3081,10 @@
           inputSearch.addEventListener("keyup", function(e) {
             if (e.key === "Enter") loadDashboardLeads();
           });
+          inputSearch.addEventListener("input", function() {
+            clearTimeout(window._searchDebounce);
+            window._searchDebounce = setTimeout(loadDashboardLeads, 200);
+          });
         }
 
         var curComp = document.getElementById("currentCompany");
@@ -3084,6 +3122,13 @@
         if (btnSaveStatus) {
           btnSaveStatus.addEventListener("click", async function() {
             if (!activeLeadItem || !supabase) return;
+
+            var isMaster = isAdminRole(currentRole);
+            var isAssignedConsultant = Boolean(activeLeadItem.assigned_rep && currentUserName && activeLeadItem.assigned_rep.trim() === currentUserName.trim());
+            if (!isMaster && !isAssignedConsultant) {
+              alert("⚠️ 영업진행 단계는 담당 컨설턴트 및 마스터만 변경할 수 있습니다.");
+              return;
+            }
             var newSt = document.getElementById("uStatus").value;
             var updateData = { status: newSt };
             var nowIso = new Date().toISOString();
@@ -3234,6 +3279,13 @@
           btnConfirmEdit.addEventListener("click", async function() {
             if (!activeLeadItem || !supabase) return;
 
+            var isMaster = isAdminRole(currentRole);
+            var isAuthor = Boolean(currentUserName && activeLeadItem.agent_name && currentUserName.trim() === activeLeadItem.agent_name.trim());
+            if (!isMaster && !isAuthor) {
+              alert("⚠️ 본인이 작성한 안건만 수정할 수 있습니다.");
+              return;
+            }
+
             var cName = document.getElementById("editCustomerName").value.trim();
             var cPhone = document.getElementById("editContactPhone").value.trim();
             if (!cName) { alert("고객(상호)을 입력해주세요."); return; }
@@ -3278,6 +3330,13 @@
         if (btnDelLead) {
           btnDelLead.addEventListener("click", async function() {
             if (!activeLeadItem || !supabase) return;
+
+            var isMaster = isAdminRole(currentRole);
+            var isAuthor = Boolean(currentUserName && activeLeadItem.agent_name && currentUserName.trim() === activeLeadItem.agent_name.trim());
+            if (!isMaster && !isAuthor) {
+              alert("⚠️ 본인이 작성한 안건만 삭제할 수 있습니다.");
+              return;
+            }
 
             var confirmDel = confirm("⚠️ 정말로 이 안건을 영구 삭제하시겠습니까?\n고객(상호): " + activeLeadItem.customer_name + "\n(삭제 후 복구할 수 없습니다)");
             if (!confirmDel) return;
