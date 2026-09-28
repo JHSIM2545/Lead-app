@@ -430,7 +430,7 @@
     .user-table-wrapper { overflow-x: auto; max-height: 55vh; border: 1px solid #e2e8f0; border-radius: 8px; }
     .user-data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; text-align: left; }
     .user-data-table th { background: #f8f9fa; padding: 10px; font-weight: 700; color: #3c4043; border-bottom: 2px solid #e8eaed; white-space: nowrap; position: sticky; top: 0; }
-    .user-data-table td { padding: 10px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; }
+    .user-data-table td { padding: 10px; border-bottom: 1px solid #f1f3f4; vertical-align: middle; white-space: nowrap; }
     .btn-user-edit { padding: 4px 8px; background: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
     .btn-user-del { padding: 4px 8px; background: #fce8e6; color: #d93025; border: 1px solid #fad2cf; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; margin-left: 4px; }
     .user-edit-box { background: #f8fbff; border: 1px solid #aecbfa; border-radius: 8px; padding: 12px; margin-top: 12px; display: none; }
@@ -934,7 +934,7 @@
 
   <!-- 관리자 전용 사용자 관리 모달 -->
   <div class="modal-overlay" id="userManageModal">
-    <div class="modal-card" style="max-width: 680px;">
+    <div class="modal-card" style="max-width: 920px; width: 95%;">
       <div class="modal-header">
         <div class="modal-header-left">
           <h3>👥 사용자 관리</h3>
@@ -942,8 +942,8 @@
         <button type="button" class="btn-close" id="btnCloseUserModal">×</button>
       </div>
       <div class="modal-body">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <span style="font-size:0.84rem; color:#5f6368;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;">0</strong>명</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:0.84rem; color:#5f6368;">총 사용자: <strong id="totalUserCount" style="color:#1a73e8;">0</strong>명 &nbsp;|&nbsp; 실시간 접속: <strong id="onlineUserCount" style="color:#137333;">0</strong>명</span>
           <button type="button" class="btn-inner btn-switch" id="btnRefreshUsers" style="padding:5px 10px; font-size:0.75rem;">🔄 새로고침</button>
         </div>
 
@@ -952,13 +952,16 @@
             <thead>
               <tr>
                 <th>이름</th>
-                <th>전화번호(아이디)</th>
+                <th>전화번호</th>
                 <th>직무</th>
-                <th>관리</th>
+                <th style="text-align:center;">실시간 접속</th>
+                <th>최근접속일시</th>
+                <th>접속기기</th>
+                <th style="text-align:center;">관리</th>
               </tr>
             </thead>
             <tbody id="userTableBody">
-              <tr><td colspan="4" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
+              <tr><td colspan="7" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 로딩 중...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1259,6 +1262,7 @@
 
           var targetScreen = (sessionData.screen === 'register') ? 'register' : 'dashboard';
           showScreen(targetScreen);
+          recordSalesPortalAccess(currentUserPhone, false);
           registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
           return true;
         } catch (e) {
@@ -1322,6 +1326,69 @@
       function isAdminRole(role) {
         var r = normalizeJobTitle(role);
         return r === '지사관리자' || r === '본사관리자';
+      }
+
+      // 접속 기기 명칭 판별 함수
+      function getDeviceName() {
+        var ua = navigator.userAgent || "";
+        var w = window.screen ? window.screen.width : window.innerWidth;
+        var h = window.screen ? window.screen.height : window.innerHeight;
+        var maxDim = Math.max(w, h);
+        var minDim = Math.min(w, h);
+
+        // 1. 갤럭시 Z 폴드 감지 (SM-F9xx 모델 또는 특유의 화면 비율)
+        if (/SM-F9[0-9]{2}/i.test(ua) || (ua.indexOf("Android") !== -1 && minDim > 650 && (minDim / maxDim) > 0.72)) {
+          return "갤럭시 Z 폴드";
+        }
+        // 2. 갤럭시 Z 플립 감지 (SM-F7xx 모델)
+        if (/SM-F7[0-9]{2}/i.test(ua)) {
+          return "갤럭시 Z 플립";
+        }
+        // 3. 삼성 갤럭시 기타 모델
+        if (/SM-[A-Z][0-9]+/i.test(ua) || /SAMSUNG/i.test(ua)) {
+          return "삼성 갤럭시";
+        }
+        // 4. 아이폰 / 아이패드
+        if (/iPhone/i.test(ua)) {
+          return "아이폰";
+        }
+        if (/iPad/i.test(ua)) {
+          return "아이패드";
+        }
+        // 5. 일반 안드로이드 폰
+        if (/Android/i.test(ua)) {
+          return "안드로이드 모바일";
+        }
+        // 6. PC 환경
+        if (/Windows NT/i.test(ua)) {
+          return "PC (Windows)";
+        }
+        if (/Macintosh|Mac OS/i.test(ua)) {
+          return "Mac";
+        }
+        return "웹 브라우저";
+      }
+
+      // 소개영업 관리포털 접속 이력 및 실시간 접속(heartbeat) 기록 함수
+      async function recordSalesPortalAccess(phone, isNewLogin) {
+        if (!supabase || !phone) return;
+        try {
+          var dev = getDeviceName();
+          var now = new Date().toISOString();
+          var updateData = {
+            sales_last_active_at: now,
+            sales_device: dev
+          };
+          if (isNewLogin) {
+            updateData.sales_last_login_at = now;
+          }
+          var res = await supabase.from("app_users").update(updateData).eq("phone", phone);
+          if (res.error) {
+            console.warn("소개포털 접속정보 기록 알림:", res.error.message);
+          }
+        } catch (e) {
+          console.warn("recordSalesPortalAccess error:", e);
+        }
       }
 
       function openNaverMap(query) {
@@ -2404,9 +2471,10 @@
       async function loadAllUsers() {
         var tbody = document.getElementById("userTableBody");
         var countEl = document.getElementById("totalUserCount");
+        var onlineCountEl = document.getElementById("onlineUserCount");
         if (!tbody || !supabase) return;
 
-        tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#9aa0a6;\">사용자 목록 불러오는 중...</td></tr>";
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#9aa0a6;">사용자 목록 불러오는 중...</td></tr>';
 
         try {
           var res = await supabase.from("app_users").select("*").order("name", { ascending: true });
@@ -2416,13 +2484,41 @@
           if (countEl) countEl.innerText = users.length;
 
           if (users.length === 0) {
-            tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#9aa0a6;\">등록된 사용자가 없습니다.</td></tr>";
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#9aa0a6;">등록된 사용자가 없습니다.</td></tr>';
+            if (onlineCountEl) onlineCountEl.innerText = "0";
             return;
           }
 
           var html = "";
+          var now = Date.now();
+          var onlineUsers = 0;
+
           users.forEach(function(u) {
             var phoneFmt = formatPhone(u.phone);
+            var normalizedJob = normalizeJobTitle(u.job);
+
+            // 실시간 접속 여부: 최근 3.5분(210초) 이내 활동 기록이 있는 경우 '접속중'
+            var isOnline = false;
+            if (u.sales_last_active_at) {
+              var lastActTime = new Date(u.sales_last_active_at).getTime();
+              if (!isNaN(lastActTime) && (now - lastActTime) < (3.5 * 60 * 1000)) {
+                isOnline = true;
+                onlineUsers++;
+              }
+            }
+
+            var onlineBadge = isOnline
+              ? '<span style="display:inline-flex; align-items:center; gap:4px; background:#e6f4ea; color:#137333; font-weight:700; padding:2px 8px; border-radius:12px; font-size:0.75rem; border:1px solid #ceead6;"><span style="width:6px; height:6px; background:#34a853; border-radius:50%; display:inline-block;"></span>접속중</span>'
+              : '<span style="display:inline-flex; align-items:center; gap:4px; background:#f1f3f4; color:#5f6368; font-weight:600; padding:2px 8px; border-radius:12px; font-size:0.75rem;"><span style="width:6px; height:6px; background:#9aa0a6; border-radius:50%; display:inline-block;"></span>오프라인</span>';
+
+            var lastLoginText = u.sales_last_login_at
+              ? formatKoreanDate(u.sales_last_login_at)
+              : (u.sales_last_active_at ? formatKoreanDate(u.sales_last_active_at) : '<span style="color:#9aa0a6;">-</span>');
+
+            var deviceText = u.sales_device
+              ? ('<span style="font-weight:600; color:#3c4043;">' + u.sales_device + '</span>')
+              : '<span style="color:#9aa0a6;">-</span>';
+
             html += "<tr>"
               + "<td><strong>" + (u.name || "-") + "</strong></td>"
               + "<td>" + phoneFmt + "</td>"
@@ -2437,14 +2533,18 @@
                 else if (norm === "CS관리자") { bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0"; }
                 else if (norm === "CS근무자") { bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf"; }
                 return '<span style="background:' + bg + '; color:' + col + '; border:1px solid ' + border + '; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;">' + norm + '</span>';
-              })(u.job) + "</td>"
-              + "<td>"
-              + "<button type=\"button\" class=\"btn-user-edit\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\" data-job=\"" + normalizeJobTitle(u.job) + "\">수정</button>"
-              + "<button type=\"button\" class=\"btn-user-del\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\">삭제</button>"
-              + "</td>"
-              + "</tr>";
+              })(u.job) + '</td>'
+              + '<td style="text-align:center;">' + onlineBadge + '</td>'
+              + '<td style="font-size:0.8rem; color:#5f6368;">' + lastLoginText + '</td>'
+              + '<td>' + deviceText + '</td>'
+              + '<td style="text-align:center;">'
+              + '<button type="button" class="btn-user-edit" data-phone="' + u.phone + '" data-name="' + (u.name || '') + '" data-job="' + normalizedJob + '">수정</button>'
+              + '<button type="button" class="btn-user-del" data-phone="' + u.phone + '" data-name="' + (u.name || '') + '">삭제</button>'
+              + '</td>'
+              + '</tr>';
           });
 
+          if (onlineCountEl) onlineCountEl.innerText = onlineUsers;
           tbody.innerHTML = html;
 
           tbody.querySelectorAll(".btn-user-edit").forEach(function(btn) {
@@ -2465,8 +2565,8 @@
           });
 
         } catch (err) {
-          console.error("사용자 로드 실패:", err);
-          tbody.innerHTML = "<tr><td colspan=\"4\" style=\"text-align:center; padding:20px; color:#d93025;\">사용자 목록 로드 오류: " + err.message + "</td></tr>";
+          console.error("사용자 목록 조회 실패:", err);
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#d93025;">사용자 목록 조회 중 오류 발생: ' + (err.message || err) + "</td></tr>";
         }
       }
 
@@ -2609,8 +2709,16 @@
             } else {
               restoreUserSession();
             }
+            recordSalesPortalAccess(currentUserPhone, false);
           }
         });
+
+        // 1분(60초) 주기로 소개영업포털 실시간 접속 상태(heartbeat) 갱신
+        setInterval(function() {
+          if (currentUserPhone && document.visibilityState === "visible") {
+            recordSalesPortalAccess(currentUserPhone, false);
+          }
+        }, 60000);
         if (!hasRestored) {
           showScreen("login");
           applyLoginTab("member");
@@ -2711,6 +2819,7 @@
 
               document.getElementById("agentName").value = name;
               registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
+              recordSalesPortalAccess(currentUserPhone, true);
               showScreen("dashboard");
 
             } catch (err) {
@@ -2788,6 +2897,7 @@
               saveUserSession({ phone: currentUserPhone, name: currentUserName, job: currentRole }, "dashboard");
               document.getElementById("agentName").value = currentUserName;
               registerServiceWorkerAndSubscribe(currentUserPhone, currentUserName);
+              recordSalesPortalAccess(currentUserPhone, true);
               showScreen("dashboard");
 
             } catch (err) {
