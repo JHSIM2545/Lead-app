@@ -102,7 +102,7 @@
     .login-error-msg {
       background: #fce8e6; color: #d93025; font-size: 0.85rem; font-weight: 600;
       padding: 10px; border-radius: 8px; margin-top: 10px; display: none; text-align: center;
-      border: 1px solid #fad2cf;
+      border: 1px solid #fad2cf; white-space: pre-line; line-height: 1.5;
     }
     #viewRegister { display: none; max-width: 600px; margin: 0 auto; position: relative; z-index: 20; }
     .intro-card {
@@ -523,11 +523,12 @@
               <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">직무 구분</label>
               <select id="regJob" required style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
                 <option value="">직무를 선택해주세요</option>
-                <option value="CS근무자">CS근무자</option>
-                <option value="CS관리자">CS관리자</option>
                 <option value="컨설턴트">컨설턴트</option>
                 <option value="기술사원">기술사원</option>
+                <option value="CS관리자">CS관리자</option>
+                <option value="CS근무자">CS근무자</option>
                 <option value="지사관리자">지사관리자</option>
+                <option value="본사스탭">본사스탭</option>
                 <option value="본사관리자">본사관리자</option>
               </select>
             </div>
@@ -974,11 +975,12 @@
             <div class="form-group">
               <label class="form-label">직무</label>
               <select id="editUserJobSelect">
-                <option value="CS근무자">CS근무자</option>
-                <option value="CS관리자">CS관리자</option>
                 <option value="컨설턴트">컨설턴트</option>
                 <option value="기술사원">기술사원</option>
+                <option value="CS관리자">CS관리자</option>
+                <option value="CS근무자">CS근무자</option>
                 <option value="지사관리자">지사관리자</option>
+                <option value="본사스탭">본사스탭</option>
                 <option value="본사관리자">본사관리자</option>
               </select>
             </div>
@@ -1243,7 +1245,12 @@
             return false;
           }
 
-          currentRole = sessionData.job ? sessionData.job.trim() : 'CS근무자';
+          var restoredRole = normalizeJobTitle(sessionData.job);
+          if (restoredRole === "본사관리자" || restoredRole === "본사스탭") {
+            clearUserSession();
+            return false;
+          }
+          currentRole = restoredRole;
           currentUserName = sessionData.name ? sessionData.name.trim() : '직원';
           currentUserPhone = sessionData.phone;
 
@@ -1266,8 +1273,55 @@
         applyLoginTab('member');
       }
 
+      // 1. 직무 명칭 통일 함수 (레거시 명칭 및 7대 표준 직무 매핑)
+      function normalizeJobTitle(job) {
+        if (!job) return 'CS근무자';
+        var j = String(job).trim();
+        
+        // 1. 완전 일치 우선
+        if (j === '컨설턴트') return '컨설턴트';
+        if (j === '기술사원') return '기술사원';
+        if (j === 'CS관리자') return 'CS관리자';
+        if (j === '지사관리자') return '지사관리자';
+        if (j === '본사스탭') return '본사스탭';
+        if (j === '본사관리자') return '본사관리자';
+        if (j === 'CS근무자') return 'CS근무자';
+
+        // 2. 레거시 및 유사어 매핑 규칙
+        // Staff(지원) -> 본사스탭
+        if (j.indexOf('스탭') !== -1 || j.toLowerCase().indexOf('staff') !== -1 || j.indexOf('지원') !== -1) {
+          return '본사스탭';
+        }
+        // 매니저(관리자) -> 본사관리자
+        if (j.indexOf('매니저') !== -1 || j.indexOf('본사') !== -1) {
+          return '본사관리자';
+        }
+        // 지사관리자
+        if (j.indexOf('지사') !== -1) {
+          return '지사관리자';
+        }
+        // 컨설턴트(영업) -> 컨설턴트
+        if (j.indexOf('컨설턴트') !== -1 || j.indexOf('영업') !== -1) {
+          return '컨설턴트';
+        }
+        // 엔지니어(기술) -> 기술사원
+        if (j.indexOf('기술') !== -1 || j.indexOf('엔지니어') !== -1) {
+          return '기술사원';
+        }
+        // CS근무자 vs 서비스(CS) -> CS관리자
+        if (j.indexOf('근무자') !== -1) {
+          return 'CS근무자';
+        }
+        if (j.indexOf('서비스') !== -1 || j.toLowerCase().indexOf('cs') !== -1) {
+          return 'CS관리자';
+        }
+
+        return j;
+      }
+
       function isAdminRole(role) {
-        return role === '지사관리자' || role === '본사관리자';
+        var r = normalizeJobTitle(role);
+        return r === '지사관리자' || r === '본사관리자';
       }
 
       function openNaverMap(query) {
@@ -2372,9 +2426,20 @@
             html += "<tr>"
               + "<td><strong>" + (u.name || "-") + "</strong></td>"
               + "<td>" + phoneFmt + "</td>"
-              + "<td>" + (function(j) { var bg = "#e8f0fe", col = "#1a73e8", border = "#aecbfa"; if (j === "본사관리자") { bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb"; } else if (j === "지사관리자") { bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2"; } else if (j === "컨설턴트") { bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa"; } else if (j === "기술사원") { bg = "#e6f4ea"; col = "#137333"; border = "#ceead6"; } else if (j === "CS근무자") { bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf"; } else if (j === "CS관리자") { bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0"; } return "<span style=\"background:" + bg + "; color:" + col + "; border:1px solid " + border + "; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;\">" + (j || "미지정") + "</span>"; })(u.job) + "</td>"
+              + "<td>" + (function(j) {
+                var norm = normalizeJobTitle(j);
+                var bg = "#e8f0fe", col = "#1a73e8", border = "#aecbfa";
+                if (norm === "본사관리자") { bg = "#f3e8fd"; col = "#7627bb"; border = "#d7bdfb"; }
+                else if (norm === "본사스탭") { bg = "#ede7f6"; col = "#512da8"; border = "#d1c4e9"; }
+                else if (norm === "지사관리자") { bg = "#fef7e0"; col = "#b06000"; border = "#fce8b2"; }
+                else if (norm === "컨설턴트") { bg = "#e8f0fe"; col = "#1a73e8"; border = "#aecbfa"; }
+                else if (norm === "기술사원") { bg = "#e6f4ea"; col = "#137333"; border = "#ceead6"; }
+                else if (norm === "CS관리자") { bg = "#fce4ec"; col = "#c2185b"; border = "#f8bbd0"; }
+                else if (norm === "CS근무자") { bg = "#fce8e6"; col = "#d93025"; border = "#fad2cf"; }
+                return '<span style="background:' + bg + '; color:' + col + '; border:1px solid ' + border + '; padding:2px 8px; border-radius:5px; font-weight:700; font-size:0.75rem; white-space:nowrap;">' + norm + '</span>';
+              })(u.job) + "</td>"
               + "<td>"
-              + "<button type=\"button\" class=\"btn-user-edit\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\" data-job=\"" + (u.job || "CS근무자") + "\">수정</button>"
+              + "<button type=\"button\" class=\"btn-user-edit\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\" data-job=\"" + normalizeJobTitle(u.job) + "\">수정</button>"
               + "<button type=\"button\" class=\"btn-user-del\" data-phone=\"" + u.phone + "\" data-name=\"" + (u.name || "") + "\">삭제</button>"
               + "</td>"
               + "</tr>";
@@ -2410,13 +2475,7 @@
         document.getElementById("editUserTargetPhone").value = phone;
         document.getElementById("editUserNameInput").value = name;
         
-        var normalizedJob = job || 'CS근무자';
-        if (normalizedJob.indexOf('본사') !== -1) normalizedJob = '본사관리자';
-        else if (normalizedJob.indexOf('영업') !== -1 || normalizedJob.indexOf('컨설턴트') !== -1) normalizedJob = '컨설턴트';
-        else if (normalizedJob.indexOf('기술') !== -1 || normalizedJob.indexOf('엔지니어') !== -1) normalizedJob = '기술사원';
-        else if (normalizedJob.indexOf('서비스') !== -1 || normalizedJob.indexOf('CS근무자') !== -1) normalizedJob = 'CS근무자';
-        else if (normalizedJob.indexOf('Staff') !== -1 || normalizedJob.indexOf('지원') !== -1 || normalizedJob.indexOf('CS관리자') !== -1) normalizedJob = 'CS관리자';
-        else if (normalizedJob.indexOf('관리자') !== -1 || normalizedJob.indexOf('지사') !== -1) normalizedJob = '지사관리자';
+        var normalizedJob = normalizeJobTitle(job);
         
         document.getElementById("editUserJobSelect").value = normalizedJob;
         document.getElementById("editUserNewPwdInput").value = "";
@@ -2427,7 +2486,7 @@
       async function saveUserEdit() {
         var phone = document.getElementById("editUserTargetPhone").value;
         var name = document.getElementById("editUserNameInput").value.trim();
-        var job = document.getElementById("editUserJobSelect").value;
+        var job = normalizeJobTitle(document.getElementById("editUserJobSelect").value);
         var newPwd = document.getElementById("editUserNewPwdInput").value.trim();
 
         if (!phone || !name || !job) {
@@ -2604,6 +2663,12 @@
             if (!name) { showLoginError("signupErr", "이름을 입력해주세요."); return; }
             if (!job) { showLoginError("signupErr", "직무를 선택해주세요."); return; }
 
+            var normalizedRegJob = normalizeJobTitle(job);
+            if (normalizedRegJob === "본사관리자" || normalizedRegJob === "본사스탭") {
+              showLoginError("signupErr", "시스템 접속 권한이 없습니다\n담당자에게 문의해 주세요");
+              return;
+            }
+
             var pwdErr = validatePassword(pwd);
             if (pwdErr) { showLoginError("signupErr", pwdErr); return; }
 
@@ -2640,7 +2705,7 @@
 
               alert("🎉 회원가입이 완료되었습니다!\n바로 시스템에 접속합니다.");
 
-              currentRole = job.trim();
+              currentRole = normalizedRegJob;
               currentUserName = name.trim();
               currentUserPhone = phone;
 
@@ -2707,7 +2772,16 @@
               }
 
               var user = matchedUser;
-              currentRole = user.job ? user.job.trim() : "CS근무자";
+              var normalizedJob = normalizeJobTitle(user.job);
+
+              // 5. 직무별 접속제한: 소개영업포털에는 본사관리자, 본사스탭 로그인 불가
+              if (normalizedJob === "본사관리자" || normalizedJob === "본사스탭") {
+                btn.disabled = false; btn.innerText = "로그인";
+                showLoginError("memberLoginErr", "시스템 접속 권한이 없습니다\n담당자에게 문의해 주세요");
+                return;
+              }
+
+              currentRole = normalizedJob;
               currentUserName = user.name ? user.name.trim() : "직원";
               currentUserPhone = user.phone;
 
