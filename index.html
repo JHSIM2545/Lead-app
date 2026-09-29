@@ -1469,8 +1469,10 @@
       function clearUserSession() {
         clearFormDraft();
         try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+        try { sessionStorage.removeItem('S1_LEAD_PORTAL_AUTH_SESSION'); } catch (e) {}
         try { localStorage.removeItem(FOLD_BRIDGE_KEY); } catch (e) {}
         try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+        try { localStorage.removeItem('S1_LEAD_PORTAL_AUTH_SESSION'); } catch (e) {}
         currentRole = '';
         currentUserName = '';
         currentUserPhone = '';
@@ -1480,18 +1482,104 @@
 
       function restoreUserSession() {
         try {
-          // 1. sessionStorage 세션 확인
           var sessionData = null;
-          var raw = sessionStorage.getItem(SESSION_KEY);
-          if (raw) {
-            try { sessionData = JSON.parse(raw); } catch (e) {}
+
+          // 0. 영업일보 관리 포털(User.html / Admin.html)로부터 전달된 자동 로그인(SSO) 파라미터 및 스토리지 확인
+          try {
+            var urlParams = new URLSearchParams(window.location.search);
+            // hash(#) 파라미터도 지원
+            if (!urlParams.get('sso') && window.location.hash.includes('sso=')) {
+              urlParams = new URLSearchParams(window.location.hash.substring(1));
+            }
+
+            var isSso = urlParams.get('sso');
+            var ssoToken = urlParams.get('sso_token') || (isSso && isSso !== '1' ? isSso : null);
+            var ssoPhone = urlParams.get('phone') || urlParams.get('sso_phone');
+            var ssoName = urlParams.get('name') || urlParams.get('sso_name') || urlParams.get('agent');
+            var ssoJob = urlParams.get('job') || urlParams.get('sso_job');
+            var ssoRole = urlParams.get('role');
+            var ssoMaster = urlParams.get('master');
+            var ssoScreen = urlParams.get('screen') || urlParams.get('view') || 'dashboard';
+
+            var ssoUser = null;
+            // 0-1. Base64 토큰이 넘어온 경우 (보안 토큰)
+            if (ssoToken) {
+              try {
+                var decoded = decodeURIComponent(escape(atob(ssoToken)));
+                ssoUser = JSON.parse(decoded);
+              } catch(e) {}
+            }
+
+            // 0-2. 영업일보에서 ?sso=1&name=...&phone=...&job=...&role=...&master=... 형식으로 넘어온 경우
+            if (!ssoUser && (isSso === '1' || ssoPhone)) {
+              ssoUser = {
+                phone: ssoPhone,
+                name: ssoName,
+                job: ssoJob,
+                role: ssoRole,
+                master: ssoMaster,
+                screen: ssoScreen
+              };
+            }
+
+            // 0-3. 동일 도메인(GitHub Pages 등)에서 영업일보가 저장한 S1_LEAD_PORTAL_AUTH_SESSION 스토리지 확인
+            if (!ssoUser) {
+              try {
+                var leadRaw = sessionStorage.getItem('S1_LEAD_PORTAL_AUTH_SESSION') || localStorage.getItem('S1_LEAD_PORTAL_AUTH_SESSION');
+                if (leadRaw) {
+                  ssoUser = JSON.parse(leadRaw);
+                }
+              } catch(e) {}
+            }
+
+            // SSO 사용자 정보가 존재하면 즉시 세션으로 생성 및 적용
+            if (ssoUser && ssoUser.phone) {
+              var cleanPhone = String(ssoUser.phone).replace(/[^0-9]/g, '');
+              var cleanName = ssoUser.name ? String(ssoUser.name).trim() : '직원';
+              var isMasterUser = !!(ssoUser.isMaster || ssoUser.role === 'master' || ssoUser.master === '1' || cleanName === '심정환' || (ssoUser.job && ssoUser.job.includes('지사관리자')));
+              var finalJob = isMasterUser ? '지사관리자' : (ssoUser.job || ssoUser.role || '컨설턴트');
+
+              sessionData = {
+                phone: cleanPhone,
+                name: cleanName,
+                job: finalJob,
+                role: isMasterUser ? 'master' : 'user',
+                isMaster: isMasterUser,
+                screen: ssoUser.screen || ssoScreen || 'dashboard',
+                savedAt: Date.now()
+              };
+              sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+              sessionStorage.setItem('S1_LEAD_PORTAL_AUTH_SESSION', JSON.stringify(sessionData));
+              try {
+                localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+                localStorage.setItem('S1_LEAD_PORTAL_AUTH_SESSION', JSON.stringify(sessionData));
+                localStorage.setItem('S1_LAST_LOGIN_PHONE', cleanPhone);
+                updateFoldBridge();
+              } catch(e) {}
+
+              // 주소창에서 sso 파라미터를 깨끗하게 제거 (새로고침 시 깨끗한 URL 유지)
+              try {
+                var cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+              } catch(e) {}
+            }
+          } catch(ssoErr) {
+            console.warn('SSO 처리 중 예외 발생:', ssoErr);
           }
 
-          // 2. 만약 sessionStorage가 비어있다면, 폴더블폰 펼침/접힘 전환(Fold Continuity Bridge)인지 확인
+          // 1. sessionStorage 세션 확인 (SSO가 없거나 기존 접속 복원의 경우)
+          if (!sessionData) {
+            var raw = sessionStorage.getItem(SESSION_KEY) || sessionStorage.getItem('S1_LEAD_PORTAL_AUTH_SESSION');
+            if (raw) {
+              try { sessionData = JSON.parse(raw); } catch (e) {}
+            }
+          }
+
+          // 2. 만약 sessionStorage가 비어있다면, 폴더블폰 펼침/접힘 전환(Fold Continuity Bridge) 확인
           var bridgeRaw = null;
           try { bridgeRaw = localStorage.getItem(FOLD_BRIDGE_KEY); } catch (e) {}
 
-          if (bridgeRaw) {
+          if (bridgeRaw && !sessionData) {
             try {
               var bridge = JSON.parse(bridgeRaw);
               var timeDiff = Date.now() - (bridge.timestamp || 0);
@@ -1500,16 +1588,14 @@
 
               // 폴더블폰 열기/닫기(화면 크기 급변) 또는 20초 이내의 핸드오버인 경우 세션 자동 승계
               if (bridge.user && bridge.user.phone && timeDiff < 20000 && (isScreenChanged || timeDiff < 6000)) {
-                if (!sessionData) {
-                  sessionData = {
-                    phone: bridge.user.phone,
-                    name: bridge.user.name,
-                    job: bridge.user.job,
-                    screen: bridge.screen || 'dashboard',
-                    savedAt: Date.now()
-                  };
-                  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
-                }
+                sessionData = {
+                  phone: bridge.user.phone,
+                  name: bridge.user.name,
+                  job: bridge.user.job,
+                  screen: bridge.screen || 'dashboard',
+                  savedAt: Date.now()
+                };
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
                 if (bridge.formDraft) {
                   sessionStorage.setItem(DRAFT_KEY, JSON.stringify(bridge.formDraft));
                 }
@@ -1525,12 +1611,27 @@
             }
           }
 
+          // 3. localStorage 영구 보관 세션 확인
+          if (!sessionData) {
+            try {
+              var localRaw = localStorage.getItem('S1_LEAD_PORTAL_AUTH_SESSION') || localStorage.getItem(SESSION_KEY);
+              if (localRaw) {
+                var parsedLocal = JSON.parse(localRaw);
+                if (parsedLocal && parsedLocal.phone) {
+                  sessionData = parsedLocal;
+                  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+                }
+              }
+            } catch(e) {}
+          }
+
           if (!sessionData || !sessionData.phone || !sessionData.name) {
             return false;
           }
 
-          var restoredRole = normalizeJobTitle(sessionData.job);
-          if (restoredRole === "본사관리자" || restoredRole === "본사스탭") {
+          var isMaster = !!(sessionData.isMaster || sessionData.role === 'master' || sessionData.name === '심정환' || (sessionData.job && sessionData.job.includes('지사관리자')));
+          var restoredRole = isMaster ? '지사관리자' : normalizeJobTitle(sessionData.job);
+          if (!isMaster && (restoredRole === "본사관리자" || restoredRole === "본사스탭")) {
             clearUserSession();
             return false;
           }
@@ -1543,7 +1644,7 @@
 
           var targetScreen = (sessionData.screen === 'register') ? 'register' : 'dashboard';
           showScreen(targetScreen);
-          recordSalesPortalAccess(currentUserPhone, false);
+          recordSalesPortalAccess(currentUserPhone, true);
           
           return true;
         } catch (e) {
