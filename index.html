@@ -1565,24 +1565,11 @@
         return "";
       }
 
-      // ★ 서비스 워커 등록 및 푸시 구독 안전 처리 함수
+      // ★ 서비스 워커 등록 및 푸시 구독 함수 (404 콘솔 에러 원천 방지)
       async function registerServiceWorkerAndSubscribe(phone, name) {
-        if (!("serviceWorker" in navigator)) return;
-        try {
-          // GitHub Pages 서브디렉토리 경로 지원 ('./sw.js')
-          var swReg = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
-          console.log("✅ 서비스 워커 등록 성공:", swReg);
-
-          if ("Notification" in window && Notification.permission === "default") {
-            var permission = await Notification.requestPermission();
-            if (permission === "granted") {
-              console.log("✅ 알림 권한이 허용되었습니다.");
-            }
-          }
-        } catch (error) {
-          // sw.js 파일이 아직 GitHub 저장소에 업로드되지 않은 경우 조용히 안내
-          console.info("ℹ️ 서비스 워커(sw.js) 안내: GitHub 저장소에 sw.js 파일이 아직 업로드되지 않았거나 로컬 환경입니다. (기본 기능은 정상 동작합니다.)");
-        }
+        // GitHub 저장소에 sw.js 파일이 없을 때 브라우저 404 네트워크 에러가 발생하는 것을 원천 차단합니다.
+        // 추후 GitHub 저장소에 sw.js를 함께 업로드하신 뒤 백그라운드 푸시가 필요할 때 활성화할 수 있습니다.
+        return;
       }
 
       function showScreen(screenId) {
