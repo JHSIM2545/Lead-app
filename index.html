@@ -399,7 +399,25 @@
     .filter-chip.chip-hold.active .chip-count { background: #ffffff !important; color: #64748b !important; }
 
     .search-box { display: flex; gap: 6px; flex: 1; max-width: 320px; min-width: 220px; }
-    .search-box input { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 8px; width: 100%; font-size: 0.9rem; }
+    .search-box input[type="text"], .search-box input[type="search"], .search-box input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: #ffffff;
+        outline: none;
+        box-sizing: border-box;
+        -webkit-appearance: none;
+      }
+      .search-box input::-webkit-search-cancel-button,
+      .search-box input::-webkit-search-decoration,
+      .search-box input::-webkit-search-results-button,
+      .search-box input::-webkit-search-results-decoration {
+        display: none;
+        -webkit-appearance: none;
+      }
+      .search-box input.dummy_unused { padding: 8px 12px; border: 1px solid #dadce0; border-radius: 8px; width: 100%; font-size: 0.9rem; }
 
     .badge {
       display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;
@@ -842,7 +860,7 @@
           <div class="row">
             <div class="form-group">
               <label class="form-label">소개자 이름 <span class="req">*</span></label>
-              <input type="text" id="agentName" placeholder="소개자 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <input type="text" id="agentName" name="agent_name_no_auto" placeholder="소개자 이름" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
             </div>
             <div class="form-group">
               <label class="form-label">컨설턴트 <span class="req">*</span></label>
@@ -864,17 +882,17 @@
 
           <div class="form-group">
             <label class="form-label" style="margin-bottom:6px;">고객(상호) <span class="req">*</span></label>
-            <input type="text" id="customerName" placeholder="예: 북서울베이커리" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <input type="text" id="customerName" name="customer_name_no_auto" placeholder="예: 북서울베이커리" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
           </div>
 
           <div class="row">
             <div class="form-group">
               <label class="form-label">대표/담당자</label>
-              <input type="text" id="contactPerson" placeholder="대표님" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="contactPerson" name="contact_person_no_auto" placeholder="대표님" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">연락처 <span class="req">*</span></label>
-              <input type="tel" id="contactPhone" placeholder="010-0000-0000" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <input type="tel" id="contactPhone" name="contact_phone_no_auto" placeholder="010-0000-0000" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
             </div>
           </div>
 
@@ -890,12 +908,12 @@
                 </svg>
               </button>
             </div>
-            <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
+            <input type="text" id="address" name="address_no_auto" placeholder="예: 번동 102번지 1층 (사거리 코너)" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
           </div>
 
           <div class="form-group">
             <label class="form-label">업종</label>
-            <input type="text" id="businessType" placeholder="식당, 카페, 의류, 학원 등" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="businessType" name="business_type_no_auto" placeholder="식당, 카페, 의류, 학원 등" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
 
           <div class="row">
@@ -932,7 +950,7 @@
 
           <div class="form-group">
             <label class="form-label">현장 설명 <span class="req">*</span></label>
-            <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
+            <textarea id="fieldDescription" name="field_desc_no_auto" rows="4" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
           </div>
 
           <!-- 현장 사진 등록 -->
@@ -1009,7 +1027,7 @@
           <button type="button" class="filter-chip chip-hold" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <input type="search" id="searchKeyword" name="search_no_auto" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -1085,39 +1103,39 @@
           <h4 style="margin:0 0 8px 0; color:#1a73e8; font-size:0.9rem;">📝 안건 상세 수정</h4>
           <div class="form-group">
             <label class="form-label">고객(상호)</label>
-            <input type="text" id="editCustomerName" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="editCustomerName" name="edit_customer_name_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="row">
             <div class="form-group">
               <label class="form-label">대표/담당자</label>
-              <input type="text" id="editContactPerson" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="editContactPerson" name="edit_contact_person_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">연락처</label>
-              <input type="tel" id="editContactPhone" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="tel" id="editContactPhone" name="edit_contact_phone_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">사업장 주소</label>
-            <input type="text" id="editAddress" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="editAddress" name="edit_address_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="row">
             <div class="form-group">
               <label class="form-label">업종</label>
-              <input type="text" id="editBusinessType" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="editBusinessType" name="edit_business_type_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">사용회사</label>
-              <input type="text" id="editCurrentCompany" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="editCurrentCompany" name="edit_current_company_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">관심상품</label>
-            <input type="text" id="editProduct" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="editProduct" name="edit_product_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="form-group">
             <label class="form-label">현장설명</label>
-            <textarea id="editFieldDesc" rows="3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <textarea id="editFieldDesc" name="edit_field_desc_no_auto" rows="3" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
           </div>
           <div class="form-group">
             <label class="form-label">현장 사진 수정 <span class="opt">(최대 4장)</span></label>
@@ -2010,7 +2028,7 @@
       }
 
 
-      // 아이디와 패스워드를 제외한 모든 텍스트창의 브라우저 자동완성(autocomplete) 영구 차단 함수
+      // 아이디와 패스워드를 제외한 모든 텍스트창의 브라우저 자동완성(autocomplete) 및 이전 검색이력 팝업 영구 차단
       function enforceNoAutocompleteGlobally() {
         try {
           var allowIds = [
@@ -2019,15 +2037,37 @@
             'curPwdInput', 'newPwdInput', 'newPwdConfirmInput',
             'editUserNewPwdInput'
           ];
-          var allInputs = document.querySelectorAll('input, textarea');
+          var allInputs = document.querySelectorAll('input:not([type="password"]):not([type="file"]):not([type="checkbox"]):not([type="hidden"]), textarea');
           allInputs.forEach(function(el) {
-            if (el.type === 'password' || allowIds.indexOf(el.id) !== -1) {
+            if (allowIds.indexOf(el.id) !== -1) {
               return; // ID 및 비밀번호는 자동완성 허용 유지
             }
             el.setAttribute('autocomplete', 'off');
             el.setAttribute('autocorrect', 'off');
             el.setAttribute('autocapitalize', 'off');
             el.setAttribute('spellcheck', 'false');
+            el.setAttribute('data-autocomplete', 'off');
+
+            // 브라우저 자동완성 및 이전 검색기록 드롭다운 원천 차단 (readonly 방패 기법)
+            if (!el.disabled && el.id !== 'carNumber') {
+              el.readOnly = true;
+
+              if (!el.dataset.shieldBound) {
+                el.dataset.shieldBound = '1';
+
+                var unlock = function() {
+                  this.readOnly = false;
+                };
+                var lock = function() {
+                  this.readOnly = true;
+                };
+
+                el.addEventListener('pointerdown', unlock, { passive: true });
+                el.addEventListener('touchstart', unlock, { passive: true });
+                el.addEventListener('focus', unlock);
+                el.addEventListener('blur', lock);
+              }
+            }
           });
         } catch (e) {}
       }
