@@ -636,23 +636,28 @@
     body.on-login {
       background-color: #f4f6f9 !important;
       min-height: 100vh;
+      margin: 0;
+      padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
     }
     body.on-login .main-container {
-      max-width: 100%;
+      max-width: 480px;
       width: 100%;
       padding: 16px;
-      margin: 0 auto;
+      margin: auto;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-sizing: border-box;
     }
     body.on-login #viewLogin {
-      margin: 20px auto;
+      margin: 0 auto;
       width: 100%;
-      max-width: 390px;
+      max-width: 440px;
+      box-sizing: border-box;
     }
     body.on-login .login-card {
       background: #ffffff !important;
@@ -2086,12 +2091,26 @@
       function updateAuthInputsAvailability(isLoginScreen) {
         var loginInputs = [
           'memberLoginPhone', 'memberLoginPwd',
-          'regPhone', 'regPwd', 'regPwdConfirm'
+          'regPhone', 'regName', 'regJob', 'regPwd', 'regPwdConfirm',
+          'btnMemberLogin', 'btnSignupSubmit'
         ];
         loginInputs.forEach(function(id) {
           var el = document.getElementById(id);
-          if (el) el.disabled = !isLoginScreen;
+          if (el) {
+            el.disabled = !isLoginScreen;
+          }
         });
+
+        var btnLogin = document.getElementById("btnMemberLogin");
+        if (btnLogin && isLoginScreen) {
+          btnLogin.disabled = false;
+          btnLogin.innerText = "로그인";
+        }
+        var btnSignup = document.getElementById("btnSignupSubmit");
+        if (btnSignup && isLoginScreen) {
+          btnSignup.disabled = false;
+          btnSignup.innerText = "가입 완료 및 로그인";
+        }
 
         if (!isLoginScreen) {
           ['curPwdInput', 'newPwdInput', 'newPwdConfirmInput', 'editUserNewPwdInput'].forEach(function(id) {
@@ -2110,19 +2129,7 @@
       // 엣지(Edge) 전자지갑 및 비밀번호 관리자가 대시보드 텍스트박스를 로그인 계정으로 오인해
       // "저장된 계정" 팝업을 띄우는 문제를 100% 원천 차단함
       // ==========================================
-      var detachedLoginForm = null;
-      function detachLoginFormFromDOM() {
-        var vLogin = document.getElementById("viewLogin");
-        if (vLogin && vLogin.parentNode) {
-          detachedLoginForm = vLogin;
-          vLogin.parentNode.removeChild(vLogin);
-        }
-      }
-      function attachLoginFormToDOM() {
-        if (detachedLoginForm && !document.getElementById("viewLogin")) {
-          document.body.insertBefore(detachedLoginForm, document.body.firstChild);
-        }
-      }
+// LoginForm remains safely inside .main-container at all times
 
       function showScreen(screenId) {
         updateAuthInputsAvailability(screenId === "login");
@@ -2134,12 +2141,10 @@
 
         document.body.classList.toggle("on-login", screenId === "login");
 
+        var vLogin = document.getElementById("viewLogin");
+        if (vLogin) vLogin.style.display = (screenId === "login" ? "block" : "none");
         if (screenId === "login") {
-          attachLoginFormToDOM();
-          var vLogin = document.getElementById("viewLogin");
-          if (vLogin) vLogin.style.display = "block";
-        } else {
-          detachLoginFormFromDOM();
+          applyLoginTab("member");
         }
 
         var vReg = document.getElementById("viewRegister");
@@ -3460,7 +3465,6 @@
       });
 
       document.addEventListener("DOMContentLoaded", function() {
-        updateAuthInputsAvailability(false);
         initSupabaseRealtime();
         clearFormDraft();
         enforceNoAutocompleteGlobally();
@@ -3473,6 +3477,9 @@
         }
         // 앱으로 다시 돌아오거나 새로고침 시 로그인 세션 및 화면 상태 자동 복원
         var hasRestored = restoreUserSession();
+        if (!hasRestored) {
+          showScreen("login");
+        }
         // 다른 앱으로 전환 후 다시 돌아왔을 때 세션 유지 및 데이터 갱신
         document.addEventListener('visibilitychange', function() {
           if (document.visibilityState === 'visible') {
