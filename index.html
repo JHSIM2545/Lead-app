@@ -763,7 +763,7 @@
 
             <div class="form-group" style="margin-bottom:14px;">
               <label class="form-label" style="display:block; font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:8px;">이름 (실명)</label>
-              <input type="text" id="regName" placeholder="예: 홍길동" required style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
+              <input type="text" id="regName" placeholder="예: 홍길동" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; font-size:1rem; background:#ffffff;">
             </div>
 
             <div class="form-group" style="margin-bottom:14px;">
@@ -838,11 +838,11 @@
         <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#1e293b;">📝 신규 안건 소개하기</h3>
       </div>
       <div class="form-card">
-        <form id="leadForm">
+        <form id="leadForm" autocomplete="off">
           <div class="row">
             <div class="form-group">
               <label class="form-label">소개자 이름 <span class="req">*</span></label>
-              <input type="text" id="agentName" placeholder="소개자 이름" required>
+              <input type="text" id="agentName" placeholder="소개자 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
             </div>
             <div class="form-group">
               <label class="form-label">컨설턴트 <span class="req">*</span></label>
@@ -859,22 +859,22 @@
 
           <div class="form-group">
             <label class="form-label">차량번호</label>
-            <input type="text" id="carNumber" placeholder="컨설턴트 선택 시 자동 입력" readonly style="background-color:#f1f3f4;">
+            <input type="text" id="carNumber" placeholder="컨설턴트 선택 시 자동 입력" readonly autocomplete="off" style="background-color:#f1f3f4;">
           </div>
 
           <div class="form-group">
             <label class="form-label" style="margin-bottom:6px;">고객(상호) <span class="req">*</span></label>
-            <input type="text" id="customerName" placeholder="예: 북서울베이커리" required>
+            <input type="text" id="customerName" placeholder="예: 북서울베이커리" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
           </div>
 
           <div class="row">
             <div class="form-group">
               <label class="form-label">대표/담당자</label>
-              <input type="text" id="contactPerson" placeholder="대표님">
+              <input type="text" id="contactPerson" placeholder="대표님" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">연락처 <span class="req">*</span></label>
-              <input type="tel" id="contactPhone" placeholder="010-0000-0000" required>
+              <input type="tel" id="contactPhone" placeholder="010-0000-0000" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
             </div>
           </div>
 
@@ -890,12 +890,12 @@
                 </svg>
               </button>
             </div>
-            <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" style="width:100%;">
+            <input type="text" id="address" placeholder="예: 번동 102번지 1층 (사거리 코너)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
           </div>
 
           <div class="form-group">
             <label class="form-label">업종</label>
-            <input type="text" id="businessType" placeholder="식당, 카페, 의류, 학원 등">
+            <input type="text" id="businessType" placeholder="식당, 카페, 의류, 학원 등" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
 
           <div class="row">
@@ -911,7 +911,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">현 서비스료(원) <span class="opt">(선택사항)</span></label>
-              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled style="background-color: #f1f3f4; text-align:right;">
+              <input type="text" id="currentFee" placeholder="미사용 시 입력 불필요" disabled autocomplete="off" style="background-color: #f1f3f4; text-align:right;">
             </div>
           </div>
 
@@ -932,7 +932,7 @@
 
           <div class="form-group">
             <label class="form-label">현장 설명 <span class="req">*</span></label>
-            <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." required></textarea>
+            <textarea id="fieldDescription" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
           </div>
 
           <!-- 현장 사진 등록 -->
@@ -1009,7 +1009,7 @@
           <button type="button" class="filter-chip chip-hold" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
-          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색">
+          <input type="text" id="searchKeyword" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -1085,39 +1085,39 @@
           <h4 style="margin:0 0 8px 0; color:#1a73e8; font-size:0.9rem;">📝 안건 상세 수정</h4>
           <div class="form-group">
             <label class="form-label">고객(상호)</label>
-            <input type="text" id="editCustomerName">
+            <input type="text" id="editCustomerName" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="row">
             <div class="form-group">
               <label class="form-label">대표/담당자</label>
-              <input type="text" id="editContactPerson">
+              <input type="text" id="editContactPerson" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">연락처</label>
-              <input type="tel" id="editContactPhone">
+              <input type="tel" id="editContactPhone" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">사업장 주소</label>
-            <input type="text" id="editAddress">
+            <input type="text" id="editAddress" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="row">
             <div class="form-group">
               <label class="form-label">업종</label>
-              <input type="text" id="editBusinessType">
+              <input type="text" id="editBusinessType" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">사용회사</label>
-              <input type="text" id="editCurrentCompany">
+              <input type="text" id="editCurrentCompany" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">관심상품</label>
-            <input type="text" id="editProduct">
+            <input type="text" id="editProduct" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="form-group">
             <label class="form-label">현장설명</label>
-            <textarea id="editFieldDesc" rows="3"></textarea>
+            <textarea id="editFieldDesc" rows="3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
           </div>
           <div class="form-group">
             <label class="form-label">현장 사진 수정 <span class="opt">(최대 4장)</span></label>
@@ -1181,7 +1181,7 @@
           </div>
 
           <div class="board-input-box">
-            <textarea id="boardContentInput" placeholder="의견 및 피드백 내용을 자유롭게 입력해주세요..."></textarea>
+            <textarea id="boardContentInput" placeholder="의견 및 피드백 내용을 자유롭게 입력해주세요..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
             
             <input type="file" id="boardFileInput" style="display:none;">
             <div id="boardFileStatus" style="display:none; font-size:0.76rem; color:#1a73e8; font-weight:600; display:flex; align-items:center; gap:6px;">
@@ -1241,7 +1241,7 @@
           <div class="row">
             <div class="form-group">
               <label class="form-label">이름</label>
-              <input type="text" id="editUserNameInput">
+              <input type="text" id="editUserNameInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">직무</label>
@@ -1369,53 +1369,22 @@
       var currentActiveScreen = 'dashboard';
       var pendingLeadIdToOpen = null;
 
+      // 자동 데이터 보관/복원(Draft) 기능 영구 삭제
       function getFormDraftObject() {
-        try {
-          return {
-            customerName: document.getElementById('customerName') ? document.getElementById('customerName').value : '',
-            contactPerson: document.getElementById('contactPerson') ? document.getElementById('contactPerson').value : '',
-            contactPhone: document.getElementById('contactPhone') ? document.getElementById('contactPhone').value : '',
-            address: document.getElementById('address') ? document.getElementById('address').value : '',
-            businessType: document.getElementById('businessType') ? document.getElementById('businessType').value : '',
-            currentCompany: document.getElementById('currentCompany') ? document.getElementById('currentCompany').value : '',
-            currentFee: document.getElementById('currentFee') ? document.getElementById('currentFee').value : '',
-            fieldDescription: document.getElementById('fieldDescription') ? document.getElementById('fieldDescription').value : '',
-            assignedRep: document.getElementById('assignedRep') ? document.getElementById('assignedRep').value : '',
-            carNumber: document.getElementById('carNumber') ? document.getElementById('carNumber').value : ''
-          };
-        } catch (e) {
-          return null;
-        }
+        return null;
       }
 
       function saveFormDraft() {
-        try {
-          var draft = getFormDraftObject();
-          if (draft) sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-        } catch (e) {}
+        // 자동 데이터 보관 기능 삭제됨
       }
 
       function restoreFormDraft() {
-        try {
-          var raw = sessionStorage.getItem(DRAFT_KEY);
-          if (!raw) return;
-          var draft = JSON.parse(raw);
-          if (!draft) return;
-          if (draft.customerName && document.getElementById('customerName')) document.getElementById('customerName').value = draft.customerName;
-          if (draft.contactPerson && document.getElementById('contactPerson')) document.getElementById('contactPerson').value = draft.contactPerson;
-          if (draft.contactPhone && document.getElementById('contactPhone')) document.getElementById('contactPhone').value = draft.contactPhone;
-          if (draft.address && document.getElementById('address')) document.getElementById('address').value = draft.address;
-          if (draft.businessType && document.getElementById('businessType')) document.getElementById('businessType').value = draft.businessType;
-          if (draft.currentCompany && document.getElementById('currentCompany')) document.getElementById('currentCompany').value = draft.currentCompany;
-          if (draft.currentFee && document.getElementById('currentFee')) document.getElementById('currentFee').value = draft.currentFee;
-          if (draft.fieldDescription && document.getElementById('fieldDescription')) document.getElementById('fieldDescription').value = draft.fieldDescription;
-          if (draft.assignedRep && document.getElementById('assignedRep')) document.getElementById('assignedRep').value = draft.assignedRep;
-          if (draft.carNumber && document.getElementById('carNumber')) document.getElementById('carNumber').value = draft.carNumber;
-        } catch (e) {}
+        // 자동 복원 기능 삭제됨
       }
 
       function clearFormDraft() {
         try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) {}
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
       }
 
       // 폴더블폰(갤럭시 Z 폴드 등) 펼침/접힘 및 화면 전환 시 상태 연속성 브릿지
@@ -1433,7 +1402,7 @@
             },
             screen: currentActiveScreen,
             activeLeadId: (activeLeadItem && activeLeadItem.lead_id) ? activeLeadItem.lead_id : null,
-            formDraft: (currentActiveScreen === 'register') ? getFormDraftObject() : null,
+            formDraft: null,
             scrollPos: window.scrollY || document.documentElement.scrollTop || 0,
             screenWidth: window.innerWidth,
             screenHeight: window.innerHeight,
@@ -2040,8 +2009,32 @@
         }
       }
 
+
+      // 아이디와 패스워드를 제외한 모든 텍스트창의 브라우저 자동완성(autocomplete) 영구 차단 함수
+      function enforceNoAutocompleteGlobally() {
+        try {
+          var allowIds = [
+            'memberLoginPhone', 'memberLoginPwd',
+            'regPhone', 'regPwd', 'regPwdConfirm',
+            'curPwdInput', 'newPwdInput', 'newPwdConfirmInput',
+            'editUserNewPwdInput'
+          ];
+          var allInputs = document.querySelectorAll('input, textarea');
+          allInputs.forEach(function(el) {
+            if (el.type === 'password' || allowIds.indexOf(el.id) !== -1) {
+              return; // ID 및 비밀번호는 자동완성 허용 유지
+            }
+            el.setAttribute('autocomplete', 'off');
+            el.setAttribute('autocorrect', 'off');
+            el.setAttribute('autocapitalize', 'off');
+            el.setAttribute('spellcheck', 'false');
+          });
+        } catch (e) {}
+      }
+
       function showScreen(screenId) {
         currentActiveScreen = screenId;
+        enforceNoAutocompleteGlobally();
         closeDetailModal();
         closePwdModal();
         closeUserModal();
@@ -2227,15 +2220,97 @@
         html += "</select>";
         return html;
       }
+
+      // ==========================================
+      // 소개영업 단계별 진행 규칙 엔진
+      // ==========================================
+      var STATUS_NUMBER_MAP = {
+        '접수대기': '1. 접수대기',
+        '접수확인': '2. 접수확인',
+        '고객면담': '3. 고객면담',
+        '추가면담': '4. 추가면담',
+        '견적제출': '5. 견적제출',
+        '견적상담': '6. 견적상담',
+        '계약완료': '7. 계약완료',
+        '계약실패': '8. 계약실패',
+        '계약보류': '9. 계약보류'
+      };
+
+      /**
+       * 소개영업 진행 규칙:
+       * 1. 접수대기 : 반드시 "접수확인"으로만 진행 가능
+       * 2. 접수확인 : 반드시 "고객면담"으로만 진행 가능
+       * 3. 고객면담 : "추가면담", "견적제출", "계약실패", "계약보류"로만 진행 가능
+       * 4. 추가면담 : "추가면담", "견적제출", "계약실패", "계약보류"로만 진행 가능
+       * 5. 견적제출 : "견적상담", "계약완료", "계약실패", "계약보류"로만 진행 가능
+       * 6. 견적상담 : "계약완료", "계약실패", "계약보류"로만 진행 가능
+       * 7. 계약완료 : 진행 종료
+       * 8. 계약실패 : 진행 종료
+       * 9. 계약보류 : "추가면담", "견적제출", "계약완료", "계약실패"로만 진행 가능
+       */
+      var STATUS_TRANSITION_RULES = {
+        '접수대기': ['접수확인'],
+        '접수확인': ['고객면담'],
+        '고객면담': ['추가면담', '견적제출', '계약실패', '계약보류'],
+        '추가면담': ['추가면담', '견적제출', '계약실패', '계약보류'],
+        '견적제출': ['견적상담', '계약완료', '계약실패', '계약보류'],
+        '견적상담': ['계약완료', '계약실패', '계약보류'],
+        '계약완료': [], // 진행 종료
+        '계약실패': [], // 진행 종료
+        '계약보류': ['추가면담', '견적제출', '계약완료', '계약실패']
+      };
+
+      function updateStatusSelectOptions(currentStatus) {
+        var uSel = document.getElementById("uStatus");
+        var btnSave = document.getElementById("btnSaveStatus");
+        var hintEl = document.getElementById("statusAuthHint");
+        if (!uSel) return;
+
+        var st = currentStatus || "접수대기";
+        var allowed = STATUS_TRANSITION_RULES[st] || [];
+        var isTerminal = (st === "계약완료" || st === "계약실패" || allowed.length === 0);
+
+        if (isTerminal) {
+          uSel.innerHTML = '<option value="" selected>🏁 진행 종료 (' + (STATUS_NUMBER_MAP[st] || st) + ')</option>';
+          uSel.disabled = true;
+          if (btnSave) btnSave.style.display = "none";
+          if (hintEl) {
+            hintEl.style.display = "block";
+            hintEl.style.color = (st === "계약완료") ? "#0a7a2f" : "#c0392b";
+            hintEl.innerText = "🏁 본 안건은 '" + st + "' 상태로 영업 진행이 최종 종료되었습니다.";
+          }
+          renderStatusFields("");
+          return;
+        }
+
+        var optsHtml = '<option value="" disabled selected>다음 진행단계 선택 (현재: ' + (STATUS_NUMBER_MAP[st] || st) + ')</option>';
+        if (allowed.length === 1) {
+          var targetSt = allowed[0];
+          optsHtml += '<option value="' + targetSt + '">' + (STATUS_NUMBER_MAP[targetSt] || targetSt) + ' (필수 다음 단계)</option>';
+        } else {
+          allowed.forEach(function(targetSt) {
+            optsHtml += '<option value="' + targetSt + '">' + (STATUS_NUMBER_MAP[targetSt] || targetSt) + '</option>';
+          });
+        }
+
+        uSel.innerHTML = optsHtml;
+        renderStatusFields("");
+      }
+
       function renderStatusFields(status) {
         var box = document.getElementById("statusExtraFields");
         if (!box) return;
         var item = activeLeadItem || {};
         var html = "";
 
+        if (!status) {
+          box.innerHTML = '<div style="font-size:0.78rem; color:#64748b; padding:10px 0; line-height:1.4;">👉 위의 <b>[진행상태 선택]</b>에서 다음 단계를 선택하시면 단계별 입력 항목(면담내용, 견적금액, 계약일정 등)이 표시됩니다.</div>';
+          return;
+        }
+
         if (status === "접수확인") {
           html += "<div class=\"form-group\"><label class=\"form-label\">영업상담메모 <span class=\"req\">*</span> <span class=\"opt\">(10자 이상)</span></label>"
-            + "<textarea id=\"fConsultMemo\" rows=\"3\" placeholder=\"확인 후 상담 내용을 10자 이상 입력해주세요.\">" + (item.consult_memo || "") + "</textarea></div>";
+            + "<textarea id=\"fConsultMemo\" rows=\"3\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"확인 후 상담 내용을 10자 이상 입력해주세요.\">" + (item.consult_memo || "") + "</textarea></div>";
 
         } else if (status === "고객면담" || status === "추가면담") {
           var pMethod = (status === "고객면담") ? (item.meeting_method || "") : "";
@@ -2243,39 +2318,39 @@
           var pDt = (status === "고객면담") ? toDatetimeLocalValue(item.meeting_datetime) : "";
           html += "<div class=\"form-group\"><label class=\"form-label\">면담방법 <span class=\"req\">*</span></label>" + buildMethodSelectHtml("fMeetingMethod", pMethod) + "</div>"
             + "<div class=\"form-group\"><label class=\"form-label\">상담내용 <span class=\"req\">*</span> <span class=\"opt\">(10자 이상)</span></label>"
-            + "<textarea id=\"fMeetingContent\" rows=\"3\" placeholder=\"상담 내용을 10자 이상 입력해주세요.\">" + pContent + "</textarea></div>"
+            + "<textarea id=\"fMeetingContent\" rows=\"3\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"상담 내용을 10자 이상 입력해주세요.\">" + pContent + "</textarea></div>"
             + "<div class=\"form-group\"><label class=\"form-label\">면담일시 <span class=\"req\">*</span></label>"
-            + "<input type=\"datetime-local\" id=\"fMeetingDatetime\" value=\"" + pDt + "\"></div>";
+            + "<input type=\"datetime-local\" id=\"fMeetingDatetime\" autocomplete=\"off\" value=\"" + pDt + "\"></div>";
           if (status === "추가면담") {
             html += "<p style=\"font-size:0.75rem; color:#5f6368; margin:4px 0 0;\">※ 추가면담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>";
           }
 
         } else if (status === "견적제출") {
           html += "<div class=\"form-group\"><label class=\"form-label\">제출 상품 <span class=\"req\">*</span></label>" + buildProductCheckboxGrid("quoteProd", item.quote_products || item.product) + "</div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">견적금액(원) <span class=\"req\">*</span></label><input type=\"text\" id=\"fQuoteAmount\" placeholder=\"예: 150,000\" style=\"text-align:right;\" value=\"" + (item.quote_amount ? Number(item.quote_amount).toLocaleString("ko-KR") : "") + "\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">예상 계약일정 <span class=\"req\">*</span></label><input type=\"date\" id=\"fExpectedContractDate\" value=\"" + toDateValue(item.expected_contract_date) + "\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">비고사항 <span class=\"req\">*</span></label><textarea id=\"fQuoteNote\" rows=\"3\" placeholder=\"고객 요구사항, 견적 보충 설명 등을 입력해주세요.\">" + (item.quote_note || "") + "</textarea></div>";
+            + "<div class=\"form-group\"><label class=\"form-label\">견적금액(원) <span class=\"req\">*</span></label><input type=\"text\" id=\"fQuoteAmount\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"예: 150,000\" style=\"text-align:right;\" value=\"" + (item.quote_amount ? Number(item.quote_amount).toLocaleString("ko-KR") : "") + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">예상 계약일정 <span class=\"req\">*</span></label><input type=\"date\" id=\"fExpectedContractDate\" autocomplete=\"off\" value=\"" + toDateValue(item.expected_contract_date) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">비고사항 <span class=\"req\">*</span></label><textarea id=\"fQuoteNote\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" rows=\"3\" placeholder=\"고객 요구사항, 견적 보충 설명 등을 입력해주세요.\">" + (item.quote_note || "") + "</textarea></div>";
 
         } else if (status === "견적상담") {
           html += "<p style=\"font-size:0.75rem; color:#5f6368; margin:0 0 6px;\">※ 견적상담은 필요 시에만 진행하며, 저장할 때마다 이력에 새로 추가됩니다.</p>"
             + "<div class=\"form-group\"><label class=\"form-label\">상품 <span class=\"opt\">(변경 시에만 선택)</span></label>" + buildProductCheckboxGrid("quoteConsultProd", "") + "</div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">견적금액(원) <span class=\"opt\">(기존: " + (item.quote_amount ? Number(item.quote_amount).toLocaleString("ko-KR") + "원" : "-") + ", 변경 시에만 입력)</span></label><input type=\"text\" id=\"fQuoteConsultAmount\" placeholder=\"변경 시에만 입력\" style=\"text-align:right;\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">계약 예정일자 변경 <span class=\"opt\">(변경 시에만)</span></label><input type=\"date\" id=\"fQuoteConsultDate\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">상담 내용 <span class=\"req\">*</span></label><textarea id=\"fQuoteConsultNote\" rows=\"3\" placeholder=\"추가 상담/변경 내용을 입력해주세요.\"></textarea></div>";
+            + "<div class=\"form-group\"><label class=\"form-label\">견적금액(원) <span class=\"opt\">(기존: " + (item.quote_amount ? Number(item.quote_amount).toLocaleString("ko-KR") + "원" : "-") + ", 변경 시에만 입력)</span></label><input type=\"text\" id=\"fQuoteConsultAmount\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"변경 시에만 입력\" style=\"text-align:right;\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">계약 예정일자 변경 <span class=\"opt\">(변경 시에만)</span></label><input type=\"date\" id=\"fQuoteConsultDate\" autocomplete=\"off\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">상담 내용 <span class=\"req\">*</span></label><textarea id=\"fQuoteConsultNote\" rows=\"3\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"추가 상담/변경 내용을 입력해주세요.\"></textarea></div>";
 
         } else if (status === "계약완료") {
-          html += "<div class=\"form-group\"><label class=\"form-label\">계약성공일자 <span class=\"req\">*</span></label><input type=\"date\" id=\"fContractDate\" value=\"" + toDateValue(item.contract_success_date) + "\"></div>"
+          html += "<div class=\"form-group\"><label class=\"form-label\">계약성공일자 <span class=\"req\">*</span></label><input type=\"date\" id=\"fContractDate\" autocomplete=\"off\" value=\"" + toDateValue(item.contract_success_date) + "\"></div>"
             + "<div class=\"form-group\"><label class=\"form-label\">확정 상품종류 <span class=\"req\">*</span></label>" + buildProductCheckboxGrid("contractProd", item.contract_products || item.product) + "</div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">계약금액(원) <span class=\"req\">*</span></label><input type=\"text\" id=\"fContractAmount\" placeholder=\"예: 1,500,000\" style=\"text-align:right;\" value=\"" + (item.contract_amount ? Number(item.contract_amount).toLocaleString("ko-KR") : "") + "\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">추가요구사항 <span class=\"opt\">(선택)</span></label><textarea id=\"fContractExtra\" rows=\"2\">" + (item.contract_extra_request || "") + "</textarea></div>";
+            + "<div class=\"form-group\"><label class=\"form-label\">계약금액(원) <span class=\"req\">*</span></label><input type=\"text\" id=\"fContractAmount\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"예: 1,500,000\" style=\"text-align:right;\" value=\"" + (item.contract_amount ? Number(item.contract_amount).toLocaleString("ko-KR") : "") + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">추가요구사항 <span class=\"opt\">(선택)</span></label><textarea id=\"fContractExtra\" rows=\"2\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\">" + (item.contract_extra_request || "") + "</textarea></div>";
 
         } else if (status === "계약실패") {
-          html += "<div class=\"form-group\"><label class=\"form-label\">실패일자 <span class=\"req\">*</span></label><input type=\"date\" id=\"fFailDate\" value=\"" + toDateValue(item.fail_date) + "\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">실패사유 <span class=\"req\">*</span></label><textarea id=\"fFailReason\" rows=\"3\" placeholder=\"실패 사유를 정확히 입력해주세요.\">" + (item.fail_reason || "") + "</textarea></div>";
+          html += "<div class=\"form-group\"><label class=\"form-label\">실패일자 <span class=\"req\">*</span></label><input type=\"date\" id=\"fFailDate\" autocomplete=\"off\" value=\"" + toDateValue(item.fail_date) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">실패사유 <span class=\"req\">*</span></label><textarea id=\"fFailReason\" rows=\"3\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"실패 사유를 정확히 입력해주세요.\">" + (item.fail_reason || "") + "</textarea></div>";
 
         } else if (status === "계약보류") {
-          html += "<div class=\"form-group\"><label class=\"form-label\">보류 기한 <span class=\"req\">*</span></label><input type=\"date\" id=\"fHoldUntil\" value=\"" + toDateValue(item.hold_until) + "\"></div>"
-            + "<div class=\"form-group\"><label class=\"form-label\">보류 사유 <span class=\"req\">*</span></label><textarea id=\"fHoldReason\" rows=\"3\" placeholder=\"보류 사유를 입력해주세요.\">" + (item.hold_reason || "") + "</textarea></div>"
+          html += "<div class=\"form-group\"><label class=\"form-label\">보류 기한 <span class=\"req\">*</span></label><input type=\"date\" id=\"fHoldUntil\" autocomplete=\"off\" value=\"" + toDateValue(item.hold_until) + "\"></div>"
+            + "<div class=\"form-group\"><label class=\"form-label\">보류 사유 <span class=\"req\">*</span></label><textarea id=\"fHoldReason\" rows=\"3\" autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"off\" spellcheck=\"false\" placeholder=\"보류 사유를 입력해주세요.\">" + (item.hold_reason || "") + "</textarea></div>"
             + "<p style=\"font-size:0.75rem; color:#5f6368; margin:4px 0 0;\">※ 보류 기한이 지나면 다음 접속(대시보드 조회) 시 자동으로 이전 진행상태로 복귀합니다.</p>";
         }
 
@@ -2900,8 +2975,8 @@
         }
 
         var uSel = document.getElementById("uStatus");
-        if (uSel) uSel.value = item.status || "접수대기";
-        renderStatusFields(uSel ? uSel.value : "접수대기");
+        var curSt = item.status || "접수대기";
+        updateStatusSelectOptions(curSt);
 
         var actionsBox = document.getElementById("authorActionsBox");
         var editContainer = document.getElementById("editLeadContainer");
@@ -2934,9 +3009,19 @@
           }
 
           if (canChangeStatus) {
-            uSel.disabled = false;
-            if (btnSave) btnSave.style.display = "block";
-            hintEl.style.display = "none";
+            var allowed = STATUS_TRANSITION_RULES[curSt] || [];
+            var isTerminal = (curSt === "계약완료" || curSt === "계약실패" || allowed.length === 0);
+            if (isTerminal) {
+              uSel.disabled = true;
+              if (btnSave) btnSave.style.display = "none";
+              hintEl.style.display = "block";
+              hintEl.style.color = (curSt === "계약완료") ? "#0a7a2f" : "#c0392b";
+              hintEl.innerText = "🏁 본 안건은 '" + curSt + "' 상태로 영업 진행이 최종 종료되었습니다.";
+            } else {
+              uSel.disabled = false;
+              if (btnSave) btnSave.style.display = "block";
+              hintEl.style.display = "none";
+            }
           } else {
             uSel.disabled = true;
             if (btnSave) btnSave.style.display = "none";
@@ -3260,6 +3345,8 @@
 
       document.addEventListener("DOMContentLoaded", function() {
         initSupabaseRealtime();
+        clearFormDraft();
+        enforceNoAutocompleteGlobally();
         var btnCloseToast = document.getElementById("btnCloseRealtimeToast");
         if (btnCloseToast) {
           btnCloseToast.addEventListener("click", function(e) {
@@ -3668,7 +3755,19 @@
               alert("⚠️ 영업진행 단계는 담당 컨설턴트 및 마스터만 변경할 수 있습니다.");
               return;
             }
+            var curSt = activeLeadItem.status || "접수대기";
             var newSt = document.getElementById("uStatus").value;
+            if (!newSt) {
+              alert("진행할 다음 영업단계를 선택해주세요.");
+              return;
+            }
+
+            var allowed = STATUS_TRANSITION_RULES[curSt] || [];
+            if (allowed.indexOf(newSt) === -1) {
+              alert("⚠️ 영업 단계 진행 규칙 안내:\n\n현재 [" + curSt + "] 단계에서는 [" + newSt + "] 단계로 진행할 수 없습니다.\n\n진행 가능한 단계: " + (allowed.length ? allowed.join(", ") : "진행 종료"));
+              return;
+            }
+
             var updateData = { status: newSt };
             var nowIso = new Date().toISOString();
 
@@ -3927,8 +4026,8 @@
 
         var formLead = document.getElementById("leadForm");
         if (formLead) {
-          formLead.addEventListener("input", saveFormDraft);
-          formLead.addEventListener("change", saveFormDraft);
+          // formLead.addEventListener("input", saveFormDraft);
+          // formLead.addEventListener("change", saveFormDraft);
           formLead.addEventListener("submit", async function(e) {
             e.preventDefault();
             if (!supabase) { alert("데이터베이스에 연결되지 않았습니다."); return; }
