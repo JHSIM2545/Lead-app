@@ -1027,8 +1027,10 @@
           <button type="button" class="filter-chip chip-hold" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
-          <input type="search" id="searchKeyword" name="search_keyword_no_wallet" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
+          <form id="searchKeywordForm" autocomplete="off" onsubmit="return false;" style="display:flex; width:100%; align-items:center; margin:0; padding:0;">
+            <input type="search" id="searchKeyword" name="search_keyword_no_wallet" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" aria-autocomplete="none" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other">
+            <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
+          </form>
         </div>
       </div>
 
@@ -1277,7 +1279,7 @@
           <div class="form-group">
             <label class="form-label">비밀번호 변경 <span class="opt">(변경 시에만 8~10자 입력)</span></label>
             <div style="position:relative; width:100%;">
-              <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" disabled maxlength="10" style="width:100%; padding-right:45px;">
+              <input type="text" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" disabled maxlength="10" autocomplete="off" aria-autocomplete="none" data-lpignore="true" data-form-type="other" style="width:100%; padding-right:45px; -webkit-text-security:disc; text-security:disc;">
               <button type="button" onclick="togglePasswordVisibility('editUserNewPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
             </div>
           </div>
@@ -1307,21 +1309,21 @@
         <div class="form-group">
           <label class="form-label">현재 비밀번호 <span class="req">*</span></label>
           <div style="position:relative; width:100%;">
-            <input type="password" id="curPwdInput" placeholder="기존 비밀번호 입력" disabled style="width:100%; padding-right:45px;">
+            <input type="text" id="curPwdInput" placeholder="기존 비밀번호 입력" disabled autocomplete="off" aria-autocomplete="none" data-lpignore="true" data-form-type="other" style="width:100%; padding-right:45px; -webkit-text-security:disc; text-security:disc;">
             <button type="button" onclick="togglePasswordVisibility('curPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">새 비밀번호 <span class="req">*</span> <span class="opt">(영문+숫자+특수문자 8~10자)</span></label>
           <div style="position:relative; width:100%;">
-            <input type="password" id="newPwdInput" placeholder="새 비밀번호 입력" disabled maxlength="10" style="width:100%; padding-right:45px;">
+            <input type="text" id="newPwdInput" placeholder="새 비밀번호 입력" disabled maxlength="10" autocomplete="off" aria-autocomplete="none" data-lpignore="true" data-form-type="other" style="width:100%; padding-right:45px; -webkit-text-security:disc; text-security:disc;">
             <button type="button" onclick="togglePasswordVisibility('newPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">새 비밀번호 확인 <span class="req">*</span></label>
           <div style="position:relative; width:100%;">
-            <input type="password" id="newPwdConfirmInput" placeholder="새 비밀번호 재입력" disabled maxlength="10" style="width:100%; padding-right:45px;">
+            <input type="text" id="newPwdConfirmInput" placeholder="새 비밀번호 재입력" disabled maxlength="10" autocomplete="off" aria-autocomplete="none" data-lpignore="true" data-form-type="other" style="width:100%; padding-right:45px; -webkit-text-security:disc; text-security:disc;">
             <button type="button" onclick="togglePasswordVisibility('newPwdConfirmInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
           </div>
         </div>
@@ -2043,10 +2045,13 @@
               return; // ID 및 비밀번호는 자동완성 허용 유지
             }
             el.setAttribute('autocomplete', 'off');
+            el.setAttribute('aria-autocomplete', 'none');
             el.setAttribute('autocorrect', 'off');
             el.setAttribute('autocapitalize', 'off');
             el.setAttribute('spellcheck', 'false');
             el.setAttribute('data-autocomplete', 'off');
+            el.setAttribute('data-lpignore', 'true');
+            el.setAttribute('data-form-type', 'other');
 
             // 브라우저 자동완성 및 이전 검색기록 드롭다운 원천 차단 (readonly 방패 기법)
             if (!el.disabled && el.id !== 'carNumber') {
@@ -2098,6 +2103,27 @@
         }
       }
 
+
+      // ==========================================
+      // 로그인 폼 DOM 완전 분리(Detach) 기법
+      // 대시보드 진입 시 로그인 폼(<div id="viewLogin">)을 DOM 트리에서 완전히 제거하여,
+      // 엣지(Edge) 전자지갑 및 비밀번호 관리자가 대시보드 텍스트박스를 로그인 계정으로 오인해
+      // "저장된 계정" 팝업을 띄우는 문제를 100% 원천 차단함
+      // ==========================================
+      var detachedLoginForm = null;
+      function detachLoginFormFromDOM() {
+        var vLogin = document.getElementById("viewLogin");
+        if (vLogin && vLogin.parentNode) {
+          detachedLoginForm = vLogin;
+          vLogin.parentNode.removeChild(vLogin);
+        }
+      }
+      function attachLoginFormToDOM() {
+        if (detachedLoginForm && !document.getElementById("viewLogin")) {
+          document.body.insertBefore(detachedLoginForm, document.body.firstChild);
+        }
+      }
+
       function showScreen(screenId) {
         updateAuthInputsAvailability(screenId === "login");
         currentActiveScreen = screenId;
@@ -2108,11 +2134,16 @@
 
         document.body.classList.toggle("on-login", screenId === "login");
 
-        var vLogin = document.getElementById("viewLogin");
+        if (screenId === "login") {
+          attachLoginFormToDOM();
+          var vLogin = document.getElementById("viewLogin");
+          if (vLogin) vLogin.style.display = "block";
+        } else {
+          detachLoginFormFromDOM();
+        }
+
         var vReg = document.getElementById("viewRegister");
         var vDash = document.getElementById("viewDashboard");
-
-        if (vLogin) vLogin.style.display = (screenId === "login" ? "block" : "none");
         if (vReg) vReg.style.display = (screenId === "register" ? "block" : "none");
         if (vDash) vDash.style.display = (screenId === "dashboard" ? "block" : "none");
 
