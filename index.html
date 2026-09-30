@@ -860,7 +860,7 @@
           <div class="row">
             <div class="form-group">
               <label class="form-label">소개자 이름 <span class="req">*</span></label>
-              <input type="text" id="agentName" name="agent_name_no_auto" placeholder="소개자 이름" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <input type="text" id="agentName" name="agent_name_no_auto" placeholder="소개자 이름" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
             </div>
             <div class="form-group">
               <label class="form-label">컨설턴트 <span class="req">*</span></label>
@@ -882,17 +882,17 @@
 
           <div class="form-group">
             <label class="form-label" style="margin-bottom:6px;">고객(상호) <span class="req">*</span></label>
-            <input type="text" id="customerName" name="customer_name_no_auto" placeholder="예: 북서울베이커리" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+            <input type="text" id="customerName" name="customer_name_no_auto" placeholder="예: 북서울베이커리" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
           </div>
 
           <div class="row">
             <div class="form-group">
               <label class="form-label">대표/담당자</label>
-              <input type="text" id="contactPerson" name="contact_person_no_auto" placeholder="대표님" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="contactPerson" name="contact_person_no_auto" placeholder="대표님" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">연락처 <span class="req">*</span></label>
-              <input type="tel" id="contactPhone" name="contact_phone_no_auto" placeholder="010-0000-0000" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
+              <input type="tel" id="contactPhone" name="contact_phone_no_auto" placeholder="010-0000-0000" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required>
             </div>
           </div>
 
@@ -908,12 +908,12 @@
                 </svg>
               </button>
             </div>
-            <input type="text" id="address" name="address_no_auto" placeholder="예: 번동 102번지 1층 (사거리 코너)" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
+            <input type="text" id="address" name="address_no_auto" placeholder="예: 번동 102번지 1층 (사거리 코너)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
           </div>
 
           <div class="form-group">
             <label class="form-label">업종</label>
-            <input type="text" id="businessType" name="business_type_no_auto" placeholder="식당, 카페, 의류, 학원 등" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="businessType" name="business_type_no_auto" placeholder="식당, 카페, 의류, 학원 등" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
 
           <div class="row">
@@ -950,7 +950,7 @@
 
           <div class="form-group">
             <label class="form-label">현장 설명 <span class="req">*</span></label>
-            <textarea id="fieldDescription" name="field_desc_no_auto" rows="4" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
+            <textarea id="fieldDescription" name="field_desc_no_auto" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
           </div>
 
           <!-- 현장 사진 등록 -->
@@ -1027,7 +1027,7 @@
           <button type="button" class="filter-chip chip-hold" data-status="계약보류">9.계약보류 <span class="chip-count" id="cCntHold">0</span></button>
         </div>
         <div class="search-box">
-          <input type="search" id="searchKeyword" name="search_no_auto" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;">
+          <input type="search" id="searchKeyword" name="search_keyword_no_wallet" placeholder="고객명, 연락처, 주소, 소개자, 컨설턴트, 메모 등 검색" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           <button type="button" class="btn-detail" id="btnSearchKeyword">검색</button>
         </div>
       </div>
@@ -1103,39 +1103,39 @@
           <h4 style="margin:0 0 8px 0; color:#1a73e8; font-size:0.9rem;">📝 안건 상세 수정</h4>
           <div class="form-group">
             <label class="form-label">고객(상호)</label>
-            <input type="text" id="editCustomerName" name="edit_customer_name_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="editCustomerName" name="edit_customer_name_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="row">
             <div class="form-group">
               <label class="form-label">대표/담당자</label>
-              <input type="text" id="editContactPerson" name="edit_contact_person_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="editContactPerson" name="edit_contact_person_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">연락처</label>
-              <input type="tel" id="editContactPhone" name="edit_contact_phone_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="tel" id="editContactPhone" name="edit_contact_phone_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">사업장 주소</label>
-            <input type="text" id="editAddress" name="edit_address_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="editAddress" name="edit_address_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="row">
             <div class="form-group">
               <label class="form-label">업종</label>
-              <input type="text" id="editBusinessType" name="edit_business_type_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="editBusinessType" name="edit_business_type_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="form-group">
               <label class="form-label">사용회사</label>
-              <input type="text" id="editCurrentCompany" name="edit_current_company_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <input type="text" id="editCurrentCompany" name="edit_current_company_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">관심상품</label>
-            <input type="text" id="editProduct" name="edit_product_no_auto" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <input type="text" id="editProduct" name="edit_product_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="form-group">
             <label class="form-label">현장설명</label>
-            <textarea id="editFieldDesc" name="edit_field_desc_no_auto" rows="3" readonly onfocus="this.readOnly=false;" onblur="this.readOnly=true;" onpointerdown="this.readOnly=false;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+            <textarea id="editFieldDesc" name="edit_field_desc_no_auto" rows="3" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
           </div>
           <div class="form-group">
             <label class="form-label">현장 사진 수정 <span class="opt">(최대 4장)</span></label>
@@ -1277,7 +1277,7 @@
           <div class="form-group">
             <label class="form-label">비밀번호 변경 <span class="opt">(변경 시에만 8~10자 입력)</span></label>
             <div style="position:relative; width:100%;">
-              <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" maxlength="10" style="width:100%; padding-right:45px;">
+              <input type="password" id="editUserNewPwdInput" placeholder="변경하지 않으려면 공란으로 두세요" disabled maxlength="10" style="width:100%; padding-right:45px;">
               <button type="button" onclick="togglePasswordVisibility('editUserNewPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
             </div>
           </div>
@@ -1307,21 +1307,21 @@
         <div class="form-group">
           <label class="form-label">현재 비밀번호 <span class="req">*</span></label>
           <div style="position:relative; width:100%;">
-            <input type="password" id="curPwdInput" placeholder="기존 비밀번호 입력" style="width:100%; padding-right:45px;">
+            <input type="password" id="curPwdInput" placeholder="기존 비밀번호 입력" disabled style="width:100%; padding-right:45px;">
             <button type="button" onclick="togglePasswordVisibility('curPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">새 비밀번호 <span class="req">*</span> <span class="opt">(영문+숫자+특수문자 8~10자)</span></label>
           <div style="position:relative; width:100%;">
-            <input type="password" id="newPwdInput" placeholder="새 비밀번호 입력" maxlength="10" style="width:100%; padding-right:45px;">
+            <input type="password" id="newPwdInput" placeholder="새 비밀번호 입력" disabled maxlength="10" style="width:100%; padding-right:45px;">
             <button type="button" onclick="togglePasswordVisibility('newPwdInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">새 비밀번호 확인 <span class="req">*</span></label>
           <div style="position:relative; width:100%;">
-            <input type="password" id="newPwdConfirmInput" placeholder="새 비밀번호 재입력" maxlength="10" style="width:100%; padding-right:45px;">
+            <input type="password" id="newPwdConfirmInput" placeholder="새 비밀번호 재입력" disabled maxlength="10" style="width:100%; padding-right:45px;">
             <button type="button" onclick="togglePasswordVisibility('newPwdConfirmInput', this)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.15rem; cursor:pointer; padding:4px 6px; line-height:1; color:#5f6368;" title="비밀번호 보기/숨기기">👁️</button>
           </div>
         </div>
@@ -2072,7 +2072,34 @@
         } catch (e) {}
       }
 
+
+      // ==========================================
+      // 브라우저 전자지갑 / 계정 관리자(저장된 계정 팝업) 원천 차단 엔진
+      // 로그인/비밀번호 변경 화면이 아닐 때는 DOM 내 모든 패스워드 입력을 비활성화(disabled)하여
+      // 브라우저가 검색창이나 일반 입력창에 "저장된 계정" 팝업을 띄우는 것을 100% 방지함
+      // ==========================================
+      function updateAuthInputsAvailability(isLoginScreen) {
+        var loginInputs = [
+          'memberLoginPhone', 'memberLoginPwd',
+          'regPhone', 'regPwd', 'regPwdConfirm'
+        ];
+        loginInputs.forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.disabled = !isLoginScreen;
+        });
+
+        if (!isLoginScreen) {
+          ['curPwdInput', 'newPwdInput', 'newPwdConfirmInput', 'editUserNewPwdInput'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+              el.disabled = true;
+            }
+          });
+        }
+      }
+
       function showScreen(screenId) {
+        updateAuthInputsAvailability(screenId === "login");
         currentActiveScreen = screenId;
         enforceNoAutocompleteGlobally();
         closeDetailModal();
@@ -3105,9 +3132,13 @@
 
       function openPwdModal() {
         hideLoginErrors();
-        document.getElementById("curPwdInput").value = "";
-        document.getElementById("newPwdInput").value = "";
-        document.getElementById("newPwdConfirmInput").value = "";
+        ['curPwdInput', 'newPwdInput', 'newPwdConfirmInput'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.disabled = false;
+            el.value = "";
+          }
+        });
         var m = document.getElementById("pwdChangeModal");
         if (m) {
           m.classList.add("open");
@@ -3127,11 +3158,20 @@
         if (idx !== -1) modalHistoryStack.splice(idx, 1);
         var m = document.getElementById("pwdChangeModal");
         if (m) m.classList.remove("open");
+        ['curPwdInput', 'newPwdInput', 'newPwdConfirmInput'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.disabled = true;
+            el.value = "";
+          }
+        });
         hideLoginErrors();
       }
 
       async function openUserModal() {
         if (!isAdminRole(currentRole)) return;
+        var pwEl = document.getElementById("editUserNewPwdInput");
+        if (pwEl) pwEl.disabled = false;
         var modal = document.getElementById("userManageModal");
         if (modal) {
           modal.classList.add("open");
@@ -3151,6 +3191,11 @@
           return;
         }
         if (idx !== -1) modalHistoryStack.splice(idx, 1);
+        var pwEl = document.getElementById("editUserNewPwdInput");
+        if (pwEl) {
+          pwEl.disabled = true;
+          pwEl.value = "";
+        }
         var modal = document.getElementById("userManageModal");
         if (modal) modal.classList.remove("open");
         document.getElementById("userEditBox").style.display = "none";
@@ -3384,6 +3429,7 @@
       });
 
       document.addEventListener("DOMContentLoaded", function() {
+        updateAuthInputsAvailability(false);
         initSupabaseRealtime();
         clearFormDraft();
         enforceNoAutocompleteGlobally();
