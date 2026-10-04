@@ -1086,7 +1086,7 @@
           <div class="detail-label">접수번호</div><div class="detail-val" id="mLeadId"></div>
           <div class="detail-label">접수일시</div><div class="detail-val" id="mDate" style="font-weight:700; color:#1a73e8;"></div>
           <div class="detail-label">소개자</div><div class="detail-val" id="mAgentName"></div>
-          <div class="detail-label">컨설턴트</div><div class="detail-val" id="mAssignedRep" style="font-weight:700; color:#1a73e8;"></div>
+          <div class="detail-label">컨설턴트</div><div class="detail-val" style="display:flex; align-items:center; gap:8px;"><span id="mAssignedRep" style="font-weight:700; color:#1a73e8;"></span><button type="button" id="btnDetailSendSms" style="padding:2px 8px; font-size:0.75rem; background:#eff6ff; color:#1a73e8; border:1px solid #bfdbfe; border-radius:6px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:3px;">📱 문자알림</button></div>
           <div class="detail-label">고객(상호)</div><div class="detail-val" id="mCustomerName" style="font-weight:800; color:#202124;"></div>
           <div class="detail-label">대표/담당자</div><div class="detail-val" id="mContactPerson"></div>
           <div class="detail-label">연락처</div><div class="detail-val" id="mContactPhone"></div>
@@ -1338,6 +1338,68 @@
     </div>
   </div>
 
+  <!-- 신규 안건 접수 완료 & 담당 컨설턴트 문자 알림 모달 -->
+  <div class="modal-overlay" id="smsNoticeModal">
+    <div class="modal-card" style="max-width: 480px; width: 92%;">
+      <div class="modal-header" style="background:#f0fdf4; border-bottom:1.5px solid #bbf7d0;">
+        <div class="modal-header-left">
+          <span style="font-size:1.35rem;">🎉</span>
+          <h3 style="color:#166534; font-size:1.05rem; font-weight:700; margin:0;">신규 안건 접수 완료</h3>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseSmsNoticeModal">×</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <p style="font-size:0.88rem; color:#1e293b; margin-bottom:12px; font-weight:600;">
+          가망고객 소개가 안전하게 등록되었습니다.<br>
+          <span style="color:#16a34a; font-weight:700;">담당 컨설턴트에게 바로 문자를 전송하시겠습니까?</span>
+        </p>
+        
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.83rem;">
+            <span style="color:#64748b;">담당 컨설턴트:</span>
+            <span id="smsModalRep" style="font-weight:700; color:#1e293b;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:0.83rem;">
+            <span style="color:#64748b;">고객명 / 상품:</span>
+            <span id="smsModalCustomer" style="font-weight:700; color:#1e293b;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.83rem;">
+            <span style="color:#64748b;">소개자:</span>
+            <span id="smsModalAgent" style="font-weight:700; color:#1e293b;">-</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:0.8rem; font-weight:700; color:#475569; margin:0;">
+              📨 발송될 문자 내용 (SMS 규격)
+            </label>
+            <span id="smsByteCount" style="font-size:0.75rem; color:#2563eb; font-weight:600;"></span>
+          </div>
+          <div id="smsModalPreview" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:10px; padding:12px 14px; font-size:0.84rem; color:#0f172a; line-height:1.5; white-space:pre-wrap; font-family:-apple-system,BlinkMacSystemFont,sans-serif; box-shadow:inset 0 1px 3px rgba(0,0,0,0.04);"></div>
+          <div style="margin-top:6px; font-size:0.75rem; color:#64748b;">
+            💡 <strong>발신번호</strong>는 본인(소개자)의 휴대폰 번호로 전송됩니다.
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button type="button" id="btnSendSmsNow" style="width:100%; padding:13px; background:#1a73e8; color:#ffffff; border:none; border-radius:10px; font-size:0.95rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(26,115,232,0.3);">
+            <span>📱 담당 컨설턴트에게 문자(SMS) 보내기</span>
+          </button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="btnCopySmsText" style="flex:1; padding:10px; background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; border-radius:8px; font-size:0.83rem; font-weight:600; cursor:pointer;">
+              📋 문자내용 복사
+            </button>
+            <button type="button" id="btnGoDashboardFromSms" style="flex:1; padding:10px; background:#ffffff; color:#64748b; border:1px solid #cbd5e1; border-radius:8px; font-size:0.83rem; font-weight:600; cursor:pointer;">
+              대시보드로 이동
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
     <!-- [실시간 알림 토스트 팝업] Supabase Realtime 전용 -->
   <div id="realtimeToast" class="realtime-toast">
     <div class="realtime-toast-icon" id="realtimeToastIcon">🔔</div>
@@ -1472,6 +1534,153 @@
         currentUserPhone = '';
         currentActiveScreen = 'login';
         pendingLeadIdToOpen = null;
+      }
+
+      
+      // ==========================================================
+      // ★ 담당 컨설턴트 전화번호 매핑 및 SMS 알림 & 바로가기 딥링크 시스템
+      // ==========================================================
+      var CONSULTANT_PHONE_MAP = {
+        "최영국": "010-3181-0141",
+        "정문재": "010-2621-1211",
+        "임영민": "010-7516-4267",
+        "박광춘": "010-4572-9150",
+        "이수열": "010-3277-2270"
+      };
+
+      var currentActiveSmsData = null;
+
+      async function getConsultantPhone(name) {
+        if (!name) return "";
+        var cleanName = name.trim();
+        if (CONSULTANT_PHONE_MAP[cleanName] && CONSULTANT_PHONE_MAP[cleanName].length >= 10) {
+          return CONSULTANT_PHONE_MAP[cleanName];
+        }
+        if (supabase) {
+          try {
+            var res = await supabase.from("app_users").select("phone").eq("name", cleanName).limit(1);
+            if (res.data && res.data.length > 0 && res.data[0].phone) {
+              var p = formatPhone(res.data[0].phone);
+              CONSULTANT_PHONE_MAP[cleanName] = p;
+              return p;
+            }
+          } catch (e) {
+            console.warn("컨설턴트 전화번호 DB 조회 오류:", e);
+          }
+        }
+        return "";
+      }
+
+      function getLeadDirectUrl(leadId) {
+        var origin = window.location.origin;
+        var pathname = window.location.pathname;
+        if (!origin || origin === "null" || !origin.startsWith("http")) {
+          origin = "https://mws0008.github.io";
+          pathname = "/Lead-app/";
+        }
+        return origin + pathname + "?lead=" + encodeURIComponent(leadId);
+      }
+
+      function generateSmsSummary(item, directUrl) {
+        var cust = item.customer_name || item.customer || "미정";
+        var prod = item.product || "";
+        var prods = prod.split(",").map(function(p) { return p.trim(); }).filter(Boolean);
+        var prodTxt = "";
+        if (prods.length > 1) {
+          prodTxt = prods[0] + " 외 " + (prods.length - 1);
+        } else if (prods.length === 1) {
+          prodTxt = prods[0];
+        } else {
+          prodTxt = "보안";
+        }
+        var agent = item.agent_name || currentUserName || "소개자";
+
+        // SMS 규격 범위 내 초간결 4줄 요약
+        return "[북서울소개] 신규안건 접수\n" +
+               "- 고객: " + cust + "(" + prodTxt + ")\n" +
+               "- 소개: " + agent + "\n" +
+               "- 상세: " + directUrl;
+      }
+
+      function openSmsApp(phone, text) {
+        var cleanPhone = (phone || "").replace(/[^0-9]/g, "");
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        var sep = isIOS ? "&" : "?";
+        var smsUrl = "sms:" + cleanPhone + sep + "body=" + encodeURIComponent(text);
+        window.location.href = smsUrl;
+      }
+
+      function openSmsNoticeModal(data) {
+        currentActiveSmsData = data;
+        var modal = document.getElementById("smsNoticeModal");
+        if (!modal) return;
+
+        var repEl = document.getElementById("smsModalRep");
+        var custEl = document.getElementById("smsModalCustomer");
+        var agentEl = document.getElementById("smsModalAgent");
+        var prevEl = document.getElementById("smsModalPreview");
+        var byteEl = document.getElementById("smsByteCount");
+
+        if (repEl) {
+          var repTxt = data.rep || "미지정";
+          if (data.repPhone) repTxt += " (" + data.repPhone + ")";
+          repEl.innerText = repTxt;
+        }
+
+        if (custEl) {
+          custEl.innerText = (data.customerName || "-") + " / " + (data.product || "-");
+        }
+
+        if (agentEl) {
+          agentEl.innerText = data.agent || currentUserName || "-";
+        }
+
+        if (prevEl) {
+          prevEl.innerText = data.smsText || "";
+        }
+
+        if (byteEl && data.smsText) {
+          byteEl.innerText = "약 " + data.smsText.length + "자 (SMS 요약)";
+        }
+
+        modal.classList.add("open");
+        try {
+          history.pushState({ modalId: "smsNoticeModal" }, "");
+          modalHistoryStack.push("smsNoticeModal");
+        } catch (e) {}
+      }
+
+      function closeSmsNoticeModal(fromPopstate) {
+        var idx = modalHistoryStack.indexOf("smsNoticeModal");
+        if (!fromPopstate && idx !== -1) {
+          history.back();
+          return;
+        }
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
+        var modal = document.getElementById("smsNoticeModal");
+        if (modal) modal.classList.remove("open");
+      }
+
+      function checkDirectLeadUrl() {
+        var targetId = null;
+        try {
+          var params = new URLSearchParams(window.location.search);
+          targetId = params.get("lead") || params.get("l") || params.get("lead_id");
+          if (!targetId && window.location.hash) {
+            var h = window.location.hash.substring(1);
+            if (h.includes("=")) {
+              var hParams = new URLSearchParams(h);
+              targetId = hParams.get("lead") || hParams.get("l") || hParams.get("lead_id");
+            } else if (h.startsWith("LD-")) {
+              targetId = h;
+            }
+          }
+        } catch (e) {}
+
+        if (targetId) {
+          pendingLeadIdToOpen = targetId;
+          try { sessionStorage.setItem("PENDING_DIRECT_LEAD_ID", targetId); } catch (e) {}
+        }
       }
 
       function restoreUserSession() {
@@ -2143,6 +2352,18 @@
 
         var vLogin = document.getElementById("viewLogin");
         if (vLogin) vLogin.style.display = (screenId === "login" ? "block" : "none");
+        if (screenId === "login") {
+          var pendingNoticeEl = document.getElementById("directLeadLoginNotice");
+          var pLead = sessionStorage.getItem("PENDING_DIRECT_LEAD_ID") || pendingLeadIdToOpen;
+          if (pendingNoticeEl) {
+            if (pLead) {
+              pendingNoticeEl.style.display = "block";
+              pendingNoticeEl.innerHTML = "📬 공유받은 소개안건 <b>[" + pLead + "]</b> 상세 확인을 위해 로그인해 주세요.";
+            } else {
+              pendingNoticeEl.style.display = "none";
+            }
+          }
+        }
         if (screenId === "login") {
           applyLoginTab("member");
         }
@@ -2854,12 +3075,31 @@
         if (pcBody) pcBody.innerHTML = pcHtml;
         if (mList) mList.innerHTML = mHtml;
 
-        if (pendingLeadIdToOpen && list && list.length > 0) {
-          var targetIdx = list.findIndex(function(it) { return it.lead_id === pendingLeadIdToOpen; });
+        if (pendingLeadIdToOpen) {
+          var targetLeadId = pendingLeadIdToOpen;
+          var targetIdx = (list && list.length > 0) ? list.findIndex(function(it) { return it.lead_id === targetLeadId; }) : -1;
           if (targetIdx !== -1) {
-            openDetailModal(targetIdx);
+            pendingLeadIdToOpen = null;
+            try { sessionStorage.removeItem("PENDING_DIRECT_LEAD_ID"); } catch (e) {}
+            setTimeout(function() { openDetailModal(targetIdx); }, 150);
+          } else if (supabase) {
+            // 목록(필터링/검색)에 없는 경우 leads 테이블에서 직접 단건 조회하여 표시
+            (async function() {
+              try {
+                var singleRes = await supabase.from("leads").select("*").eq("lead_id", targetLeadId).single();
+                if (singleRes && singleRes.data) {
+                  currentLeadsData.unshift(singleRes.data);
+                  renderLeadTables(currentLeadsData);
+                  setTimeout(function() { openDetailModal(0); }, 150);
+                }
+              } catch (e) {
+                console.warn("단건 안건 다이렉트 조회 실패:", e);
+              } finally {
+                pendingLeadIdToOpen = null;
+                try { sessionStorage.removeItem("PENDING_DIRECT_LEAD_ID"); } catch (e) {}
+              }
+            })();
           }
-          pendingLeadIdToOpen = null;
         }
 
         document.querySelectorAll(".btn-detail, .customer-cell, .m-customer-name").forEach(function(el) {
@@ -3468,6 +3708,79 @@
         initSupabaseRealtime();
         clearFormDraft();
         enforceNoAutocompleteGlobally();
+        
+        // ==========================================================
+        // ★ SMS 알림 모달 버튼 이벤트 바인딩
+        // ==========================================================
+        var btnCloseSms = document.getElementById("btnCloseSmsNoticeModal");
+        if (btnCloseSms) {
+          btnCloseSms.addEventListener("click", function() {
+            closeSmsNoticeModal();
+            showScreen("dashboard");
+          });
+        }
+        var btnGoDashSms = document.getElementById("btnGoDashboardFromSms");
+        if (btnGoDashSms) {
+          btnGoDashSms.addEventListener("click", function() {
+            closeSmsNoticeModal();
+            showScreen("dashboard");
+          });
+        }
+        var btnSendSms = document.getElementById("btnSendSmsNow");
+        if (btnSendSms) {
+          btnSendSms.addEventListener("click", function() {
+            if (!currentActiveSmsData) return;
+            openSmsApp(currentActiveSmsData.repPhone, currentActiveSmsData.smsText);
+          });
+        }
+        var btnCopySms = document.getElementById("btnCopySmsText");
+        if (btnCopySms) {
+          btnCopySms.addEventListener("click", function() {
+            if (!currentActiveSmsData || !currentActiveSmsData.smsText) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(currentActiveSmsData.smsText).then(function() {
+                alert("📋 문자 내용이 클립보드에 복사되었습니다.\n카카오톡이나 문자 앱에 붙여넣어 전송하세요.");
+              }).catch(function() {
+                alert("복사 실패: 수동으로 내용을 복사해주세요.");
+              });
+            } else {
+              var ta = document.createElement("textarea");
+              ta.value = currentActiveSmsData.smsText;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand("copy");
+              document.body.removeChild(ta);
+              alert("📋 문자 내용이 복사되었습니다.");
+            }
+          });
+        }
+
+        // 안건 상세 모달의 [📱 문자알림] 버튼
+        var btnDetailSms = document.getElementById("btnDetailSendSms");
+        if (btnDetailSms) {
+          btnDetailSms.addEventListener("click", async function() {
+            if (!activeLeadItem) return;
+            var rep = activeLeadItem.assigned_rep;
+            var repPhone = await getConsultantPhone(rep);
+            var directUrl = getLeadDirectUrl(activeLeadItem.lead_id);
+            var smsSummary = generateSmsSummary(activeLeadItem, directUrl);
+
+            openSmsNoticeModal({
+              leadId: activeLeadItem.lead_id,
+              rep: rep,
+              repPhone: repPhone,
+              customerName: activeLeadItem.customer_name,
+              product: activeLeadItem.product,
+              agent: activeLeadItem.agent_name,
+              directUrl: directUrl,
+              smsText: smsSummary
+            });
+          });
+        }
+
+        // URL 직통 파라미터(?lead= 또는 ?l=) 감지
+        checkDirectLeadUrl();
+
         var btnCloseToast = document.getElementById("btnCloseRealtimeToast");
         if (btnCloseToast) {
           btnCloseToast.addEventListener("click", function(e) {
@@ -3676,6 +3989,11 @@
               currentUserName = user.name ? user.name.trim() : "직원";
               currentUserPhone = user.phone;
 
+              var pendingDirectId = sessionStorage.getItem("PENDING_DIRECT_LEAD_ID");
+              if (pendingDirectId) {
+                pendingLeadIdToOpen = pendingDirectId;
+                currentStatusFilter = "전체";
+              }
               saveUserSession({ phone: currentUserPhone, name: currentUserName, job: currentRole }, "dashboard");
               document.getElementById("agentName").value = currentUserName;
               
@@ -4202,8 +4520,8 @@
 
               if (res.error) throw res.error;
 
-              alert("✅ 가망고객 소개가 성공적으로 접수되었습니다!" + (photoUrls.length > 0 ? "\n(사진 " + photoUrls.length + "장 등록 완료)" : ""));
-
+              var custVal = document.getElementById("customerName").value;
+              var prodVal = checked.join(", ");
 
               clearFormDraft();
               document.getElementById("customerName").value = "";
@@ -4221,7 +4539,28 @@
 
               uploadedPhotos = [];
               renderPreview();
-              showScreen("dashboard");
+
+              // 담당 컨설턴트 번호 확인 및 SMS 요약 생성
+              var repPhone = await getConsultantPhone(rep);
+              var directUrl = getLeadDirectUrl(leadId);
+              var smsSummary = generateSmsSummary({
+                lead_id: leadId,
+                customer_name: custVal,
+                product: prodVal,
+                agent_name: agent
+              }, directUrl);
+
+              // 문자 전송 모달 즉시 팝업
+              openSmsNoticeModal({
+                leadId: leadId,
+                rep: rep,
+                repPhone: repPhone,
+                customerName: custVal,
+                product: prodVal,
+                agent: agent,
+                directUrl: directUrl,
+                smsText: smsSummary
+              });
 
             } catch (err) {
               alert("등록 실패: " + (err.message || err));
