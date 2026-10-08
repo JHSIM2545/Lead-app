@@ -431,39 +431,39 @@
     }
 
     /* 1. 접수대기 (주황/앰버) */
-    .mobile-lead-card.stage-wait { border-color: #f59e0b !important; }
+    .mobile-lead-card.stage-wait { --stage-color: #f59e0b; }
     .badge.stage-wait, .badge-wait { background: #fef3c7; color: #b45309; border-color: #f59e0b !important; }
 
     /* 2. 접수확인 (스카이블루) */
-    .mobile-lead-card.stage-confirm { border-color: #0284c7 !important; }
+    .mobile-lead-card.stage-confirm { --stage-color: #0284c7; }
     .badge.stage-confirm, .badge-ing { background: #e0f2fe; color: #0284c7; border-color: #0284c7 !important; }
 
     /* 3. 고객면담 (퍼플) */
-    .mobile-lead-card.stage-consult { border-color: #7c3aed !important; }
+    .mobile-lead-card.stage-consult { --stage-color: #7c3aed; }
     .badge.stage-consult, .badge-meet { background: #ede9fe; color: #7c3aed; border-color: #7c3aed !important; }
 
     /* 4. 추가면담 (인디고) */
-    .mobile-lead-card.stage-moreconsult { border-color: #6366f1 !important; }
+    .mobile-lead-card.stage-moreconsult { --stage-color: #6366f1; }
     .badge.stage-moreconsult { background: #e0e7ff; color: #6366f1; border-color: #6366f1 !important; }
 
     /* 5. 견적제출 (진한 오렌지/앰버) */
-    .mobile-lead-card.stage-quote { border-color: #ea580c !important; }
+    .mobile-lead-card.stage-quote { --stage-color: #ea580c; }
     .badge.stage-quote, .badge-quote { background: #ffedd5; color: #ea580c; border-color: #ea580c !important; }
 
     /* 6. 견적상담 (브론즈/웜앰버) */
-    .mobile-lead-card.stage-quoteconsult { border-color: #b45309 !important; }
+    .mobile-lead-card.stage-quoteconsult { --stage-color: #b45309; }
     .badge.stage-quoteconsult { background: #fef3c7; color: #b45309; border-color: #b45309 !important; }
 
     /* 7. 계약완료 (초록/성공) */
-    .mobile-lead-card.stage-done { border-color: #16a34a !important; }
+    .mobile-lead-card.stage-done { --stage-color: #16a34a; }
     .badge.stage-done, .badge-done { background: #dcfce7; color: #16a34a; border-color: #16a34a !important; }
 
     /* 8. 계약실패 (빨강/실패) */
-    .mobile-lead-card.stage-fail { border-color: #dc2626 !important; }
+    .mobile-lead-card.stage-fail { --stage-color: #dc2626; }
     .badge.stage-fail, .badge-fail { background: #fee2e2; color: #dc2626; border-color: #dc2626 !important; }
 
     /* 9. 계약보류 (슬레이트 그레이) */
-    .mobile-lead-card.stage-hold, .mobile-lead-card.stage-cancel { border-color: #64748b !important; }
+    .mobile-lead-card.stage-hold, .mobile-lead-card.stage-cancel { --stage-color: #64748b; }
     .badge.stage-hold, .badge.stage-cancel, .badge-hold, .badge-cancel { background: #f1f5f9; color: #475569; border-color: #64748b !important; }
 
     .pc-table-wrapper {
@@ -729,6 +729,158 @@
       line-height: 1;
       flex-shrink: 0;
     }
+
+    /* ==========================================================
+       [모바일 최적화] 일반 사용자 = A안(앱형 카드 + 하단 탭바)
+                       지사관리자 = B안(요약 현황판 + 단계별 입력)
+       ========================================================== */
+    .step-title, .step-progress, .form-bar .btn-prev, .form-bar .btn-next { display: none; }
+    .form-bar { margin-top: 10px; }
+    .form-bar .btn-prev, .form-bar .btn-next {
+      border: none; border-radius: 12px; font-size: 1rem; font-weight: 800; cursor: pointer; min-height: 52px;
+    }
+    .form-bar .btn-prev { background: #eef2f6; color: #334155; flex: 1; }
+    .form-bar .btn-next { background: #1a73e8; color: #ffffff; flex: 2; }
+    #mobileTabBar, #mobileFab, .m-user-chip, #adminSummary, .m-list-head { display: none; }
+
+    #mobileMenuSheet { display: none; position: fixed; inset: 0; z-index: 100000; background: rgba(15,23,42,0.5); align-items: flex-end; }
+    #mobileMenuSheet.open { display: flex; }
+    #mobileMenuSheet .sheet-card { width: 100%; background: #ffffff; border-radius: 20px 20px 0 0; padding: 10px 16px calc(16px + env(safe-area-inset-bottom)); }
+    #mobileMenuSheet .sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: #cbd5e1; margin: 0 auto 12px; }
+    #mobileMenuSheet .sheet-user { font-size: 1.02rem; font-weight: 800; color: #0f172a; padding: 4px 4px 12px; border-bottom: 1px solid #eef2f6; margin-bottom: 6px; }
+    #mobileMenuSheet .sheet-btn { display: block; width: 100%; text-align: left; background: none; border: none; min-height: 54px; padding: 0 6px; font-size: 1rem; font-weight: 700; color: #1e293b; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+    #mobileMenuSheet .sheet-btn.danger { color: #dc2626; }
+    #mobileMenuSheet .sheet-btn.cancel { color: #64748b; border-bottom: none; text-align: center; margin-top: 4px; }
+
+    @media (max-width: 768px) {
+      body { background: #f4f6fa; }
+      body:not(.on-login) .main-container { width: 100%; padding: 0 12px calc(92px + env(safe-area-inset-bottom)); }
+
+      /* 상단 앱바 */
+      .inner-header-bar {
+        margin: 0 -12px 10px; border-radius: 0; border: none; border-bottom: 1px solid #e2e8f0; box-shadow: none;
+        padding: calc(10px + env(safe-area-inset-top)) 14px 10px; flex-direction: row; align-items: center;
+      }
+      .header-sub-row, .header-action-primary { display: none !important; }
+      .header-main-row { width: 100%; }
+      .portal-brand-img { width: 32px; height: 32px; }
+      .portal-brand-title { font-size: 1.1rem; }
+      .m-user-chip {
+        display: inline-flex; align-items: center; gap: 4px; min-height: 38px; padding: 0 12px;
+        border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 19px; font-size: 0.82rem; font-weight: 700; color: #334155; cursor: pointer;
+      }
+      #viewRegister { max-width: none; }
+      .reg-title-wrap { display: none; }
+
+      /* 현황 화면: 검색 + 상태 칩 고정 */
+      #viewDashboard .toolbar-card {
+        position: sticky; top: 0; z-index: 150; margin: 0 -12px 10px !important; border-radius: 0 !important;
+        padding: 8px 12px 6px !important; box-shadow: 0 1px 0 #e2e8f0 !important;
+        flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 8px !important;
+      }
+      #viewDashboard .search-box { order: -1; min-width: 0; }
+      #viewDashboard .search-box input { min-height: 46px; border-radius: 12px; background: #f1f5f9; border-color: transparent; font-size: 16px; padding: 0 14px; }
+      #viewDashboard .search-box .btn-detail { min-height: 46px; padding: 0 16px; border-radius: 12px; }
+      .filter-chip { min-height: 38px; }
+
+      /* 안건 카드 */
+      .mobile-lead-card {
+        position: relative; background: #ffffff; border: 1px solid #e8edf3 !important; border-left: 5px solid var(--stage-color, #cbd5e1) !important;
+        border-radius: 14px; padding: 13px 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(15,23,42,0.05);
+        cursor: pointer; -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-lead-card:active { background: #f8fafc; }
+      .mobile-lead-card.my-lead-card { background: #f0f7ff !important; }
+      .m-customer-name { font-size: 1.08rem; color: #0f172a; margin: 2px 0 6px; }
+      .m-phone-link { background: #f1f5f9; border-radius: 10px; padding: 0 12px; min-height: 40px; margin-bottom: 8px; font-size: 0.92rem; }
+      .m-info-row { font-size: 0.84rem; }
+      .mobile-lead-card .btn-detail { min-height: 38px; padding: 0 16px; border-radius: 10px; }
+      .mobile-lead-card .map-pin-btn { min-height: 30px; }
+
+      /* 등록 폼 (A안: 섹션 카드 + 하단 고정 버튼) */
+      .form-card { background: transparent; border: none; box-shadow: none; padding: 0; margin-bottom: 8px; }
+      #leadForm .step-pane { background: #ffffff; border: 1px solid #e8edf3; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+      #leadForm .step-title { display: block; font-size: 0.98rem; font-weight: 800; color: #0f172a; margin: 0 0 12px; }
+      #leadForm .step-pane[data-step="2"] .row { flex-direction: column; gap: 0; }
+      #leadForm .row > div { min-width: 0; }
+      #leadForm input[type="text"], #leadForm input[type="tel"], #leadForm select { min-height: 48px; border-radius: 12px; }
+      #leadForm textarea { border-radius: 12px; }
+      #leadForm .prod-grid { grid-template-columns: repeat(3, 1fr); }
+      #leadForm .prod-item { position: relative; justify-content: center; text-align: center; min-height: 46px; padding: 8px 4px; font-size: 0.84rem; border-radius: 10px; }
+      #leadForm .prod-item input[type="checkbox"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+      #leadForm .photo-btn { min-height: 54px; border-radius: 12px; }
+      .form-bar {
+        position: sticky; bottom: calc(66px + env(safe-area-inset-bottom)); z-index: 120; display: flex; gap: 8px;
+        margin: 0 -12px; padding: 10px 12px; background: rgba(244,246,250,0.96);
+      }
+      .form-bar button.submit-btn { margin-top: 0; min-height: 52px; border-radius: 14px; flex: 1; }
+      .history-card { border-radius: 14px; box-shadow: none; border: 1px solid #e8edf3; margin-bottom: 12px; }
+
+      /* 하단 탭바 (일반 사용자) */
+      body[data-screen="dashboard"]:not(.role-admin) #mobileTabBar,
+      body[data-screen="register"]:not(.role-admin) #mobileTabBar {
+        display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 300; background: #ffffff;
+        border-top: 1px solid #e2e8f0; padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+      }
+      #mobileTabBar button {
+        flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px;
+        font-size: 0.72rem; font-weight: 700; color: #94a3b8; min-height: 50px; border-radius: 10px; cursor: pointer;
+      }
+      #mobileTabBar button.on { color: #1a73e8; }
+      #mobileTabBar svg, #mobileFab svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+      /* ---------- 지사관리자(B안) ---------- */
+      body.role-admin #viewDashboard .toolbar-card { position: static; margin: 0 0 8px !important; border-radius: 14px !important; border: 1px solid #e8edf3; box-shadow: none !important; padding: 8px !important; }
+      body.role-admin #statusFilterBar { display: none !important; }
+      body.role-admin.filters-open #statusFilterBar { display: flex !important; flex-wrap: wrap !important; overflow: visible !important; }
+      body.role-admin[data-screen="dashboard"] #adminSummary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 10px; }
+      .adm-tile { background: #ffffff; border: 1px solid #e8edf3; border-radius: 14px; padding: 12px 14px; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+      .adm-tile .adm-lb { display: block; font-size: 0.78rem; color: #64748b; font-weight: 700; }
+      .adm-tile .adm-num { display: block; font-size: 1.7rem; font-weight: 800; color: #0f172a; margin-top: 2px; line-height: 1.2; }
+      .adm-tile.on { border-color: #1a73e8; background: #eff6ff; }
+      .adm-tile.on .adm-num { color: #1a73e8; }
+      body.role-admin[data-screen="dashboard"] .m-list-head { display: flex; justify-content: space-between; align-items: center; margin: 6px 2px 8px; font-size: 0.95rem; font-weight: 800; color: #0f172a; }
+      .m-filter-btn { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px; min-height: 34px; padding: 0 12px; font-size: 0.8rem; font-weight: 700; color: #1a73e8; cursor: pointer; }
+      body.role-admin .mobile-card-list { background: #ffffff; border: 1px solid #e8edf3; border-radius: 14px; overflow: hidden; }
+      body.role-admin .mobile-lead-card { border-radius: 0; border: none !important; border-bottom: 1px solid #eef2f6 !important; border-left: 5px solid var(--stage-color, #cbd5e1) !important; box-shadow: none; margin: 0; padding: 11px 12px; }
+      body.role-admin .mobile-lead-card .m-phone-link,
+      body.role-admin .mobile-lead-card .m-info-row + .m-info-row,
+      body.role-admin .mobile-lead-card .btn-detail,
+      body.role-admin .mobile-lead-card .btn-table-map { display: none; }
+      body.role-admin .m-card-header { margin-bottom: 2px; }
+      body.role-admin .m-customer-name { margin: 0 0 4px; }
+      body.role-admin .m-info-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      body.role-admin .m-footer-actions { margin-top: 4px; padding-top: 0; border-top: none; }
+      body.role-admin[data-screen="dashboard"] #mobileFab {
+        display: flex; position: fixed; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border-radius: 50%;
+        background: #1a73e8; color: #ffffff; border: none; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(26,115,232,0.4); z-index: 300; cursor: pointer;
+      }
+      body.role-admin[data-screen="register"] .main-container { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+      body.role-admin #leadForm .step-progress { display: block; margin: 2px 2px 14px; }
+      body.role-admin #leadForm .sp-label { display: block; font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; }
+      body.role-admin #leadForm .sp-bars { display: flex; gap: 5px; }
+      body.role-admin #leadForm .sp-bars i { flex: 1; height: 5px; border-radius: 3px; background: #dbe3ec; }
+      body.role-admin #leadForm .sp-bars i.on { background: #1a73e8; }
+      body.role-admin #leadForm .step-pane { display: none; background: transparent; border: none; padding: 0; margin: 0 0 8px; }
+      body.role-admin #leadForm[data-step="1"] .step-pane[data-step="1"],
+      body.role-admin #leadForm[data-step="2"] .step-pane[data-step="2"],
+      body.role-admin #leadForm[data-step="3"] .step-pane[data-step="3"] { display: block; }
+      body.role-admin #leadForm .step-title { font-size: 1.25rem; margin-bottom: 14px; }
+      body.role-admin #leadForm input[type="text"], body.role-admin #leadForm input[type="tel"], body.role-admin #leadForm select { min-height: 52px; font-size: 16px; }
+      body.role-admin .form-bar { bottom: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+      body.role-admin #leadForm:not([data-step="1"]) .form-bar .btn-prev { display: block; }
+      body.role-admin #leadForm:not([data-step="3"]) .form-bar .btn-next { display: block; }
+      body.role-admin #leadForm:not([data-step="3"]) .form-bar #submitBtn { display: none; }
+
+      /* 상세·관리 모달을 하단 시트로 */
+      .modal-overlay { align-items: flex-end; padding: 0; }
+      .modal-card { width: 100% !important; max-width: 100% !important; max-height: 92vh; border-radius: 18px 18px 0 0; }
+      .modal-header { padding: 14px 16px; }
+      .btn-close { min-width: 44px; min-height: 44px; font-size: 1.8rem; }
+      .modal-body { padding: 16px 16px calc(16px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+      .btn-save-status, .btn-action-edit, .btn-action-del { min-height: 48px; }
+    }
+    .m-chip-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
   </head>
 <body class="on-login">
@@ -857,11 +1009,14 @@
         </div>
       </div>
 
-      <div style="margin: 4px 0 12px 2px;">
+      <div class="reg-title-wrap" style="margin: 4px 0 12px 2px;">
         <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#1e293b;">📝 신규 안건 소개하기</h3>
       </div>
       <div class="form-card">
-        <form id="leadForm" autocomplete="off">
+        <form id="leadForm" autocomplete="off" data-step="1">
+          <div class="step-progress" aria-live="polite"><span class="sp-label"></span><div class="sp-bars"><i></i><i></i><i></i></div></div>
+          <div class="step-pane" data-step="1">
+          <h4 class="step-title">소개 · 고객 정보</h4>
           <div class="row">
             <div class="form-group">
               <label class="form-label">소개자 이름 <span class="req">*</span></label>
@@ -901,6 +1056,9 @@
             </div>
           </div>
 
+          </div>
+          <div class="step-pane" data-step="2">
+          <h4 class="step-title">사업장 · 상품</h4>
           <!-- 사업장 주소 -->
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -953,6 +1111,9 @@
             </div>
           </div>
 
+          </div>
+          <div class="step-pane" data-step="3">
+          <h4 class="step-title">현장 설명 · 사진</h4>
           <div class="form-group">
             <label class="form-label">현장 설명 <span class="req">*</span></label>
             <textarea id="fieldDescription" name="field_desc_no_auto" rows="4" style="min-height: 110px; line-height: 1.5;" placeholder="현장 상황 및 상담 희망 내용을 상세히 입력해주세요." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required></textarea>
@@ -978,7 +1139,12 @@
             </div>
           </div>
 
-          <button type="submit" id="submitBtn" class="submit-btn">⚡ 실시간 접수 등록</button>
+          </div>
+          <div class="form-bar">
+            <button type="button" class="btn-prev">이전</button>
+            <button type="button" class="btn-next">다음</button>
+            <button type="submit" id="submitBtn" class="submit-btn">⚡ 실시간 접수 등록</button>
+          </div>
         </form>
       </div>
 
@@ -2373,6 +2539,9 @@
         if (vReg) vReg.style.display = (screenId === "register" ? "block" : "none");
         if (vDash) vDash.style.display = (screenId === "dashboard" ? "block" : "none");
 
+        document.body.classList.toggle("role-admin", isAdminRole(currentRole));
+        document.body.setAttribute("data-screen", screenId);
+
         var roleLabel = isAdminRole(currentRole) ? "👑 지사관리자" : ("👤 " + (currentUserName || "직원") + " (" + (currentRole || "컨설턴트") + ")");
 
         // 등록 화면 상단 사용자 뱃지
@@ -2417,6 +2586,8 @@
         if (regLogout) {
           regLogout.onclick = doLogout;
         }
+
+        if (window.__mobileShellRefresh) window.__mobileShellRefresh(screenId);
 
         if (screenId !== "login" && currentUserPhone) {
           saveUserSession({ phone: currentUserPhone, name: currentUserName, job: currentRole }, screenId);
@@ -3053,7 +3224,7 @@
 
           var stClass = getStageClass(r.status);
           var theme = getStageTheme(r.status);
-          var cardBorder = 'border: 2px solid ' + theme.border + ' !important;';
+          var cardBorder = '--stage-color:' + theme.border + ';';
           var badgeStyle = 'border: 1.5px solid ' + theme.border + ' !important; background: ' + theme.bg + ' !important; color: ' + theme.text + ' !important;';
           var mCardClasses = 'mobile-lead-card ' + stClass + (isMyLead ? ' my-lead-card' : '');
 
@@ -4571,6 +4742,216 @@
           });
         }
       });
+    })();
+  </script>
+  <script>
+    /* [모바일 셸] 일반 사용자 = 하단 탭바 / 지사관리자 = 요약 현황판 + 단계별 입력 (기존 기능·ID 변경 없음) */
+    (function () {
+      var $ = function (id) { return document.getElementById(id); };
+      var body = document.body;
+      var SVG = {
+        list: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+        plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+        user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>',
+        fab: '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px"><path d="M12 5v14M5 12h14"/></svg>'
+      };
+      function screen() { return body.getAttribute('data-screen') || 'login'; }
+      function isAdmin() { return body.classList.contains('role-admin'); }
+      function userLabel() {
+        var el = $(screen() === 'register' ? 'regUserTitle' : 'dashUserTitle') || $('dashUserTitle');
+        return el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+      }
+      function pick(dashId, regId) { return $(screen() === 'register' ? regId : dashId); }
+
+      var kwInput = $('searchKeyword');
+      if (kwInput && window.matchMedia('(max-width: 768px)').matches) kwInput.placeholder = '고객명, 연락처, 주소 검색';
+
+      /* 헤더 사용자 칩 */
+      document.querySelectorAll('.inner-header-bar .header-main-row').forEach(function (row) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'm-user-chip';
+        chip.innerHTML = '<span class="m-chip-name">내 정보</span><span aria-hidden="true">▾</span>';
+        chip.addEventListener('click', openSheet);
+        row.appendChild(chip);
+      });
+
+      /* 내 정보 시트 */
+      var sheet = document.createElement('div');
+      sheet.id = 'mobileMenuSheet';
+      sheet.innerHTML = '<div class="sheet-card"><div class="sheet-handle"></div><div class="sheet-user" id="sheetUser"></div>'
+        + '<button type="button" class="sheet-btn" data-act="pwd">비밀번호 변경</button>'
+        + '<button type="button" class="sheet-btn" data-act="users" id="sheetUsersBtn">사용자 관리</button>'
+        + '<button type="button" class="sheet-btn danger" data-act="logout">로그아웃</button>'
+        + '<button type="button" class="sheet-btn cancel" data-act="close">닫기</button></div>';
+      body.appendChild(sheet);
+      function openSheet() {
+        $('sheetUser').textContent = userLabel();
+        $('sheetUsersBtn').style.display = isAdmin() ? 'block' : 'none';
+        sheet.classList.add('open');
+      }
+      function closeSheet() { sheet.classList.remove('open'); }
+      sheet.addEventListener('click', function (e) {
+        if (e.target === sheet) { closeSheet(); return; }
+        var b = e.target.closest('.sheet-btn');
+        if (!b) return;
+        var act = b.getAttribute('data-act');
+        var target = null;
+        if (act === 'pwd') target = pick('dashUserTitle', 'regUserTitle');
+        else if (act === 'users') target = $('dashUsersBtn');
+        else if (act === 'logout') target = pick('dashLogoutBtn', 'regLogoutBtn');
+        closeSheet();
+        if (target) setTimeout(function () { target.click(); }, 60);
+      });
+
+      /* 하단 탭바 (일반 사용자) */
+      var tab = document.createElement('nav');
+      tab.id = 'mobileTabBar';
+      tab.setAttribute('aria-label', '주요 메뉴');
+      tab.innerHTML = '<button type="button" data-tab="dashboard">' + SVG.list + '현황</button>'
+        + '<button type="button" data-tab="register">' + SVG.plus + '소개하기</button>'
+        + '<button type="button" data-tab="me">' + SVG.user + '내 정보</button>';
+      body.appendChild(tab);
+      tab.addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b) return;
+        var t = b.getAttribute('data-tab');
+        if (t === 'me') { openSheet(); return; }
+        if (t === screen()) { window.scrollTo(0, 0); return; }
+        var target = t === 'dashboard' ? $('regSwitchBtn') : $('dashSwitchBtn');
+        if (target) target.click();
+      });
+
+      /* 관리자 + 버튼 */
+      var fab = document.createElement('button');
+      fab.type = 'button';
+      fab.id = 'mobileFab';
+      fab.setAttribute('aria-label', '신규 안건 소개하기');
+      fab.innerHTML = SVG.fab;
+      fab.addEventListener('click', function () { var b = $('dashSwitchBtn'); if (b) b.click(); });
+      body.appendChild(fab);
+
+      /* 관리자 요약 타일 + 목록 헤드 */
+      var dash = $('viewDashboard');
+      var toolbar = dash ? dash.querySelector('.toolbar-card') : null;
+      var summary = document.createElement('div');
+      summary.id = 'adminSummary';
+      var tiles = [
+        { key: 'wait', label: '접수대기', status: '접수대기' },
+        { key: 'ing', label: '진행 중', status: null },
+        { key: 'done', label: '계약완료', status: '계약완료' },
+        { key: 'total', label: '전체', status: '전체' }
+      ];
+      tiles.forEach(function (t) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'adm-tile';
+        b.setAttribute('data-key', t.key);
+        b.innerHTML = '<span class="adm-lb">' + t.label + '</span><span class="adm-num">0</span>';
+        b.addEventListener('click', function () {
+          if (t.status) {
+            var chip = document.querySelector('#statusFilterBar [data-status="' + t.status + '"]');
+            if (chip) chip.click();
+          } else {
+            body.classList.toggle('filters-open');
+          }
+        });
+        summary.appendChild(b);
+      });
+      var head = document.createElement('div');
+      head.className = 'm-list-head';
+      head.innerHTML = '<span id="mListTitle">최근 안건</span><button type="button" class="m-filter-btn" id="mFilterBtn">상태 필터</button>';
+      if (dash && toolbar) {
+        dash.insertBefore(summary, toolbar);
+        toolbar.parentNode.insertBefore(head, toolbar.nextSibling);
+      }
+      $('mFilterBtn').addEventListener('click', function () { body.classList.toggle('filters-open'); });
+
+      function num(id) { var el = $(id); return el ? (parseInt(el.textContent, 10) || 0) : 0; }
+      function refreshSummary() {
+        var ing = num('cCntConfirm') + num('cCntConsult') + num('cCntMoreConsult') + num('cCntQuote') + num('cCntQuoteConsult');
+        var vals = { wait: num('cCntWait'), ing: ing, done: num('cCntDone'), total: num('cCntTotal') };
+        var active = document.querySelector('#statusFilterBar .filter-chip.active');
+        var st = active ? active.getAttribute('data-status') : '전체';
+        summary.querySelectorAll('.adm-tile').forEach(function (b) {
+          var k = b.getAttribute('data-key');
+          b.querySelector('.adm-num').textContent = vals[k];
+          var on = (k === 'wait' && st === '접수대기') || (k === 'done' && st === '계약완료') || (k === 'total' && st === '전체');
+          b.classList.toggle('on', on);
+        });
+        $('mListTitle').textContent = st === '전체' ? '최근 안건' : '안건 · ' + st;
+      }
+      var bar = $('statusFilterBar');
+      if (bar) {
+        new MutationObserver(refreshSummary).observe(bar, { subtree: true, childList: true, characterData: true });
+        bar.addEventListener('click', function () { setTimeout(refreshSummary, 0); });
+      }
+
+      /* 카드 전체 탭 → 상세 열기 */
+      var mList = $('mobileCardList');
+      if (mList) {
+        mList.addEventListener('click', function (e) {
+          if (e.target.closest('a, button, .m-customer-name')) return;
+          var card = e.target.closest('.mobile-lead-card');
+          var btn = card ? card.querySelector('.btn-detail') : null;
+          if (btn) btn.click();
+        });
+      }
+
+      /* 단계별 입력 (지사관리자 모바일) */
+      var form = $('leadForm');
+      var STEP_NAMES = ['소개 · 고객 정보', '사업장 · 상품', '현장 설명 · 사진'];
+      var step = 1;
+      function setStep(n) {
+        step = n;
+        form.setAttribute('data-step', String(n));
+        var lab = form.querySelector('.sp-label');
+        if (lab) lab.textContent = n + ' / 3  ' + STEP_NAMES[n - 1];
+        form.querySelectorAll('.sp-bars i').forEach(function (b, i) { b.classList.toggle('on', i < n); });
+      }
+      function validateStep(n) {
+        var pane = form.querySelector('.step-pane[data-step="' + n + '"]');
+        var els = pane.querySelectorAll('input, select, textarea');
+        for (var i = 0; i < els.length; i++) {
+          if (!els[i].checkValidity()) { els[i].reportValidity(); return false; }
+        }
+        if (n === 2 && !form.querySelector('input[name="prod"]:checked')) {
+          alert('관심상품을 1개 이상 선택해주세요.');
+          return false;
+        }
+        return true;
+      }
+      if (form) {
+        setStep(1);
+        form.querySelector('.btn-next').addEventListener('click', function () {
+          if (validateStep(step)) { setStep(Math.min(3, step + 1)); window.scrollTo(0, 0); }
+        });
+        form.querySelector('.btn-prev').addEventListener('click', function () {
+          setStep(Math.max(1, step - 1)); window.scrollTo(0, 0);
+        });
+        form.addEventListener('invalid', function (e) {
+          var p = e.target.closest ? e.target.closest('.step-pane') : null;
+          if (p) setStep(parseInt(p.getAttribute('data-step'), 10));
+        }, true);
+      }
+      var sms = $('smsNoticeModal');
+      if (sms && form) {
+        new MutationObserver(function () { if (sms.classList.contains('open')) setStep(1); })
+          .observe(sms, { attributes: true, attributeFilter: ['class'] });
+      }
+
+      /* showScreen()에서 호출 */
+      window.__mobileShellRefresh = function (screenId) {
+        var nm = userLabel();
+        document.querySelectorAll('.m-chip-name').forEach(function (n) { n.textContent = nm || '내 정보'; });
+        tab.querySelectorAll('button[data-tab]').forEach(function (b) {
+          b.classList.toggle('on', b.getAttribute('data-tab') === screenId);
+        });
+        if (screenId === 'register' && form) setStep(1);
+        if (screenId !== 'dashboard') body.classList.remove('filters-open');
+        closeSheet();
+        refreshSummary();
+      };
     })();
   </script>
 </body>
