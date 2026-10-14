@@ -2023,6 +2023,7 @@
       }
 
       function doLogout() {
+        try { recordSalesPortalLoginLog('logout', currentUserName, currentUserPhone, currentRole); } catch (e_) {}
         clearUserSession();
         showScreen('login');
         applyLoginTab('member');
@@ -2121,6 +2122,40 @@
       }
 
       // 소개영업 관리포털 접속 이력 및 실시간 접속(heartbeat) 기록 함수
+      // ===== 로그인 이력(login_logs) 기록: 접속 시스템 = '소개영업' =====
+      // 영업일보와 같은 login_logs 테이블에 남긴다. 컬럼 구성이 달라도 기록되도록 단계적으로 재시도한다.
+      var SALES_LOG_LAST_ = {};
+      async function recordSalesPortalLoginLog(kind, name, phone, role) {
+        try {
+          if (!supabase || !phone) return false;
+          var key = kind + ':' + phone;
+          var nowMs = Date.now();
+          if (SALES_LOG_LAST_[key] && nowMs - SALES_LOG_LAST_[key] < 3000) return true; // 중복 클릭/이벤트 방지
+          SALES_LOG_LAST_[key] = nowMs;
+          var ua = navigator.userAgent || '';
+          var browser = /Edg\//.test(ua) ? 'Edge' : /SamsungBrowser/.test(ua) ? '삼성인터넷' : /Whale\//.test(ua) ? 'Whale' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : '기타';
+          var device = /Mobi|Android|iPhone|iPod/i.test(ua) ? '모바일' : 'PC';
+          var sys = '소개영업';
+          var k = kind === 'logout' ? 'logout' : 'login_success';
+          var label = (kind === 'logout' ? '로그아웃' : '로그인') + ' · ' + sys;
+          var nm = String(name || '').trim(), ph = String(phone || '').trim();
+          var base = { name: nm, phone: ph, browser: browser, device_type: device };
+          var tries = [
+            Object.assign({}, base, { role: role || '', type: k, system: sys }),
+            Object.assign({}, base, { role: role || '', type: k + ' · ' + sys }),
+            Object.assign({}, base, { type: k + ' · ' + sys }),
+            Object.assign({}, base, { action: label }),
+            { name: nm, phone: ph, action: label }
+          ];
+          for (var i = 0; i < tries.length; i++) {
+            var r = await supabase.from('login_logs').insert([tries[i]]);
+            if (!r.error) return true;
+            console.warn('[login_logs] 소개영업 기록 재시도', i, r.error && r.error.message);
+          }
+        } catch (e) { console.warn('[login_logs] 소개영업 기록 실패', e); }
+        return false;
+      }
+
       async function recordSalesPortalAccess(phone, isNewLogin) {
         if (!supabase || !phone) return;
         try {
@@ -4086,6 +4121,7 @@
               document.getElementById("agentName").value = name;
               
               recordSalesPortalAccess(currentUserPhone, true);
+              try { await Promise.race([recordSalesPortalLoginLog('login', currentUserName, currentUserPhone, currentRole), new Promise(function(res){ setTimeout(res, 2500); })]); } catch (e_) {}
               showScreen("dashboard");
 
             } catch (err) {
@@ -4169,6 +4205,7 @@
               document.getElementById("agentName").value = currentUserName;
               
               recordSalesPortalAccess(currentUserPhone, true);
+              try { await Promise.race([recordSalesPortalLoginLog('login', currentUserName, currentUserPhone, currentRole), new Promise(function(res){ setTimeout(res, 2500); })]); } catch (e_) {}
               showScreen("dashboard");
 
             } catch (err) {
