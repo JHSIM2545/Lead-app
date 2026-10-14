@@ -1816,15 +1816,32 @@
         } catch (e) {}
       }
 
+      var SMS_SKIP_POP_ = false;
       function closeSmsNoticeModal(fromPopstate) {
         var idx = modalHistoryStack.indexOf("smsNoticeModal");
-        if (!fromPopstate && idx !== -1) {
-          history.back();
-          return;
-        }
-        if (idx !== -1) modalHistoryStack.splice(idx, 1);
+        // 화면에서는 history 동작과 무관하게 즉시 닫는다 (popstate 처리 누락 시 팝업이 남던 문제 방지)
         var modal = document.getElementById("smsNoticeModal");
         if (modal) modal.classList.remove("open");
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
+        if (!fromPopstate && idx !== -1) {
+          // 팝업을 열 때 쌓은 history 항목만 정리하고, 이 popstate는 다른 모달 닫기로 흘러가지 않게 무시
+          SMS_SKIP_POP_ = true;
+          setTimeout(function () { SMS_SKIP_POP_ = false; }, 500);
+          try { history.back(); } catch (e) { SMS_SKIP_POP_ = false; }
+        }
+      }
+      // 상세 모달을 history 동작 없이 즉시 닫는다 (대시보드로 이동 시 사용)
+      function forceCloseDetailModal_() {
+        var dm = document.getElementById("detailModal");
+        if (!dm || !dm.classList.contains("open")) return;
+        var di = modalHistoryStack.indexOf("detailModal");
+        if (di !== -1) modalHistoryStack.splice(di, 1);
+        dm.classList.remove("open");
+        var ec = document.getElementById("editLeadContainer");
+        if (ec) ec.style.display = "none";
+        try { clearBoardFile(); } catch (e) {}
+        activeLeadItem = null;
+        try { updateFoldBridge(); } catch (e) {}
       }
 
       function checkDirectLeadUrl() {
@@ -3881,6 +3898,13 @@
 
             // 폰의 물리/제스처 뒤로가기 버튼 처리 (사진 및 모달 닫기)
       window.addEventListener("popstate", function(e) {
+        // 0. 문자알림 팝업: 닫을 때 발생시킨 popstate는 무시, 열려 있으면 팝업만 닫기
+        if (SMS_SKIP_POP_) { SMS_SKIP_POP_ = false; return; }
+        var smsBox = document.getElementById("smsNoticeModal");
+        if (smsBox && smsBox.classList.contains("open")) {
+          closeSmsNoticeModal(true);
+          return;
+        }
         // 1. 사진 확대 라이트박스가 열려있는 경우 -> 사진만 닫기 (상세 화면 유지!)
         var photoBox = document.getElementById("photoLightbox");
         if (photoBox && photoBox.style.display !== "none") {
@@ -3921,15 +3945,20 @@
         var btnCloseSms = document.getElementById("btnCloseSmsNoticeModal");
         if (btnCloseSms) {
           btnCloseSms.addEventListener("click", function() {
+            // 안건 상세에서 연 경우에는 팝업만 닫고 상세 화면 유지, 신규 접수 직후라면 대시보드로
+            var dmOpen = document.getElementById("detailModal");
+            var fromDetail = !!(dmOpen && dmOpen.classList.contains("open"));
             closeSmsNoticeModal();
-            showScreen("dashboard");
+            if (!fromDetail) showScreen("dashboard");
           });
         }
         var btnGoDashSms = document.getElementById("btnGoDashboardFromSms");
         if (btnGoDashSms) {
           btnGoDashSms.addEventListener("click", function() {
             closeSmsNoticeModal();
+            forceCloseDetailModal_();
             showScreen("dashboard");
+            try { loadDashboardLeads(); } catch (e) {}
           });
         }
         var btnSendSms = document.getElementById("btnSendSmsNow");
