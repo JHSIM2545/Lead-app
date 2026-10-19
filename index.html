@@ -3829,7 +3829,7 @@
           var onlineUsers = 0;
 
           users.forEach(function(u) {
-            var phoneFmt = formatPhone(u.phone);
+            var phoneFmt = String(u.phone || "").replace(/[^0-9]/g, "") || "-";
             var normalizedJob = normalizeJobTitle(u.job);
 
             // 실시간 접속 여부: 최근 3.5분(210초) 이내 활동 기록이 있는 경우 '접속중'
