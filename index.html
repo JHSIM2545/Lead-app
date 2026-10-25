@@ -222,6 +222,27 @@
       text-decoration: none; cursor: pointer; transition: all 0.15s;
     }
     .map-pin-btn:hover { background: #ffebee; border-color: #e53935; }
+    .ref-chip { display: none; margin-top: 6px; padding: 7px 10px; background: #eef4ff; border: 1px solid #c7dafc; border-radius: 8px; color: #1a56c4; font-size: 0.82rem; font-weight: 700; word-break: break-all; }
+    .ref-chip.on { display: block; }
+    .map-pin-btn.set { background: #e8f5e9; border-color: #81c784; }
+    /* 위치 지정 (중앙 핀 방식) */
+    .ref-pk { position: fixed; inset: 0; z-index: 100010; background: #fff; display: none; flex-direction: column; }
+    .ref-pk.on { display: flex; }
+    .ref-pk-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; background: rgba(255,255,255,.96); border-bottom: 1px solid #e2e8f0; }
+    .ref-pk-head b { font-size: 16px; font-weight: 800; color: #202124; }
+    .ref-pk-head button { background: #eef1f7; color: #1a3a6b; border: none; border-radius: 12px; padding: 10px 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .ref-pk-head button.ok { background: #1a73e8; color: #fff; }
+    .ref-pk-body { position: relative; flex: 1; }
+    #refPkMap { position: absolute; inset: 0; background: #e9ecef; }
+    .ref-cross { position: absolute; left: 50%; top: 50%; z-index: 600; width: 38px; height: 46px; margin: -46px 0 0 -19px; pointer-events: none; }
+    .ref-cross svg { filter: drop-shadow(0 3px 4px rgba(0,0,0,.35)); }
+    .ref-pk-search { position: absolute; left: 10px; right: 10px; top: 10px; z-index: 620; display: flex; gap: 6px; }
+    .ref-pk-search input { flex: 1; height: 46px; border: none; border-radius: 13px; padding: 0 14px; font-size: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.22); background: #fff; }
+    .ref-pk-search button { height: 46px; border-radius: 13px; border: none; background: #1a3a6b; color: #fff; font-weight: 700; padding: 0 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .ref-pk-addr { position: absolute; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom)); z-index: 620; background: #fff; border-radius: 15px; padding: 12px 14px; box-shadow: 0 6px 20px rgba(0,0,0,.28); font-size: 14px; font-weight: 700; color: #202124; }
+    .ref-pk-addr small { display: block; color: #8a94a6; font-size: 11.5px; margin-top: 2px; font-weight: 600; }
+    .ref-pk-gps { position: absolute; right: 12px; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 620; width: 46px; height: 46px; border-radius: 50%; background: #fff; color: #1a3a6b; border: none; box-shadow: 0 2px 12px rgba(0,0,0,.28); font-size: 20px; cursor: pointer; }
+    .ref-toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 100020; background: rgba(17,24,39,.94); color: #fff; border-radius: 999px; padding: 10px 18px; font-size: 13.5px; font-weight: 700; display: none; max-width: 90vw; text-align: center; }
 
     .btn-login-action {
       width: 100%; padding: 14px; background: #1a73e8; color: #ffffff; border: none;
@@ -1074,7 +1095,7 @@
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
               <label class="form-label" style="margin-bottom:0;">사업장 주소 / 위치</label>
-              <button type="button" class="map-pin-btn" id="btnOpenNaverMapForm" title="네이버 지도 검색" aria-label="네이버 지도 검색">
+              <button type="button" class="map-pin-btn" id="btnOpenNaverMapForm" title="지도에서 위치 지정" aria-label="지도에서 위치 지정">
                 <svg width="16" height="20" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg" style="display:block;">
                   <ellipse cx="12" cy="27" rx="7" ry="2.2" fill="#0b0f10"></ellipse>
                   <path d="M12 1C6.5 1 2 5.5 2 11c0 7 10 17 10 17s10-10 10-17c0-5.5-4.5-10-10-10z" fill="#17b06b"></path>
@@ -1083,6 +1104,7 @@
               </button>
             </div>
             <input type="text" id="address" name="address_no_auto" placeholder="예: 번동 102번지 1층 (사거리 코너)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
+            <div class="ref-chip" id="refPlaceInfo"></div>
           </div>
 
           <div class="form-group">
@@ -2207,6 +2229,222 @@
           console.warn("recordSalesPortalAccess error:", e);
         }
       }
+
+      // ==========================================================
+      // 지도 엔진 / 위치 지정 (TA 관리 포털 지도와 동일: 카카오맵 → 키 없으면 OpenStreetMap)
+      // ==========================================================
+      var REF_KAKAO_KEY = '4ab1f892386fe4e3375fc2823082d2de';
+      var REF_NAVER_KEY = '';
+      var REF_DEFAULT_CENTER = { lat: 37.6396, lng: 127.0257 };   // 북서울(강북) 기본 중심
+      var REFMAP = { kind: null, loading: null };
+      var refPkMapObj = null, refPkAddr = "", refPkTimer = null, refPkCb = null, refLastNom = 0;
+      var refFormPlace = null;
+
+      function refKakaoKey() { try { return (localStorage.getItem('S1_KAKAO_MAP_KEY') || REF_KAKAO_KEY || '').trim(); } catch (e) { return REF_KAKAO_KEY; } }
+      function refNaverKey() { try { return (localStorage.getItem('S1_NAVER_MAP_KEY') || REF_NAVER_KEY || '').trim(); } catch (e) { return REF_NAVER_KEY; } }
+      function refToast(msg, ms) {
+        var t = document.getElementById("refToast"); if (!t) return;
+        t.textContent = msg; t.style.display = "block";
+        clearTimeout(refToast._t); refToast._t = setTimeout(function() { t.style.display = "none"; }, ms || 2200);
+      }
+      function refLoadScript(src) { return new Promise(function(res, rej) { var sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = function() { rej(new Error('로드 실패: ' + src)); }; document.head.appendChild(sc); }); }
+      function refLoadCss(href) { var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = href; document.head.appendChild(l); }
+      window.navermap_authFailure = function() { refToast('네이버 지도 인증 실패 — 키와 등록된 웹 서비스 URL을 확인하세요', 4500); };
+
+      function refMapInit() {
+        if (REFMAP.loading) return REFMAP.loading;
+        REFMAP.loading = (async function() {
+          var kk = refKakaoKey();
+          if (kk) {
+            try {
+              await refLoadScript('https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + encodeURIComponent(kk) + '&libraries=services&autoload=false');
+              await new Promise(function(res, rej) { if (!(window.kakao && kakao.maps)) return rej(new Error('kakao sdk')); kakao.maps.load(res); });
+              REFMAP.kind = 'kakao'; return 'kakao';
+            } catch (e) { console.warn('[지도] 카카오맵 로드 실패, OSM으로 대체', e); }
+          }
+          var nk = kk ? '' : refNaverKey();
+          if (nk) {
+            try {
+              await refLoadScript('https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(nk) + '&submodules=geocoder');
+              if (window.naver && naver.maps) { REFMAP.kind = 'naver'; return 'naver'; }
+            } catch (e) { console.warn('[지도] 네이버 지도 로드 실패, OSM으로 대체', e); }
+          }
+          refLoadCss('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css');
+          await refLoadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js');
+          REFMAP.kind = 'osm'; return 'osm';
+        })();
+        return REFMAP.loading;
+      }
+
+      // 빨간 입체 핀 (중앙 핀)
+      function refPinSvg() {
+        return '<svg viewBox="0 0 60 86" width="100%" height="100%" aria-hidden="true"><defs><linearGradient id="refPg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5252"/><stop offset=".55" stop-color="#f00f0f"/><stop offset="1" stop-color="#c70000"/></linearGradient></defs>'
+          + '<path d="M30 3C14.5 3 4 14.5 4 29.5c0 18 20 38 26 48 6-10 26-30 26-48C56 14.5 45.5 3 30 3z" fill="url(#refPg)"/>'
+          + '<path d="M14 18c4-8 12-12 20-11-9 1-16 6-18 14z" fill="#fff" opacity=".28"/>'
+          + '<circle cx="30" cy="29" r="11.5" fill="#fff" stroke="#fff" stroke-width="2.5"/></svg>';
+      }
+
+      // 지도 래퍼: setView / center / onMove / invalidate
+      function refNewMap(container, opts) {
+        opts = opts || {};
+        var lat = opts.lat || REF_DEFAULT_CENTER.lat, lng = opts.lng || REF_DEFAULT_CENTER.lng, zoom = opts.zoom || 14;
+        if (REFMAP.kind === 'kakao') {
+          var K = kakao.maps, lv = function(z) { return Math.max(1, Math.min(14, 19 - z)); };
+          var kmap = new K.Map(container, { center: new K.LatLng(lat, lng), level: lv(zoom) });
+          return {
+            setView: function(a, b, z) { kmap.setCenter(new K.LatLng(a, b)); if (z) kmap.setLevel(lv(z)); },
+            center: function() { var c = kmap.getCenter(); return { lat: c.getLat(), lng: c.getLng() }; },
+            onMove: function(cb) { K.event.addListener(kmap, 'idle', cb); },
+            invalidate: function() { kmap.relayout(); }
+          };
+        }
+        if (REFMAP.kind === 'naver') {
+          var nmap = new naver.maps.Map(container, { center: new naver.maps.LatLng(lat, lng), zoom: zoom + 1, zoomControl: false, mapDataControl: false, scaleControl: false, logoControl: true });
+          return {
+            setView: function(a, b, z) { nmap.setCenter(new naver.maps.LatLng(a, b)); if (z) nmap.setZoom(z + 1); },
+            center: function() { var c = nmap.getCenter(); return { lat: c.lat(), lng: c.lng() }; },
+            onMove: function(cb) { naver.maps.Event.addListener(nmap, 'idle', cb); },
+            invalidate: function() { naver.maps.Event.trigger(nmap, 'resize'); }
+          };
+        }
+        var lmap = L.map(container, { zoomControl: false, attributionControl: true }).setView([lat, lng], zoom);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(lmap);
+        return {
+          setView: function(a, b, z) { lmap.setView([a, b], z || lmap.getZoom()); },
+          center: function() { var c = lmap.getCenter(); return { lat: c.lat, lng: c.lng }; },
+          onMove: function(cb) { lmap.on('moveend', cb); },
+          invalidate: function() { lmap.invalidateSize(); }
+        };
+      }
+
+      function refSleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+      async function refGeocode(q) {
+        q = String(q || '').trim(); if (!q) return null;
+        await refMapInit();
+        if (REFMAP.kind === 'kakao') {
+          var S = kakao.maps.services;
+          var a = await new Promise(function(res) { new S.Geocoder().addressSearch(q, function(r, st) { res(st === S.Status.OK && r.length ? { lat: parseFloat(r[0].y), lng: parseFloat(r[0].x), address: (r[0].road_address && r[0].road_address.address_name) || r[0].address_name || q } : null); }); });
+          if (a) return a;
+          return new Promise(function(res) { new S.Places().keywordSearch(q, function(r, st) { res(st === S.Status.OK && r.length ? { lat: parseFloat(r[0].y), lng: parseFloat(r[0].x), address: r[0].road_address_name || r[0].address_name || q } : null); }); });
+        }
+        if (REFMAP.kind === 'naver' && naver.maps.Service) {
+          return new Promise(function(res) { naver.maps.Service.geocode({ query: q }, function(st, r) {
+            if (st !== naver.maps.Service.Status.OK || !r.v2 || !r.v2.addresses || !r.v2.addresses.length) return res(null);
+            var ad = r.v2.addresses[0]; res({ lat: parseFloat(ad.y), lng: parseFloat(ad.x), address: ad.roadAddress || ad.jibunAddress || q });
+          }); });
+        }
+        var wait = 1100 - (Date.now() - refLastNom); if (wait > 0) await refSleep(wait);
+        refLastNom = Date.now();
+        try {
+          var r2 = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=kr&accept-language=ko&q=' + encodeURIComponent(q));
+          var j = await r2.json(); if (!j.length) return null;
+          return { lat: parseFloat(j[0].lat), lng: parseFloat(j[0].lon), address: q };
+        } catch (e) { return null; }
+      }
+      async function refReverse(lat, lng) {
+        await refMapInit();
+        if (REFMAP.kind === 'kakao') {
+          var S = kakao.maps.services;
+          return new Promise(function(res) { new S.Geocoder().coord2Address(lng, lat, function(r, st) {
+            if (st !== S.Status.OK || !r.length) return res('');
+            res((r[0].road_address && r[0].road_address.address_name) || (r[0].address && r[0].address.address_name) || '');
+          }); });
+        }
+        if (REFMAP.kind === 'naver' && naver.maps.Service) {
+          return new Promise(function(res) { naver.maps.Service.reverseGeocode({ coords: new naver.maps.LatLng(lat, lng), orders: [naver.maps.Service.OrderType.ROAD_ADDR, naver.maps.Service.OrderType.ADDR].join(',') }, function(st, r) {
+            if (st !== naver.maps.Service.Status.OK) return res('');
+            var a = r.v2 && r.v2.address; res(a ? (a.roadAddress || a.jibunAddress || '') : '');
+          }); });
+        }
+        var wait = 1100 - (Date.now() - refLastNom); if (wait > 0) await refSleep(wait);
+        refLastNom = Date.now();
+        try {
+          var r3 = await fetch('https://nominatim.openstreetmap.org/reverse?format=jsonv2&accept-language=ko&lat=' + lat + '&lon=' + lng);
+          var j2 = await r3.json(); if (!j2 || !j2.display_name) return '';
+          var parts = j2.display_name.split(',').map(function(x) { return x.trim(); }).filter(function(x) { return x && x !== '대한민국' && !/^\d{5}$/.test(x); });
+          return parts.reverse().join(' ');
+        } catch (e) { return ''; }
+      }
+      function refGps() {
+        return new Promise(function(res, rej) {
+          if (!navigator.geolocation) return rej(new Error('이 기기는 위치 기능을 지원하지 않습니다.'));
+          navigator.geolocation.getCurrentPosition(function(p) { res({ lat: p.coords.latitude, lng: p.coords.longitude, acc: p.coords.accuracy }); },
+            function(e) { rej(new Error(e.code === 1 ? '위치 권한이 꺼져 있습니다. 브라우저 설정에서 허용해주세요.' : '현재 위치를 가져오지 못했습니다.')); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 15000 });
+        });
+      }
+
+      // ---- 위치 선택기 ----
+      async function refPickOnMap(init, cb) {
+        var box = document.getElementById("refPicker"); if (!box) return;
+        refPkCb = cb;
+        box.classList.add("on");
+        try { history.pushState({ modalId: "refPicker" }, ""); modalHistoryStack.push("refPicker"); } catch (e) {}
+        document.getElementById("refPkQ").value = (init && init.q) || "";
+        document.getElementById("refPkAddr").textContent = "";
+        document.getElementById("refPkCoord").textContent = "";
+        var cross = document.getElementById("refCross"); if (cross && !cross.firstChild) cross.innerHTML = refPinSvg();
+        try { await refMapInit(); } catch (e) { refToast('지도를 불러오지 못했습니다'); closeRefPicker(); return; }
+        var c = (init && init.lat) ? init : null;
+        if (!refPkMapObj) {
+          document.getElementById("refPkMap").innerHTML = "";
+          refPkMapObj = refNewMap(document.getElementById("refPkMap"), c ? { lat: c.lat, lng: c.lng, zoom: 17 } : {});
+          refPkMapObj.onMove(function() { clearTimeout(refPkTimer); refPkTimer = setTimeout(refPkUpdate, 450); });
+        }
+        refPkMapObj.invalidate();
+        if (c) refPkMapObj.setView(c.lat, c.lng, 17);
+        else if (init && init.q) refPkMapObj.setView(REF_DEFAULT_CENTER.lat, REF_DEFAULT_CENTER.lng, 14);
+        else { try { var p = await refGps(); refPkMapObj.setView(p.lat, p.lng, 17); } catch (e) { refPkMapObj.setView(REF_DEFAULT_CENTER.lat, REF_DEFAULT_CENTER.lng, 14); } }
+        setTimeout(refPkUpdate, 500);
+        if (!c && init && init.q) refPkSearch(true);
+      }
+      async function refPkUpdate() {
+        var box = document.getElementById("refPicker");
+        if (!refPkMapObj || !box || !box.classList.contains("on")) return;
+        var c = refPkMapObj.center();
+        document.getElementById("refPkCoord").textContent = c.lat.toFixed(5) + ", " + c.lng.toFixed(5);
+        document.getElementById("refPkAddr").textContent = "…";
+        var a = await refReverse(c.lat, c.lng); refPkAddr = a;
+        document.getElementById("refPkAddr").textContent = a || "주소 없음";
+      }
+      async function refPkSearch(quiet) {
+        var q = document.getElementById("refPkQ").value.trim(); if (!q) return;
+        if (!quiet) refToast("검색 중");
+        var r = await refGeocode(q);
+        if (!r) { if (!quiet) refToast("검색 결과 없음", 3000); return; }
+        refPkMapObj.setView(r.lat, r.lng, 17);
+      }
+      async function refPkGpsGo() { try { var p = await refGps(); refPkMapObj.setView(p.lat, p.lng, 17); } catch (e) { refToast(e.message, 3500); } }
+      function closeRefPicker(fromPopstate) {
+        var idx = modalHistoryStack.indexOf("refPicker");
+        if (!fromPopstate && idx !== -1) { history.back(); return; }
+        if (idx !== -1) modalHistoryStack.splice(idx, 1);
+        var box = document.getElementById("refPicker"); if (box) box.classList.remove("on");
+        refPkCb = null;
+      }
+      function refPkOk() {
+        if (!refPkMapObj) return;
+        var c = refPkMapObj.center(), cb = refPkCb, a = refPkAddr || "";
+        closeRefPicker();
+        if (cb) cb({ lat: c.lat, lng: c.lng, address: a });
+      }
+
+      // ---- 안건 등록 폼 연동 ----
+      function refFormChip() {
+        var chip = document.getElementById("refPlaceInfo"), btn = document.getElementById("btnOpenNaverMapForm"), p = refFormPlace;
+        if (!chip) return;
+        if (p && p.lat) { chip.textContent = "📍 " + (p.address || (p.lat.toFixed(5) + ", " + p.lng.toFixed(5))); chip.classList.add("on"); if (btn) btn.classList.add("set"); }
+        else { chip.textContent = ""; chip.classList.remove("on"); if (btn) btn.classList.remove("set"); }
+      }
+      function refFormPlaceOpen() {
+        var addrEl = document.getElementById("address"), custEl = document.getElementById("customerName");
+        var q = (addrEl.value.trim() || (custEl ? custEl.value.trim() : ""));
+        refPickOnMap(refFormPlace && refFormPlace.lat ? refFormPlace : { q: q }, function(r) {
+          refFormPlace = { lat: r.lat, lng: r.lng, address: r.address || "" };
+          if (r.address) addrEl.value = r.address;
+          refFormChip();
+        });
+      }
+      function refResetPlace() { refFormPlace = null; refFormChip(); }
 
       function openNaverMap(query) {
         if (!query) return;
@@ -4008,6 +4246,12 @@
           closeSmsNoticeModal(true);
           return;
         }
+        // 0-1. 위치 지정 지도가 열려있는 경우 -> 지도만 닫기
+        var refPkBox = document.getElementById("refPicker");
+        if (refPkBox && refPkBox.classList.contains("on")) {
+          closeRefPicker(true);
+          return;
+        }
         // 1. 사진 확대 라이트박스가 열려있는 경우 -> 사진만 닫기 (상세 화면 유지!)
         var photoBox = document.getElementById("photoLightbox");
         if (photoBox && photoBox.style.display !== "none") {
@@ -4171,18 +4415,18 @@
         }
 
         var btnOpenMapForm = document.getElementById("btnOpenNaverMapForm");
-        if (btnOpenMapForm) {
-          btnOpenMapForm.addEventListener("click", function() {
-            var addr = document.getElementById("address").value.trim();
-            var cust = document.getElementById("customerName").value.trim();
-            var target = addr || cust;
-            if (!target) {
-              alert("검색할 주소 또는 고객(상호)을 먼저 입력해주세요.");
-              return;
-            }
-            openNaverMap(target);
-          });
-        }
+        if (btnOpenMapForm) btnOpenMapForm.addEventListener("click", refFormPlaceOpen);
+        var refAddrInput = document.getElementById("address");
+        if (refAddrInput) refAddrInput.addEventListener("input", function() {
+          if (refFormPlace && this.value.trim() !== (refFormPlace.address || "")) refResetPlace();
+        });
+        var refBind = function(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener("click", fn); };
+        refBind("refPkCancel", function() { closeRefPicker(); });
+        refBind("refPkOk", refPkOk);
+        refBind("refPkSearch", function() { refPkSearch(); });
+        refBind("refPkGps", refPkGpsGo);
+        var refQ = document.getElementById("refPkQ");
+        if (refQ) refQ.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); refPkSearch(); } });
 
         // ==========================================================
         // 신규 회원가입 (표준 SHA-256(phone + ":" + pwd) 해시 적용)
@@ -4869,6 +5113,18 @@
 
               if (res.error) throw res.error;
 
+              // 위치 좌표 저장 (TA 관리 포털 지도에서 동일 안건 위치로 사용) — 실패해도 접수에는 영향 없음
+              if (refFormPlace && refFormPlace.lat) {
+                try {
+                  await supabase.from("ta_places").upsert([{
+                    lead_id: leadId, src: "ref", consultant: rep,
+                    lat: refFormPlace.lat, lng: refFormPlace.lng,
+                    address: document.getElementById("address").value || refFormPlace.address || "",
+                    updated_at: new Date().toISOString()
+                  }], { onConflict: "lead_id" });
+                } catch (pe) { console.warn("위치 저장 실패:", pe); }
+              }
+
               var custVal = document.getElementById("customerName").value;
               var prodVal = checked.join(", ");
 
@@ -4877,6 +5133,7 @@
               document.getElementById("contactPerson").value = "";
               document.getElementById("contactPhone").value = "";
               document.getElementById("address").value = "";
+              refResetPlace();
               document.getElementById("businessType").value = "";
               document.getElementById("fieldDescription").value = "";
               document.getElementById("assignedRep").value = "";
@@ -5132,5 +5389,18 @@
       };
     })();
   </script>
+
+  <!-- 위치 지정 (중앙 핀 방식) -->
+  <div class="ref-pk" id="refPicker">
+    <div class="ref-pk-head"><button type="button" id="refPkCancel">취소</button><b>위치 지정</b><button type="button" class="ok" id="refPkOk">이 위치로 지정</button></div>
+    <div class="ref-pk-body">
+      <div id="refPkMap"></div>
+      <div class="ref-cross" id="refCross"></div>
+      <div class="ref-pk-search"><input id="refPkQ" placeholder="주소 · 건물명 검색" autocomplete="off"><button type="button" id="refPkSearch" aria-label="검색"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button></div>
+      <button type="button" class="ref-pk-gps" id="refPkGps" aria-label="내 위치">◎</button>
+      <div class="ref-pk-addr"><span id="refPkAddr"></span><small id="refPkCoord"></small></div>
+    </div>
+  </div>
+  <div class="ref-toast" id="refToast"></div>
 </body>
 </html>
