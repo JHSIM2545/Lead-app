@@ -863,15 +863,13 @@
 
       /* ---------- 지사관리자(B안) ---------- */
       body.role-admin #viewDashboard .toolbar-card { position: static; margin: 0 0 8px !important; border-radius: 14px !important; border: 1px solid #e8edf3; box-shadow: none !important; padding: 8px !important; }
-      body.role-admin #statusFilterBar { display: none !important; }
-      body.role-admin.filters-open #statusFilterBar { display: flex !important; flex-wrap: wrap !important; overflow: visible !important; }
-      body.role-admin[data-screen="dashboard"] #adminSummary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 10px; }
+      body[data-screen="dashboard"][data-tab="home"] #adminSummary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 10px; }
       .adm-tile { background: #ffffff; border: 1px solid #e8edf3; border-radius: 14px; padding: 12px 14px; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
       .adm-tile .adm-lb { display: block; font-size: 0.78rem; color: #64748b; font-weight: 700; }
       .adm-tile .adm-num { display: block; font-size: 1.7rem; font-weight: 800; color: #0f172a; margin-top: 2px; line-height: 1.2; }
       .adm-tile.on { border-color: #1a73e8; background: #eff6ff; }
       .adm-tile.on .adm-num { color: #1a73e8; }
-      body.role-admin[data-screen="dashboard"] .m-list-head { display: flex; justify-content: space-between; align-items: center; margin: 6px 2px 8px; font-size: 0.95rem; font-weight: 800; color: #0f172a; }
+      body[data-screen="dashboard"][data-tab="home"] .m-list-head { display: flex; justify-content: space-between; align-items: center; margin: 6px 2px 8px; font-size: 0.95rem; font-weight: 800; color: #0f172a; }
       .m-filter-btn { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px; min-height: 34px; padding: 0 12px; font-size: 0.8rem; font-weight: 700; color: #1a73e8; cursor: pointer; }
       body.role-admin .mobile-card-list { background: #ffffff; border: 1px solid #e8edf3; border-radius: 14px; overflow: hidden; }
       body.role-admin .mobile-lead-card { border-radius: 0; border: none !important; border-bottom: 1px solid #eef2f6 !important; border-left: 5px solid var(--stage-color, #cbd5e1) !important; box-shadow: none; margin: 0; padding: 11px 12px; }
@@ -887,7 +885,7 @@
         display: flex; position: fixed; right: 16px; bottom: calc(18px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border-radius: 50%;
         background: #1a73e8; color: #ffffff; border: none; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(26,115,232,0.4); z-index: 300; cursor: pointer;
       }
-      body.role-admin[data-screen="register"] .main-container { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+      body.role-admin[data-screen="register"] .main-container { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
       body.role-admin #leadForm .step-progress { display: block; margin: 2px 2px 14px; }
       body.role-admin #leadForm .sp-label { display: block; font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 6px; }
       body.role-admin #leadForm .sp-bars { display: flex; gap: 5px; }
@@ -899,7 +897,7 @@
       body.role-admin #leadForm[data-step="3"] .step-pane[data-step="3"] { display: block; }
       body.role-admin #leadForm .step-title { font-size: 1.25rem; margin-bottom: 14px; }
       body.role-admin #leadForm input[type="text"], body.role-admin #leadForm input[type="tel"], body.role-admin #leadForm select { min-height: 52px; font-size: 16px; }
-      body.role-admin .form-bar { bottom: 0; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
+      body.role-admin .form-bar { bottom: calc(66px + env(safe-area-inset-bottom)); padding-bottom: 10px; }
       body.role-admin #leadForm:not([data-step="1"]) .form-bar .btn-prev { display: block; }
       body.role-admin #leadForm:not([data-step="3"]) .form-bar .btn-next { display: block; }
       body.role-admin #leadForm:not([data-step="3"]) .form-bar #submitBtn { display: none; }
@@ -913,7 +911,63 @@
       .btn-save-status, .btn-action-edit, .btn-action-del { min-height: 48px; }
     }
     .m-chip-name { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-</style>
+
+    /* ==========================================================
+       [TA 관리 포털식 앱 셸] 하단 메뉴: 홈 · 목록 · + · 지도 · 더보기
+       ========================================================== */
+    #refMapScreen { display: none; }
+    @media (max-width: 768px) {
+      body[data-screen="dashboard"] #mobileTabBar, body[data-screen="register"] #mobileTabBar {
+        display: grid !important; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 300;
+        background: #ffffff; border-top: 1px solid #eceef2; padding: 0 0 env(safe-area-inset-bottom); height: calc(64px + env(safe-area-inset-bottom));
+      }
+      #mobileTabBar button {
+        background: none !important; border: none; color: #9aa0aa; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 3px; font-size: 10px; font-weight: 700; padding: 0; border-radius: 0; min-height: 0; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      }
+      #mobileTabBar button svg { width: 23px; height: 23px; stroke: currentColor; fill: currentColor; fill-opacity: .18; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+      #mobileTabBar button.on { color: #111111; }
+      #mobileTabBar button.on svg { stroke-width: 2.3; fill-opacity: .9; }
+      #mobileTabBar button.add i { width: 48px; height: 48px; border-radius: 50%; background: #111111; display: flex; align-items: center; justify-content: center; margin-top: -18px; box-shadow: 0 6px 14px rgba(0,0,0,.28); }
+      #mobileTabBar button.add svg { stroke: #ffffff; fill: none; width: 24px; height: 24px; stroke-width: 2.4; }
+      #mobileTabBar button.add.on { color: #111111; }
+      .m-user-chip, #mobileFab { display: none !important; }
+
+      /* 홈: 요약 타일 + 최근 안건 5건 / 목록: 검색 + 상태 칩 + 전체 / 지도: 전체 화면 */
+      body[data-screen="dashboard"][data-tab="home"] .toolbar-card,
+      body[data-screen="dashboard"][data-tab="map"] .toolbar-card,
+      body[data-screen="dashboard"][data-tab="map"] .mobile-card-list,
+      body[data-screen="dashboard"][data-tab="map"] .inner-header-bar { display: none !important; }
+      body[data-screen="dashboard"][data-tab="home"] #mobileCardList .mobile-lead-card:nth-child(n+6) { display: none; }
+      body[data-screen="dashboard"][data-tab="list"] #statusFilterBar { display: flex !important; }
+      body[data-screen="dashboard"][data-tab="map"] { overflow: hidden; }
+      body[data-screen="dashboard"][data-tab="map"] #refMapScreen {
+        display: block; position: fixed; left: 0; right: 0; top: 0; bottom: calc(64px + env(safe-area-inset-bottom)); z-index: 250; background: #e9ecef;
+      }
+      #refMap { position: absolute; inset: 0; background: #e9ecef; }
+      .ref-maptop { position: absolute; left: 10px; right: 10px; top: calc(10px + env(safe-area-inset-top)); z-index: 500; display: flex; flex-direction: column; gap: 6px; pointer-events: none; }
+      .ref-maptop > * { pointer-events: auto; }
+      .ref-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+      .ref-chips::-webkit-scrollbar { display: none; }
+      .ref-chip2 { flex: none; background: #ffffff; border: none; border-radius: 999px; padding: 8px 13px; font-size: 13px; font-weight: 700; color: #334155; box-shadow: 0 2px 8px rgba(0,0,0,.2); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+      .ref-chip2 i { width: 9px; height: 9px; border-radius: 50%; background: var(--c, #94a3b8); display: inline-block; }
+      .ref-chip2.on { background: #111111; color: #ffffff; }
+      .ref-mapnote { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 12px; padding: 8px 12px; font-size: 12.5px; font-weight: 700; display: flex; justify-content: space-between; gap: 8px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+      .ref-mapnote button { background: #92400e; color: #ffffff; border: none; border-radius: 9px; padding: 6px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+      .ref-mapbtn { position: absolute; right: 12px; z-index: 500; width: 44px; height: 44px; border-radius: 50%; background: #ffffff; color: #0f2547; border: none; box-shadow: 0 2px 12px rgba(0,0,0,.22); display: flex; align-items: center; justify-content: center; font-size: 19px; cursor: pointer; padding: 0; }
+      .ref-prev { position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 510; background: #ffffff; border-radius: 18px; padding: 15px 15px 13px; box-shadow: 0 10px 30px rgba(16,24,40,.28); display: none; }
+      .ref-prev .nm { font-size: 16.5px; font-weight: 800; color: #111827; padding-right: 28px; }
+      .ref-prev .ad { font-size: 12.5px; color: #6b7280; margin-top: 6px; font-weight: 600; }
+      .ref-prev .tg { margin-top: 6px; display: flex; gap: 5px; flex-wrap: wrap; }
+      .ref-prev .tg span { border-radius: 7px; padding: 3px 8px; font-size: 11.5px; font-weight: 700; background: #eef1f7; }
+      .ref-prev .bt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 11px; }
+      .ref-prev .bt button { border-radius: 12px; padding: 11px 6px; font-size: 13.5px; font-weight: 700; border: none; cursor: pointer; }
+      .ref-prev .x { position: absolute; right: 8px; top: 8px; background: none; color: #9aa3b2; border: none; font-size: 22px; padding: 4px 10px; cursor: pointer; }
+    }
+    .ref-pin2 { width: 34px; height: 48px; filter: drop-shadow(0 3px 3px rgba(0,0,0,.35)); transform-origin: 50% 92%; cursor: pointer; }
+    .ref-pin2.sel { transform: scale(1.3); }
+    .ref-me { width: 16px; height: 16px; border-radius: 50%; background: #2f6bff; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(47,107,255,.25); }
+  </style>
   </head>
 <body class="on-login">
 
@@ -2291,28 +2345,71 @@
         if (REFMAP.kind === 'kakao') {
           var K = kakao.maps, lv = function(z) { return Math.max(1, Math.min(14, 19 - z)); };
           var kmap = new K.Map(container, { center: new K.LatLng(lat, lng), level: lv(zoom) });
-          return {
+          var kms = [];
+          var kapi = {
             setView: function(a, b, z) { kmap.setCenter(new K.LatLng(a, b)); if (z) kmap.setLevel(lv(z)); },
+            addMarker: function(o) {
+              var d = document.createElement('div'); d.innerHTML = o.html; if (o.onClick) d.addEventListener('click', o.onClick);
+              var m = new K.CustomOverlay({ position: new K.LatLng(o.lat, o.lng), content: d, xAnchor: 0.5, yAnchor: 1, map: kmap });
+              kms.push(m); return m;
+            },
+            clear: function() { kms.forEach(function(m) { m.setMap(null); }); kms = []; },
+            fit: function(pts) {
+              if (!pts.length) return;
+              if (pts.length === 1) { kapi.setView(pts[0][0], pts[0][1], 16); return; }
+              var b = new K.LatLngBounds(); pts.forEach(function(p) { b.extend(new K.LatLng(p[0], p[1])); });
+              kmap.setBounds(b, 110, 30, 90, 30);
+            },
             center: function() { var c = kmap.getCenter(); return { lat: c.getLat(), lng: c.getLng() }; },
             onMove: function(cb) { K.event.addListener(kmap, 'idle', cb); },
+            onClick: function(cb) { K.event.addListener(kmap, 'click', function(e) { cb(e.latLng.getLat(), e.latLng.getLng()); }); },
             invalidate: function() { kmap.relayout(); }
           };
+          return kapi;
         }
         if (REFMAP.kind === 'naver') {
           var nmap = new naver.maps.Map(container, { center: new naver.maps.LatLng(lat, lng), zoom: zoom + 1, zoomControl: false, mapDataControl: false, scaleControl: false, logoControl: true });
-          return {
+          var nms = [];
+          var napi = {
             setView: function(a, b, z) { nmap.setCenter(new naver.maps.LatLng(a, b)); if (z) nmap.setZoom(z + 1); },
+            addMarker: function(o) {
+              var m = new naver.maps.Marker({ position: new naver.maps.LatLng(o.lat, o.lng), map: nmap, icon: { content: o.html, anchor: new naver.maps.Point(17, 44) } });
+              if (o.onClick) naver.maps.Event.addListener(m, 'click', o.onClick);
+              nms.push(m); return m;
+            },
+            clear: function() { nms.forEach(function(m) { m.setMap(null); }); nms = []; },
+            fit: function(pts) {
+              if (!pts.length) return;
+              if (pts.length === 1) { napi.setView(pts[0][0], pts[0][1], 16); return; }
+              var b = new naver.maps.LatLngBounds(); pts.forEach(function(p) { b.extend(new naver.maps.LatLng(p[0], p[1])); });
+              nmap.fitBounds(b, { top: 110, bottom: 90, left: 30, right: 30 });
+            },
             center: function() { var c = nmap.getCenter(); return { lat: c.lat(), lng: c.lng() }; },
             onMove: function(cb) { naver.maps.Event.addListener(nmap, 'idle', cb); },
+            onClick: function(cb) { naver.maps.Event.addListener(nmap, 'click', function(e) { cb(e.coord.lat(), e.coord.lng()); }); },
             invalidate: function() { naver.maps.Event.trigger(nmap, 'resize'); }
           };
+          return napi;
         }
         var lmap = L.map(container, { zoomControl: false, attributionControl: true }).setView([lat, lng], zoom);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(lmap);
+        var llayer = L.layerGroup().addTo(lmap);
         return {
           setView: function(a, b, z) { lmap.setView([a, b], z || lmap.getZoom()); },
+          addMarker: function(o) {
+            var m = L.marker([o.lat, o.lng], { icon: L.divIcon({ html: o.html, className: '', iconSize: [34, 48], iconAnchor: [17, 44] }) }).addTo(llayer);
+            if (o.onClick) m.on('click', o.onClick);
+            return m;
+          },
+          clear: function() { llayer.clearLayers(); },
+          fit: function(pts) {
+            if (!pts.length) return;
+            if (pts.length === 1) { lmap.setView(pts[0], 16); return; }
+            lmap.fitBounds(L.latLngBounds(pts), { padding: [50, 50] });
+          },
           center: function() { var c = lmap.getCenter(); return { lat: c.lat, lng: c.lng }; },
           onMove: function(cb) { lmap.on('moveend', cb); },
+          onClick: function(cb) { lmap.on('click', function(e) { cb(e.latlng.lat, e.latlng.lng); }); },
           invalidate: function() { lmap.invalidateSize(); }
         };
       }
@@ -2445,6 +2542,126 @@
         });
       }
       function refResetPlace() { refFormPlace = null; refFormChip(); }
+
+      // ---- 지도 탭 (전체 안건 위치 표시: TA 관리 포털 지도와 동일 방식) ----
+      var REF_GRP = { ing: { l: '진행중', c: '#2563eb' }, won: { l: '계약완료', c: '#16a34a' }, fail: { l: '계약실패', c: '#dc2626' }, hold: { l: '계약보류', c: '#64748b' } };
+      var refMapObj = null, refMapSel = null, refPlaces = {}, refMapGroup = 'all', refGeoBusy = false, refMapPlacesLoaded = false, refMapRendering = false;
+      var REF_GEO_LS = 'S1_REF_GEO';
+      function refGroupOf(st) { return st === '계약완료' ? 'won' : st === '계약실패' ? 'fail' : st === '계약보류' ? 'hold' : 'ing'; }
+      function refGeoCacheGet() { try { return JSON.parse(localStorage.getItem(REF_GEO_LS) || '{}') || {}; } catch (e) { return {}; } }
+      function refGeoCacheSet(o) { try { localStorage.setItem(REF_GEO_LS, JSON.stringify(o)); } catch (e) {} }
+      function refEsc(v) { return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+      function refPinHtml(dot, sel) {
+        var id = 'rpg' + (++refPinHtml.n);
+        return '<div class="ref-pin2' + (sel ? ' sel' : '') + '"><svg viewBox="0 0 60 86" width="100%" height="100%" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6aa9ff"/><stop offset=".55" stop-color="#1f6bff"/><stop offset="1" stop-color="#0b3fb3"/></linearGradient></defs>'
+          + '<ellipse cx="30" cy="80" rx="22" ry="5" fill="rgba(255,255,255,.85)" stroke="#111" stroke-width="2.2"/>'
+          + '<path d="M30 3C14.5 3 4 14.5 4 29.5c0 18 20 38 26 48 6-10 26-30 26-48C56 14.5 45.5 3 30 3z" fill="url(#' + id + ')"/>'
+          + '<path d="M14 18c4-8 12-12 20-11-9 1-16 6-18 14z" fill="#fff" opacity=".28"/>'
+          + '<circle cx="30" cy="29" r="11.5" fill="' + (dot || '#fff') + '" stroke="#fff" stroke-width="2.5"/></svg></div>';
+      }
+      refPinHtml.n = 0;
+
+      async function refLoadPlaces() {
+        var out = {}, cache = refGeoCacheGet();
+        Object.keys(cache).forEach(function(k) { out[k] = cache[k]; });
+        if (supabase) {
+          try {
+            var r = await supabase.from('ta_places').select('lead_id,lat,lng,address').limit(3000);
+            if (!r.error && r.data) r.data.forEach(function(p) { if (p.lat !== null && p.lat !== undefined && p.lng !== null && p.lng !== undefined) out[p.lead_id] = { lat: Number(p.lat), lng: Number(p.lng), address: p.address || '' }; });
+          } catch (e) {}
+        }
+        refPlaces = out; refMapPlacesLoaded = true;
+      }
+      function refMapVisible() { return document.body.getAttribute('data-screen') === 'dashboard' && document.body.getAttribute('data-tab') === 'map'; }
+
+      async function refMapRender(noFit) {
+        if (refMapRendering) return;
+        refMapRendering = true;
+        try {
+          var leads = window.__refAllLeads || [];
+          var gb = document.getElementById('refMapGroups');
+          var cnt = function(g) { return g === 'all' ? leads.length : leads.filter(function(l) { return refGroupOf(l.status || '접수대기') === g; }).length; };
+          var chips = [['all', '전체', '']].concat(Object.keys(REF_GRP).map(function(k) { return [k, REF_GRP[k].l, REF_GRP[k].c]; }));
+          gb.innerHTML = chips.map(function(c) { return '<button type="button" class="ref-chip2' + (refMapGroup === c[0] ? ' on' : '') + '" data-g="' + c[0] + '">' + (c[2] ? '<i style="--c:' + c[2] + '"></i>' : '') + c[1] + ' ' + cnt(c[0]) + '</button>'; }).join('');
+          var shown = leads.filter(function(l) { return refMapGroup === 'all' || refGroupOf(l.status || '접수대기') === refMapGroup; });
+          var placed = shown.filter(function(l) { return refPlaces[l.lead_id] && refPlaces[l.lead_id].lat; });
+          var noPlace = shown.filter(function(l) { return !(refPlaces[l.lead_id] && refPlaces[l.lead_id].lat); });
+          var geoable = noPlace.filter(function(l) { return l.address; });
+          document.getElementById('refMapNote').innerHTML = noPlace.length ? '<div class="ref-mapnote"><span>📌 위치 미지정 ' + noPlace.length + '건</span>' + (geoable.length ? '<button type="button" id="refBatchGeo">주소로 일괄 지정</button>' : '') + '</div>' : '';
+          try { await refMapInit(); } catch (e) { document.getElementById('refMap').innerHTML = '<div style="padding:40px;text-align:center;color:#64748b;">지도를 불러오지 못했습니다. 네트워크를 확인해주세요.</div>'; return; }
+          if (!refMapObj) {
+            document.getElementById('refMap').innerHTML = '';
+            refMapObj = refNewMap(document.getElementById('refMap'));
+            refMapObj.onClick(function() { document.getElementById('refPrev').style.display = 'none'; refMapSel = null; });
+          }
+          refMapObj.invalidate();
+          refMapObj.clear();
+          placed.forEach(function(l) {
+            var th = getStageTheme(l.status || '접수대기');
+            refMapObj.addMarker({ lat: refPlaces[l.lead_id].lat, lng: refPlaces[l.lead_id].lng, html: refPinHtml(th.border, refMapSel === l.lead_id), onClick: function() { refMapPreview(l.lead_id); } });
+          });
+          if (!noFit) refMapObj.fit(placed.map(function(l) { return [refPlaces[l.lead_id].lat, refPlaces[l.lead_id].lng]; }));
+        } finally { refMapRendering = false; }
+      }
+      function refMapPreview(id) {
+        var l = (window.__refAllLeads || []).filter(function(x) { return x.lead_id === id; })[0]; if (!l) return;
+        refMapSel = id;
+        var pl = refPlaces[id] || {}, st = l.status || '접수대기', th = getStageTheme(st), tel = String(l.contact_phone || '').replace(/[^0-9]/g, '');
+        var prev = document.getElementById('refPrev');
+        prev.innerHTML = '<button type="button" class="x" data-a="close">×</button>'
+          + '<div class="nm">' + refEsc(l.customer_name) + '</div>'
+          + '<div class="tg"><span style="color:' + th.text + ';background:' + th.bg + ';">' + refEsc(STATUS_NUMBER_MAP[st] || st) + '</span><span>' + refEsc(l.assigned_rep || '-') + '</span></div>'
+          + '<div class="ad">📍 ' + refEsc(pl.address || l.address || '') + '</div>'
+          + '<div class="bt"><button type="button" data-a="detail" style="background:#0f2547;color:#fff;">상세보기</button>'
+          + '<button type="button" data-a="nav" style="background:#fee500;color:#111;">길찾기</button>'
+          + (tel ? '<button type="button" data-a="tel" style="background:#16a34a;color:#fff;">전화</button>' : '<span></span>') + '</div>';
+        prev.setAttribute('data-id', id);
+        prev.style.display = 'block';
+        refMapRender(true);
+      }
+      async function refMapMyLoc() {
+        try {
+          var p = await refGps(); await refMapInit();
+          if (!refMapObj) await refMapRender(true);
+          refMapObj.setView(p.lat, p.lng, 16);
+          refMapObj.addMarker({ lat: p.lat, lng: p.lng, html: '<div class="ref-me"></div>' });
+        } catch (e) { refToast(e.message, 3500); }
+      }
+      function refMapFitAll() {
+        if (!refMapObj) return;
+        var pts = (window.__refAllLeads || []).filter(function(l) { return refPlaces[l.lead_id] && refPlaces[l.lead_id].lat; }).map(function(l) { return [refPlaces[l.lead_id].lat, refPlaces[l.lead_id].lng]; });
+        refMapObj.fit(pts);
+      }
+      async function refBatchGeo() {
+        if (refGeoBusy) return;
+        var todo = (window.__refAllLeads || []).filter(function(l) { return l.address && !(refPlaces[l.lead_id] && refPlaces[l.lead_id].lat); });
+        if (!todo.length) return;
+        refGeoBusy = true; var ok = 0, fail = 0, cache = refGeoCacheGet();
+        for (var k = 0; k < todo.length; k++) {
+          refToast('위치 찾는 중 ' + (k + 1) + '/' + todo.length, 4000);
+          var l = todo[k], r = await refGeocode(l.address);
+          if (r) {
+            refPlaces[l.lead_id] = { lat: r.lat, lng: r.lng, address: l.address };
+            cache[l.lead_id] = refPlaces[l.lead_id]; ok++;
+            if (supabase) { try { await supabase.from('ta_places').upsert([{ lead_id: l.lead_id, src: 'ref', consultant: l.assigned_rep || '', lat: r.lat, lng: r.lng, address: l.address, updated_at: new Date().toISOString() }], { onConflict: 'lead_id' }); } catch (e) {} }
+          } else fail++;
+          if (k % 3 === 2) { refGeoCacheSet(cache); refMapRender(true); }
+        }
+        refGeoCacheSet(cache);
+        refGeoBusy = false;
+        refToast('위치 ' + ok + '건 지정' + (fail ? ' · ' + fail + '건 실패' : ''), 4000);
+        refMapRender();
+      }
+      window.refMapTabShow = async function() {
+        if (!refMapPlacesLoaded) await refLoadPlaces();
+        refMapRender(false);
+      };
+      window.__refMapRefresh = function() { if (refMapVisible()) { refLoadPlaces().then(function() { refMapRender(true); }); } };
+      window.__refReload = function() { loadDashboardLeads(); };
+      window.__refOpenLead = function(id) {
+        var it = (window.__refAllLeads || []).filter(function(x) { return x.lead_id === id; })[0];
+        if (it) openDetailModal(-1, it);
+      };
 
       function openNaverMap(query) {
         if (!query) return;
@@ -3519,6 +3736,8 @@
 
           var list = res.data || [];
           list = await reactivateExpiredHolds(list);
+          window.__refAllLeads = list;
+          if (window.__refMapRefresh) { try { window.__refMapRefresh(); } catch (e) {} }
           var counts = { total: 0, wait: 0, confirm: 0, consult: 0, moreConsult: 0, quote: 0, quoteConsult: 0, done: 0, fail: 0, hold: 0 };
 
           list.forEach(function(r) {
@@ -3854,8 +4073,8 @@
         if (statusBox) statusBox.style.display = "none";
       }
 
-      function openDetailModal(idx) {
-        var item = currentLeadsData[idx];
+      function openDetailModal(idx, directItem) {
+        var item = directItem || currentLeadsData[idx];
         if (!item) return;
         activeLeadItem = item;
         updateFoldBridge();
@@ -4425,6 +4644,23 @@
         refBind("refPkOk", refPkOk);
         refBind("refPkSearch", function() { refPkSearch(); });
         refBind("refPkGps", refPkGpsGo);
+        var refGrpBox = document.getElementById("refMapGroups");
+        if (refGrpBox) refGrpBox.addEventListener("click", function(e) { var b = e.target.closest("[data-g]"); if (b) { refMapGroup = b.getAttribute("data-g"); refMapRender(true); } });
+        var refNoteBox = document.getElementById("refMapNote");
+        if (refNoteBox) refNoteBox.addEventListener("click", function(e) { if (e.target.id === "refBatchGeo") refBatchGeo(); });
+        refBind("refMapMy", refMapMyLoc);
+        refBind("refMapFit", refMapFitAll);
+        var refPrevBox = document.getElementById("refPrev");
+        if (refPrevBox) refPrevBox.addEventListener("click", function(e) {
+          var b = e.target.closest("[data-a]"); if (!b) return;
+          var id = refPrevBox.getAttribute("data-id"), a = b.getAttribute("data-a");
+          var l = (window.__refAllLeads || []).filter(function(x) { return x.lead_id === id; })[0]; if (!l) return;
+          var pl = refPlaces[id] || {};
+          if (a === "close") { refPrevBox.style.display = "none"; refMapSel = null; refMapRender(true); }
+          else if (a === "detail") window.__refOpenLead(id);
+          else if (a === "nav") window.open("https://map.kakao.com/link/to/" + encodeURIComponent(l.customer_name || "목적지") + "," + pl.lat + "," + pl.lng, "_blank");
+          else if (a === "tel") location.href = "tel:" + String(l.contact_phone || "").replace(/[^0-9]/g, "");
+        });
         var refQ = document.getElementById("refPkQ");
         if (refQ) refQ.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); refPkSearch(); } });
 
@@ -5215,6 +5451,7 @@
       var sheet = document.createElement('div');
       sheet.id = 'mobileMenuSheet';
       sheet.innerHTML = '<div class="sheet-card"><div class="sheet-handle"></div><div class="sheet-user" id="sheetUser"></div>'
+        + '<button type="button" class="sheet-btn" data-act="reload">데이터 새로고침</button>'
         + '<button type="button" class="sheet-btn" data-act="pwd">비밀번호 변경</button>'
         + '<button type="button" class="sheet-btn" data-act="users" id="sheetUsersBtn">사용자 관리</button>'
         + '<button type="button" class="sheet-btn danger" data-act="logout">로그아웃</button>'
@@ -5232,6 +5469,7 @@
         if (!b) return;
         var act = b.getAttribute('data-act');
         var target = null;
+        if (act === 'reload') { closeSheet(); if (window.__refReload) window.__refReload(); return; }
         if (act === 'pwd') target = pick('dashUserTitle', 'regUserTitle');
         else if (act === 'users') target = $('dashUsersBtn');
         else if (act === 'logout') target = pick('dashLogoutBtn', 'regLogoutBtn');
@@ -5239,32 +5477,55 @@
         if (target) setTimeout(function () { target.click(); }, 60);
       });
 
-      /* 하단 탭바 (일반 사용자) */
+      /* 하단 메뉴 (TA 관리 포털식): 홈 · 목록 · + · 지도 · 더보기 */
+      var TABS = {
+        home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
+        list: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>',
+        add: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+        map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+        more: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'
+      };
       var tab = document.createElement('nav');
       tab.id = 'mobileTabBar';
       tab.setAttribute('aria-label', '주요 메뉴');
-      tab.innerHTML = '<button type="button" data-tab="dashboard">' + SVG.list + '현황</button>'
-        + '<button type="button" data-tab="register">' + SVG.plus + '소개하기</button>'
-        + '<button type="button" data-tab="me">' + SVG.user + '내 정보</button>';
+      tab.innerHTML = '<button type="button" data-tab="home">' + TABS.home + '홈</button>'
+        + '<button type="button" data-tab="list">' + TABS.list + '목록</button>'
+        + '<button type="button" class="add" data-tab="add" aria-label="안건 등록"><i>' + TABS.add + '</i><span>등록</span></button>'
+        + '<button type="button" data-tab="map">' + TABS.map + '지도</button>'
+        + '<button type="button" data-tab="more">' + TABS.more + '더보기</button>';
       body.appendChild(tab);
-      tab.addEventListener('click', function (e) {
-        var b = e.target.closest('button');
-        if (!b) return;
-        var t = b.getAttribute('data-tab');
-        if (t === 'me') { openSheet(); return; }
-        if (t === screen()) { window.scrollTo(0, 0); return; }
-        var target = t === 'dashboard' ? $('regSwitchBtn') : $('dashSwitchBtn');
-        if (target) target.click();
-      });
 
-      /* 관리자 + 버튼 */
-      var fab = document.createElement('button');
-      fab.type = 'button';
-      fab.id = 'mobileFab';
-      fab.setAttribute('aria-label', '신규 안건 소개하기');
-      fab.innerHTML = SVG.fab;
-      fab.addEventListener('click', function () { var b = $('dashSwitchBtn'); if (b) b.click(); });
-      body.appendChild(fab);
+      var curTab = 'home';
+      try { var st0 = sessionStorage.getItem('S1_REF_TAB'); if (st0 === 'home' || st0 === 'list' || st0 === 'map') curTab = st0; } catch (e) {}
+      function applyTab(t) {
+        var shown = screen() === 'register' ? 'add' : t;
+        body.setAttribute('data-tab', shown);
+        tab.querySelectorAll('button[data-tab]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-tab') === shown); });
+        if (screen() === 'dashboard') {
+          if (t === 'home') {
+            var act = document.querySelector('#statusFilterBar .filter-chip.active');
+            if (act && act.getAttribute('data-status') !== '전체') { var all = document.querySelector('#statusFilterBar [data-status="전체"]'); if (all) all.click(); }
+          }
+          if (t === 'map' && window.refMapTabShow) window.refMapTabShow();
+        }
+      }
+      function goTab(t) {
+        if (t === 'more') { openSheet(); return; }
+        if (t === 'add') {
+          if (screen() === 'register') { window.scrollTo(0, 0); return; }
+          var a = $('dashSwitchBtn'); if (a) a.click();
+          return;
+        }
+        curTab = t;
+        try { sessionStorage.setItem('S1_REF_TAB', t); } catch (e) {}
+        if (screen() === 'register') { var r = $('regSwitchBtn'); if (r) r.click(); return; }
+        applyTab(t);
+        window.scrollTo(0, 0);
+      }
+      tab.addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-tab]');
+        if (b) goTab(b.getAttribute('data-tab'));
+      });
 
       /* 관리자 요약 타일 + 목록 헤드 */
       var dash = $('viewDashboard');
@@ -5287,20 +5548,19 @@
           if (t.status) {
             var chip = document.querySelector('#statusFilterBar [data-status="' + t.status + '"]');
             if (chip) chip.click();
-          } else {
-            body.classList.toggle('filters-open');
           }
+          goTab('list');
         });
         summary.appendChild(b);
       });
       var head = document.createElement('div');
       head.className = 'm-list-head';
-      head.innerHTML = '<span id="mListTitle">최근 안건</span><button type="button" class="m-filter-btn" id="mFilterBtn">상태 필터</button>';
+      head.innerHTML = '<span id="mListTitle">최근 안건</span><button type="button" class="m-filter-btn" id="mFilterBtn">전체 보기</button>';
       if (dash && toolbar) {
         dash.insertBefore(summary, toolbar);
         toolbar.parentNode.insertBefore(head, toolbar.nextSibling);
       }
-      $('mFilterBtn').addEventListener('click', function () { body.classList.toggle('filters-open'); });
+      $('mFilterBtn').addEventListener('click', function () { goTab('list'); });
 
       function num(id) { var el = $(id); return el ? (parseInt(el.textContent, 10) || 0) : 0; }
       function refreshSummary() {
@@ -5379,9 +5639,7 @@
       window.__mobileShellRefresh = function (screenId) {
         var nm = userLabel();
         document.querySelectorAll('.m-chip-name').forEach(function (n) { n.textContent = nm || '내 정보'; });
-        tab.querySelectorAll('button[data-tab]').forEach(function (b) {
-          b.classList.toggle('on', b.getAttribute('data-tab') === screenId);
-        });
+        applyTab(curTab);
         if (screenId === 'register' && form) setStep(1);
         if (screenId !== 'dashboard') body.classList.remove('filters-open');
         closeSheet();
@@ -5402,5 +5660,14 @@
     </div>
   </div>
   <div class="ref-toast" id="refToast"></div>
+
+  <!-- 지도 탭 -->
+  <div id="refMapScreen">
+    <div id="refMap"></div>
+    <div class="ref-maptop"><div class="ref-chips" id="refMapGroups"></div><div id="refMapNote"></div></div>
+    <button type="button" class="ref-mapbtn" style="bottom:16px;" id="refMapMy" aria-label="내 위치">◎</button>
+    <button type="button" class="ref-mapbtn" style="bottom:68px; font-size:15px; font-weight:800;" id="refMapFit" aria-label="전체 보기">⤢</button>
+    <div class="ref-prev" id="refPrev"></div>
+  </div>
 </body>
 </html>
