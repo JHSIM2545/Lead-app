@@ -2993,6 +2993,61 @@
         }
       }
 
+      // ---- 푸시 알림 (Web Push) ----
+      var PUSH_VAPID_PUBLIC = "BPswZCC-twLU8AoMiSHAyHp8l3K2LMtDCyCr-3rua3I9UCqUFyrDehn3g5Hb4kr7ojNCuBJ8B0cA4S-yD6EvRgI";
+      function pushSupported() { return ("serviceWorker" in navigator) && ("PushManager" in window) && ("Notification" in window) && window.isSecureContext; }
+      function b64ToU8(b) { var p = "=".repeat((4 - b.length % 4) % 4), r = atob((b + p).replace(/-/g, "+").replace(/_/g, "/")), o = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) o[i] = r.charCodeAt(i); return o; }
+      function b64Url(buf) { var a = new Uint8Array(buf), s = ""; for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s); }
+      async function pushSaveSub(sub) {
+        if (!supabase || !currentUserName) return false;
+        var j = sub.toJSON(), k = j.keys || {};
+        var r = await supabase.from("push_subs").upsert({ endpoint: sub.endpoint, user_name: String(currentUserName).trim(), p256dh: k.p256dh || b64Url(sub.getKey("p256dh")), auth: k.auth || b64Url(sub.getKey("auth")), user_agent: (navigator.userAgent || "").slice(0, 200), updated_at: new Date().toISOString() }, { onConflict: "endpoint" });
+        if (r.error) { console.warn("[푸시] 구독 저장 실패", r.error); return false; }
+        return true;
+      }
+      async function pushEnable() {
+        if (!pushSupported()) { alert("이 브라우저는 푸시 알림을 지원하지 않습니다.\n(안드로이드 크롬 사용, 아이폰은 '홈 화면에 추가' 후 사용)"); return false; }
+        var perm = Notification.permission;
+        if (perm === "default") perm = await Notification.requestPermission();
+        if (perm !== "granted") { alert("알림 권한이 허용되지 않았습니다.\n브라우저 설정에서 이 사이트의 알림을 허용해 주세요."); return false; }
+        try {
+          var reg = await navigator.serviceWorker.register("sw.js");
+          await navigator.serviceWorker.ready;
+          var sub = await reg.pushManager.getSubscription();
+          if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(PUSH_VAPID_PUBLIC) });
+          var ok = await pushSaveSub(sub);
+          if (!ok) { alert("알림 등록 정보를 저장하지 못했습니다. (push_subs 테이블 설정 확인 필요)"); return false; }
+          return true;
+        } catch (e) { console.warn("[푸시] 구독 실패", e); alert("알림 설정 실패: " + (e && e.message || e)); return false; }
+      }
+      async function pushDisable() {
+        try {
+          var reg = await navigator.serviceWorker.getRegistration();
+          var sub = reg && await reg.pushManager.getSubscription();
+          if (sub) { try { await supabase.from("push_subs").delete().eq("endpoint", sub.endpoint); } catch (e) {} await sub.unsubscribe(); }
+        } catch (e) {}
+      }
+      async function pushIsOn() {
+        if (!pushSupported() || Notification.permission !== "granted") return false;
+        try { var reg = await navigator.serviceWorker.getRegistration(); return !!(reg && await reg.pushManager.getSubscription()); } catch (e) { return false; }
+      }
+      // 로그인 후: 이미 허용된 기기는 구독 정보를 현재 사용자로 조용히 갱신
+      async function pushSilentSync() {
+        try {
+          if (!pushSupported() || Notification.permission !== "granted" || !currentUserName) return;
+          var reg = await navigator.serviceWorker.register("sw.js"); await navigator.serviceWorker.ready;
+          var sub = await reg.pushManager.getSubscription(); if (sub) await pushSaveSub(sub);
+        } catch (e) {}
+      }
+      window.__pushToggle = async function() { if (await pushIsOn()) { await pushDisable(); alert("푸시 알림을 껐습니다."); } else if (await pushEnable()) alert("푸시 알림이 켜졌습니다.\n내가 소개한 안건의 진행상황이 갱신되면 알려드립니다."); };
+      window.__pushIsOn = pushIsOn;
+      function notifyReferrer(lead) {
+        try {
+          if (!supabase || !lead || !lead.agent_name || String(lead.agent_name).trim() === String(currentUserName || "").trim()) return;
+          supabase.functions.invoke("notify-referrer", { body: { lead_id: lead.lead_id, actor: currentUserName } }).then(function(r) { if (r && r.error) console.warn("[푸시] 발송 실패", r.error); }).catch(function() {});
+        } catch (e) {}
+      }
+
       // ---- 앱 내 카메라 (getUserMedia). 불가/거부 시 기본 카메라(파일 선택)로 대체 ----
       var CAM = { stream: null, facing: "environment", fallback: null };
       function camStop() {
@@ -4130,6 +4185,7 @@
           var list = res.data || [];
           list = await reactivateExpiredHolds(list);
           window.__refAllLeads = list;
+          if (!window.__pushSynced) { window.__pushSynced = true; pushSilentSync(); }
           if (window.__refHomeRefresh) { try { window.__refHomeRefresh(); } catch (e) {} }
           if (window.__refMapRefresh) { try { window.__refMapRefresh(); } catch (e) {} }
           var counts = { total: 0, wait: 0, confirm: 0, consult: 0, moreConsult: 0, quote: 0, quoteConsult: 0, done: 0, fail: 0, hold: 0 };
@@ -5560,6 +5616,7 @@
             this.disabled = false; this.innerText = "상태 저장하기";
 
             if (!res.error) {
+              notifyReferrer(activeLeadItem);
               alert("✅ 진행상태가 업데이트되었습니다: " + newSt);
 
               closeDetailModal();
@@ -5878,6 +5935,7 @@
       sheet.id = 'mobileMenuSheet';
       sheet.innerHTML = '<div class="sheet-card"><div class="sheet-handle"></div><div class="sheet-user" id="sheetUser"></div>'
         + '<button type="button" class="sheet-btn" data-act="reload">데이터 새로고침</button>'
+        + '<button type="button" class="sheet-btn" data-act="push" id="sheetPushBtn">🔔 푸시 알림 설정</button>'
         + '<button type="button" class="sheet-btn" data-act="pwd">비밀번호 변경</button>'
         + '<button type="button" class="sheet-btn" data-act="users" id="sheetUsersBtn">사용자 관리</button>'
         + '<button type="button" class="sheet-btn danger" data-act="logout">로그아웃</button>'
@@ -5887,6 +5945,7 @@
         $('sheetUser').textContent = userLabel();
         $('sheetUsersBtn').style.display = isAdmin() ? 'block' : 'none';
         sheet.classList.add('open');
+        if (window.__pushIsOn) window.__pushIsOn().then(function (on) { var pb = $('sheetPushBtn'); if (pb) pb.textContent = on ? '🔔 푸시 알림 끄기 (현재 켜짐)' : '🔔 푸시 알림 켜기'; });
       }
       function closeSheet() { sheet.classList.remove('open'); }
       sheet.addEventListener('click', function (e) {
@@ -5896,6 +5955,7 @@
         var act = b.getAttribute('data-act');
         var target = null;
         if (act === 'reload') { closeSheet(); if (window.__refReload) window.__refReload(); return; }
+        if (act === 'push') { closeSheet(); if (window.__pushToggle) window.__pushToggle(); return; }
         if (act === 'pwd') target = pick('dashUserTitle', 'regUserTitle');
         else if (act === 'users') target = $('dashUsersBtn');
         else if (act === 'logout') target = pick('dashLogoutBtn', 'regLogoutBtn');
