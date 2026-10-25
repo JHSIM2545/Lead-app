@@ -6130,7 +6130,7 @@
       function renderHome() {
         var all = window.__refAllLeads;
         if (!all) { summary.innerHTML = ''; recent.innerHTML = '<div class="hm-empty">데이터 로딩 중...</div>'; return; }
-        var sc = { list: window.__refMine ? window.__refMine(all) : all, label: '내 안건 (등록·배정)' };
+        var sc = isAdmin() ? { list: all, label: '지사 전체 안건' } : { list: window.__refMine ? window.__refMine(all) : all, label: '내 안건 (등록·배정)' };
         var list = sc.list, cnt = {};
         HM_STAGES.forEach(function (s) { cnt[s[0]] = 0; });
         list.forEach(function (l) { var st = l.status || '접수대기'; if (cnt[st] !== undefined) cnt[st]++; });
