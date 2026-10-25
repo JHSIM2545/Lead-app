@@ -1045,6 +1045,13 @@
     .ref-cam-bar button { border: 0; background: rgba(255,255,255,.16); color: #fff; font-size: 15px; font-weight: 700; padding: 11px 16px; border-radius: 22px; min-width: 64px; }
     .ref-cam-bar .shut { width: 68px; height: 68px; border-radius: 50%; background: #fff; border: 5px solid rgba(255,255,255,.45); padding: 0; min-width: 0; }
     .ref-cam-cnt { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 0; right: 0; text-align: center; color: #fff; font-weight: 700; font-size: 14px; text-shadow: 0 1px 3px #000; pointer-events: none; }
+    #mobileMenuSheet .sheet-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    #mobileMenuSheet .sheet-row small { color: #94a3b8; font-weight: 500; font-size: .78rem; margin-left: 6px; }
+    .tg-sw { position: relative; width: 78px; height: 36px; border-radius: 18px; background: linear-gradient(#4a4a4a, #3a3a3a); box-shadow: inset 0 1px 3px rgba(0,0,0,.35); transition: background .2s; flex: none; }
+    .tg-sw i { position: absolute; top: 3px; left: 3px; width: 30px; height: 30px; border-radius: 50%; background: #fff; color: #3a3a3a; font-style: normal; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: left .2s, color .2s; letter-spacing: -.3px; }
+    .tg-sw.on { background: linear-gradient(#16d38a, #0bb872); }
+    .tg-sw.on i { left: 45px; color: #0bb872; }
+    .tg-sw.busy { opacity: .6; }
   </style>
   </head>
 <body class="on-login">
@@ -3039,7 +3046,7 @@
           var sub = await reg.pushManager.getSubscription(); if (sub) await pushSaveSub(sub);
         } catch (e) {}
       }
-      window.__pushToggle = async function() { if (await pushIsOn()) { await pushDisable(); alert("푸시 알림을 껐습니다."); } else if (await pushEnable()) alert("푸시 알림이 켜졌습니다.\n내가 소개한 안건의 진행상황이 갱신되면 알려드립니다."); };
+      window.__pushToggle = async function() { if (await pushIsOn()) { await pushDisable(); } else { await pushEnable(); } return await pushIsOn(); };
       window.__pushIsOn = pushIsOn;
       function notifyReferrer(lead) {
         try {
@@ -5935,17 +5942,22 @@
       sheet.id = 'mobileMenuSheet';
       sheet.innerHTML = '<div class="sheet-card"><div class="sheet-handle"></div><div class="sheet-user" id="sheetUser"></div>'
         + '<button type="button" class="sheet-btn" data-act="reload">데이터 새로고침</button>'
-        + '<button type="button" class="sheet-btn" data-act="push" id="sheetPushBtn">🔔 푸시 알림 설정</button>'
+        + '<div class="sheet-btn sheet-row" data-act="push" id="sheetPushBtn" role="switch" aria-checked="false" tabindex="0"><span>안건 진행 알림</span><span class="tg-sw" id="sheetPushTg"><i>OFF</i></span></div>'
         + '<button type="button" class="sheet-btn" data-act="pwd">비밀번호 변경</button>'
         + '<button type="button" class="sheet-btn" data-act="users" id="sheetUsersBtn">사용자 관리</button>'
         + '<button type="button" class="sheet-btn danger" data-act="logout">로그아웃</button>'
         + '<button type="button" class="sheet-btn cancel" data-act="close">닫기</button></div>';
       body.appendChild(sheet);
+      function setPushUi(on) {
+        var tg = $('sheetPushTg'), pb = $('sheetPushBtn'); if (!tg) return;
+        tg.classList.toggle('on', !!on); tg.firstChild.textContent = on ? 'ON' : 'OFF';
+        if (pb) pb.setAttribute('aria-checked', on ? 'true' : 'false');
+      }
       function openSheet() {
         $('sheetUser').textContent = userLabel();
         $('sheetUsersBtn').style.display = isAdmin() ? 'block' : 'none';
         sheet.classList.add('open');
-        if (window.__pushIsOn) window.__pushIsOn().then(function (on) { var pb = $('sheetPushBtn'); if (pb) pb.textContent = on ? '🔔 푸시 알림 끄기 (현재 켜짐)' : '🔔 푸시 알림 켜기'; });
+        if (window.__pushIsOn) window.__pushIsOn().then(setPushUi);
       }
       function closeSheet() { sheet.classList.remove('open'); }
       sheet.addEventListener('click', function (e) {
@@ -5955,7 +5967,12 @@
         var act = b.getAttribute('data-act');
         var target = null;
         if (act === 'reload') { closeSheet(); if (window.__refReload) window.__refReload(); return; }
-        if (act === 'push') { closeSheet(); if (window.__pushToggle) window.__pushToggle(); return; }
+        if (act === 'push') {
+          var tg = $('sheetPushTg'); if (!tg || tg.classList.contains('busy') || !window.__pushToggle) return;
+          tg.classList.add('busy');
+          window.__pushToggle().then(setPushUi).catch(function () {}).then(function () { tg.classList.remove('busy'); });
+          return;
+        }
         if (act === 'pwd') target = pick('dashUserTitle', 'regUserTitle');
         else if (act === 'users') target = $('dashUsersBtn');
         else if (act === 'logout') target = pick('dashLogoutBtn', 'regLogoutBtn');
