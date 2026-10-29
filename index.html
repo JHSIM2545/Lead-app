@@ -1118,6 +1118,13 @@
       #mobileMenuSheet .sheet-btn { font-size: 15px; font-weight: 700; }
       #mobileMenuSheet .sheet-user { font-size: 16px; }
     }
+    .rep-auto-hint { margin-top: 6px; font-size: 12.5px; line-height: 1.45; color: #64748b; }
+    .rep-auto-hint small { color: #94a3b8; }
+    .rep-auto-hint .rah-ok { color: #0b8a4f; font-weight: 700; }
+    .rep-auto-hint .rah-warn { color: #b45309; font-weight: 700; }
+    .rep-auto-hint .rah-manual { color: #1a73e8; font-weight: 700; }
+    .rep-auto-hint .rah-none { color: #94a3b8; }
+    .rep-auto-hint a { color: #1a73e8; font-weight: 700; margin-left: 4px; }
   </style>
   </head>
 <body class="on-login">
@@ -1161,6 +1168,10 @@
             <div style="border-top:1px dotted #cbd5e1; margin-top:28px; padding-top:22px; text-align:center;">
               <div style="font-size:0.9rem; color:#64748b; margin-bottom:8px;">아직 계정이 없으신가요?</div>
               <button type="button" id="btnGoSignup" style="background:none; border:none; font-size:0.98rem; font-weight:700; color:#1a73e8; cursor:pointer; text-decoration:underline; padding:4px 8px;">신규 회원가입</button>
+            </div>
+            <div id="loginInstallWrap" style="display:none; margin-top:18px; text-align:center;">
+              <button type="button" id="btnLoginInstall" style="width:100%; padding:13px; background:#fff; color:#1a73e8; border:1.5px solid #1a73e8; border-radius:10px; font-size:1rem; font-weight:700; cursor:pointer;">📲 앱으로 설치하기</button>
+              <div style="font-size:0.78rem; color:#94a3b8; margin-top:6px;">홈 화면에 추가하면 앱처럼 바로 실행할 수 있어요</div>
             </div>
           </form>
         </div>
@@ -1269,6 +1280,7 @@
                 <option value="임영민">임영민</option>
                 <option value="박광춘">박광춘</option>
               </select>
+              <div id="repAutoHint" class="rep-auto-hint" style="display:none;"></div>
             </div>
           </div>
 
@@ -1310,6 +1322,7 @@
             </div>
             <input type="text" id="address" name="address_no_auto" placeholder="예: 번동 102번지 1층 (사거리 코너)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;">
             <div class="ref-chip" id="refPlaceInfo"></div>
+            <div id="repAutoHint2" class="rep-auto-hint" style="display:none;"></div>
           </div>
 
           <div class="form-group">
@@ -1517,6 +1530,18 @@
           <div class="form-group">
             <label class="form-label">고객(상호)</label>
             <input type="text" id="editCustomerName" name="edit_customer_name_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="form-group" id="editRepGroup" style="display:none;">
+            <label class="form-label">담당 컨설턴트 <span class="opt">(관리자)</span></label>
+            <select id="editAssignedRep" class="rep-select">
+              <option value="">컨설턴트 선택</option>
+              <option value="정문재">정문재</option>
+              <option value="이수열">이수열</option>
+              <option value="최영국">최영국</option>
+              <option value="임영민">임영민</option>
+              <option value="박광춘">박광춘</option>
+            </select>
+            <div id="editRepHint" class="rep-auto-hint"></div>
           </div>
           <div class="row">
             <div class="form-group">
@@ -2694,6 +2719,7 @@
           refFormPlace = { lat: r.lat, lng: r.lng, address: r.address || "" };
           if (r.address) addrEl.value = r.address;
           refFormChip();
+          repAutoSchedule(50);
         });
       }
       function refResetPlace() { refFormPlace = null; refFormChip(); }
@@ -3066,6 +3092,247 @@
         }
       }
 
+      // ---- 주소 → 담당 차량·컨설턴트 자동배정 (DB의 ta_zones · ta_zone_rules 참조) ----
+      var ZM = { zones: null, rules: null, idx: null, loading: null };
+      var ZM_GU = ['강북구','도봉구','노원구','성북구','중랑구','동대문구','종로구','중구','용산구','성동구','광진구','은평구','서대문구','마포구','양천구','강서구','구로구','금천구','영등포구','동작구','관악구','서초구','강남구','송파구','강동구'];
+      function zmBuild(zoneRows, ruleRows) {
+        ZM.zones = {}; (zoneRows || []).forEach(function(z) { ZM.zones[z.zone] = z; });
+        ZM.rules = {}; (ruleRows || []).forEach(function(r) { ZM.rules[r.key] = r.data; });
+        ZM.idx = {};
+        var add = function(name, gu, key, real) { (ZM.idx[name] = ZM.idx[name] || []).push({ gu: gu, key: key, dong: real }); };
+        Object.keys(ZM.rules.dong_index || {}).forEach(function(k) {
+          var p = k.split(" "), gu = p[0], dong = p[1];
+          add(dong, gu, k, dong);
+          var m = /^(\D+?)(\d)·(\d)동$/.exec(dong);
+          if (m) { add(m[1] + m[2] + "동", gu, k, dong); add(m[1] + m[3] + "동", gu, k, dong); }
+        });
+      }
+      async function zmLoad() {
+        if (ZM.rules) return true;
+        if (ZM.loading) return ZM.loading;
+        ZM.loading = (async function() {
+          try {
+            if (!supabase) return false;
+            var z = await supabase.from("ta_zones").select("*");
+            var r = await supabase.from("ta_zone_rules").select("key,data");
+            if (z.error || r.error || !r.data || !r.data.length) throw (z.error || r.error || new Error("규칙 없음"));
+            zmBuild(z.data, r.data);
+            return true;
+          } catch (e) { console.warn("[자동배정] 규칙 로드 실패", e); ZM.loading = null; return false; }
+        })();
+        return ZM.loading;
+      }
+      function zmParse(addr) {
+        var s = String(addr || "").replace(/[,，]/g, " ").replace(/\s+/g, " ").trim();
+        var paren = (s.match(/\(([^)]*)\)/g) || []).join(" ").replace(/[()]/g, " ");
+        var main = s.replace(/\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
+        var toks = main.split(" "), ptoks = paren.split(/\s+/).filter(Boolean);
+        var o = { text: s, main: main, gu: "", road: "", base: "", gil: null, gilSfx: "", num: null, dongs: [], legal: "", bun: null, ji: 0, san: 0 };
+        toks.forEach(function(t) { if (!o.gu && ZM_GU.indexOf(t) >= 0) o.gu = t; });
+        var rRoad = /^([가-힣0-9·\.]+로)(?:(\d+)([가-힣]?)길)?$/, rGil = /^([가-힣]+길)$/, rNum = /^(\d+)(?:-(\d+))?(?:번지|호|번)?$/;
+        var pick = null;
+        for (var i = 0; i < toks.length && !pick; i++) {
+          var m = rRoad.exec(toks[i]), g = !m && rGil.exec(toks[i]);
+          if (m || g) {
+            var nx = toks[i + 1], nm = nx && rNum.exec(nx);
+            pick = { m: m, g: g, tok: toks[i], num: nm ? parseInt(nm[1], 10) : null };
+          } else {
+            var m2 = /^([가-힣0-9·\.]+?로)(\d+)(?:-(\d+))?$/.exec(toks[i]);
+            if (m2) pick = { m: [toks[i], m2[1]], g: null, tok: m2[1], num: parseInt(m2[2], 10) };
+          }
+        }
+        if (pick) {
+          o.road = pick.tok; o.num = pick.num;
+          if (pick.m) { o.base = pick.m[1]; if (pick.m[2]) { o.gil = parseInt(pick.m[2], 10); o.gilSfx = pick.m[3] || ""; } }
+          else o.base = pick.tok;
+        }
+        var all = toks.concat(ptoks);
+        all.forEach(function(t, i) {
+          var tt = t.replace(/\./g, "·");
+          if (/^[가-힣]+?\d?(?:·\d)?동$/.test(tt) && ZM.idx && ZM.idx[tt] && o.dongs.indexOf(tt) < 0) o.dongs.push(tt);
+          if (!o.legal && /^[가-힣]+동$/.test(t) && ZM.rules && ZM.rules.legal_dong_index && ZM.rules.legal_dong_index[t]) {
+            o.legal = t;
+            var a = all[i + 1], b = a, san = 0;
+            if (a === "산") { san = 1; b = all[i + 2]; }
+            var jm = b && rNum.exec(b);
+            if (jm) { o.bun = parseInt(jm[1], 10); o.ji = jm[2] ? parseInt(jm[2], 10) : 0; o.san = san; }
+          }
+        });
+        return o;
+      }
+      function zmPickRange(rows, road, n) {
+        var hits = rows.filter(function(r) { return r[0] === road && n >= r[1] && n <= r[2] && (!r[4] || (r[4] === "e" ? n % 2 === 0 : n % 2 === 1)); });
+        if (!hits.length) return null;
+        hits.sort(function(a, b) { return ((b[5] ? 1 : 0) - (a[5] ? 1 : 0)) || ((a[2] - a[1]) - (b[2] - b[1])); });
+        return hits[0][3];
+      }
+      function zmSplit(dong, P, src) {
+        var R = ZM.rules, sr = (R.split_rules || {})[dong];
+        var road = P.road, N = P.num, par = N == null ? null : (N % 2 === 0 ? "e" : "o");
+        var how = src + " " + dong + (road ? " · " + road + (N != null ? " " + N : "") : "");
+        if (sr && road) {
+          var nr = ((R.main_road_number_rules || {})[dong] || {})[road];
+          if (nr && N != null) for (var i = 0; i < nr.length; i++) if (N >= nr[i][0] && N <= nr[i][1]) return { zone: nr[i][2], conf: "high", how: how + " (번호 구간)" };
+          var pr = ((R.parity_rules || {})[dong] || {})[road];
+          if (pr && par && pr[par]) return { zone: pr[par], conf: "high", how: how + " (" + (par === "e" ? "짝수" : "홀수") + "번)" };
+          var rs = sr.roads || [];
+          for (var j = 0; j < rs.length; j++) if (rs[j][0] === road) return { zone: rs[j][1], conf: "high", how: how + " (도로 규칙)" };
+          var px = sr.prefix || [];
+          for (var k = 0; k < px.length; k++) if (road.indexOf(px[k][0]) === 0) return { zone: px[k][1], conf: "medium", how: how + " (" + (px[k][2] || "도로 규칙") + ")" };
+          if (sr.opts && sr.opts[road]) return { ambiguous: true, dong: dong, cands: sr.opts[road], how: how + " (경계 도로)" };
+        }
+        return { ambiguous: true, dong: dong, cands: (sr && sr.fallback) || [], how: how + " (경계 지역)" };
+      }
+      function zmDong(gu, dong, P, conf, src) {
+        dong = String(dong || "").replace(/\./g, "·");
+        var cand = (ZM.idx || {})[dong]; if (!cand) return null;
+        var c = cand.filter(function(x) { return !gu || x.gu === gu; }); if (!c.length) c = cand;
+        var v = ZM.rules.dong_index[c[0].key];
+        if (v === "SPLIT") return zmSplit(c[0].dong, P, src);
+        return { zone: v, conf: conf, how: src + " " + dong };
+      }
+      function zmRoad(P) {
+        var R = ZM.rules, rows = (R.main_road_ranges || {}).rows || [], dong = null, conf = "high", src = "";
+        if (P.gil && !P.gilSfx) {
+          var an = ((R.gil_anchors || {}).rows || []).filter(function(a) { return a[0] === P.base && a[1] === P.gil; });
+          if (an.length) { dong = an[0][2]; src = "도로 " + P.road + " 기준점"; }
+        }
+        if (!dong && !P.gil && P.num != null) { dong = zmPickRange(rows, P.base, P.num); src = "도로 " + P.base + " " + P.num; }
+        if (dong) { var r = zmDong(P.gu, dong, P, conf, src + " →"); if (r) return r; }
+        // 분할 동 규칙에 같은 도로명이 있고 결과가 하나로 정해지는 경우
+        var zs = {}, nz = 0;
+        Object.keys(R.split_rules || {}).forEach(function(d) {
+          ((R.split_rules[d].roads) || []).forEach(function(e) { if (e[0] === P.road && !zs[e[1]]) { zs[e[1]] = d; nz++; } });
+        });
+        if (nz === 1 && (P.gil || !/로$/.test(P.road))) { var z1 = Object.keys(zs)[0]; return { zone: z1, conf: "medium", how: "도로명 " + P.road + " (" + zs[z1] + " 규칙)" }; }
+        if (P.gil && P.num == null) {   // ○○로N길: 본선 번호 구간으로 근사
+          var d2 = zmPickRange(rows, P.base, P.gil);
+          if (d2) { var r2 = zmDong(P.gu, d2, P, "low", "도로 " + P.road + " (본선 " + P.gil + "번 부근 추정) →"); if (r2) return r2; }
+        }
+        return null;
+      }
+      function zmJibun(P) {
+        var R = ZM.rules, L = R.legal_dong_index || {}, v = L[P.legal]; if (!P.legal || v == null) return null;
+        if (typeof v === "string") return { zone: v, conf: "medium", how: "법정동 " + P.legal };
+        if (!Array.isArray(v)) return null;
+        if (v.length === 1) return zmDong(P.gu, v[0], P, "medium", "법정동 " + P.legal + " →");
+        var sm = (R.jibun_samples || {})[P.legal];
+        if (P.bun != null && sm && sm.length) {
+          var best = null, bd = 1e12;
+          sm.forEach(function(s) { if (s[0] !== P.san) return; var d = Math.abs(s[1] - P.bun) * 100000 + Math.abs(s[2] - P.ji); if (d < bd) { bd = d; best = s; } });
+          if (best) {
+            var dn = best[3], vv = R.dong_index[Object.keys(R.dong_index).filter(function(k) { return k.split(" ")[1] === dn; })[0]], zone = null;
+            if (vv === "SPLIT") { var rs = ((R.split_rules[dn] || {}).roads) || []; for (var i = 0; i < rs.length; i++) if (rs[i][0] === best[4]) zone = rs[i][1]; }
+            else zone = vv;
+            if (zone) return { zone: zone, conf: "low", how: "지번 표본 추정 (" + P.legal + " " + P.bun + "번지 ≈ " + dn + ")" };
+          }
+        }
+        return null;
+      }
+      function zmMatch(addr, hint, depth) {
+        var R = ZM.rules; if (!R) return null;
+        var P = zmParse(addr); if (!P.text && !(hint && hint.dong)) return null;
+        var oa = R.out_of_area_regions || [];
+        if (P.gu && oa.indexOf(P.gu) >= 0) return { zone: "OTHER", conf: "high", how: P.gu + " (타 지사 관할 지역)" };
+        for (var a = 0; a < oa.length; a++) {
+          if (/구$/.test(oa[a])) continue;
+          if (P.text.indexOf(oa[a]) >= 0 && !((oa[a] === "장암동" || oa[a] === "호원동") && P.gu)) return { zone: "OTHER", conf: "high", how: oa[a] + " (타 지사 관할 지역)" };
+        }
+        if (!depth) {
+          var go = R.government_offices || [];
+          for (var g = 0; g < go.length; g++) if (P.text.indexOf(go[g][0]) >= 0) { var rg = zmMatch(go[g][1], null, 1); if (rg && rg.zone) { rg.how = "관공서 " + go[g][0] + " · " + rg.how; return rg; } }
+        }
+        // 관할 명칭(학교·역·아파트 등): 가장 긴 이름, 한 구역일 때만
+        var bestLen = 0, bestZ = {}, bestName = "";
+        Object.keys(R.zones || {}).forEach(function(z) {
+          ((R.zones[z].landmarks) || []).forEach(function(l) {
+            if (l.length < 3 || P.text.indexOf(l) < 0) return;
+            if (l.length > bestLen) { bestLen = l.length; bestZ = {}; bestZ[z] = 1; bestName = l; }
+            else if (l.length === bestLen) bestZ[z] = 1;
+          });
+        });
+        if (bestLen && Object.keys(bestZ).length === 1) return { zone: Object.keys(bestZ)[0], conf: "medium", how: "관할 명칭 '" + bestName + "'" };
+        if (hint && hint.dong) { var rh = zmDong(hint.gu || P.gu, hint.dong, P, "high", "지도 행정동"); if (rh) return rh; }
+        for (var i = 0; i < P.dongs.length; i++) { var rd = zmDong(P.gu, P.dongs[i], P, "high", "행정동"); if (rd) return rd; }
+        if (P.road) { var rr = zmRoad(P); if (rr) return rr; }
+        var rj = zmJibun(P); if (rj) return rj;
+        if (P.base && (R.out_of_area_roads || []).indexOf(P.base) >= 0 && (!P.gu || ["강북구", "도봉구", "노원구"].indexOf(P.gu) < 0)) return { zone: "OTHER", conf: "low", how: "도로 " + P.base + " (관할 외 도로)" };
+        var kws = (R.keywords || []).slice().sort(function(x, y) { return y[0].length - x[0].length; });
+        for (var k = 0; k < kws.length; k++) if (P.text.indexOf(kws[k][0]) >= 0) return { zone: kws[k][1], conf: "low", how: "키워드 '" + kws[k][0] + "' (추정)" };
+        return null;
+      }
+      // 주소(+지도 행정동 힌트) → {zone, vehicle, consultant, conf, how} / {ambiguous, cands} / null
+      async function zmSuggest(addr, hint) {
+        if (!(await zmLoad())) return null;
+        var m = zmMatch(addr, hint, 0); if (!m) return null;
+        if (m.zone) { var z = ZM.zones[m.zone] || {}; m.vehicle = z.vehicle || ""; m.consultant = z.consultant || ""; }
+        else if (m.cands) m.cands = m.cands.map(function(c) { var z = ZM.zones[c[0]] || {}; return { zone: c[0], vehicle: z.vehicle || "", consultant: z.consultant || "", label: c[1] }; });
+        return m;
+      }
+
+      // ---- 등록 화면: 자동배정 기본값 + 수동 변경 ----
+      var repManual = false, repAutoApplied = false, repAutoSeq = 0, repAutoLast = null, repAutoTimer = null;
+      var REP_CAR_FALLBACK = { "최영국": "28호", "박광춘": "160호", "임영민": "127호", "이수열": "27호", "정문재": "26호" };
+      function refRegionHint(lat, lng) {
+        return new Promise(function(res) {
+          try {
+            var S = window.kakao && window.kakao.maps && window.kakao.maps.services;
+            if (!S) return res(null);
+            new S.Geocoder().coord2RegionCode(lng, lat, function(r, st) {
+              if (st !== S.Status.OK || !r || !r.length) return res(null);
+              var h = r.filter(function(x) { return x.region_type === "H"; })[0] || r[0];
+              res(h ? { gu: h.region_2depth_name, dong: h.region_3depth_name } : null);
+            });
+          } catch (e) { res(null); }
+        });
+      }
+      function repHintHtml(m, applied) {
+        var esc = function(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function(c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+        if (!m) return '<span class="rah-none">주소로 담당 차량을 찾지 못했습니다. 컨설턴트를 직접 선택해 주세요.</span>';
+        if (m.ambiguous) {
+          var c = (m.cands || []).filter(function(x) { return x.consultant; }).map(function(x) { return esc(x.vehicle + " " + x.consultant) + (x.label ? " (" + esc(x.label) + ")" : ""); });
+          return '<span class="rah-warn">경계 지역입니다' + (m.dong ? " (" + esc(m.dong) + ")" : "") + '. 직접 선택해 주세요' + (c.length ? " — 후보: " + c.join(" / ") : "") + '</span>';
+        }
+        if (m.zone === "OTHER" || !m.consultant) return '<span class="rah-warn">타 지사 관할로 보입니다 (' + esc(m.how) + '). 컨설턴트를 직접 선택해 주세요.</span>';
+        var low = m.conf === "low";
+        return '<span class="' + (low ? "rah-warn" : "rah-ok") + '">🚗 ' + (applied ? "자동배정: " : "자동배정 제안: ") + esc(m.vehicle) + " · " + esc(m.consultant) + (low ? " (추정 — 확인해 주세요)" : "") + '</span> <small>' + esc(m.how) + '</small>';
+      }
+      async function repAutoRun(force) {
+        var addrEl = document.getElementById("address"), selEl = document.getElementById("assignedRep"), hintEl = document.getElementById("repAutoHint"), carEl = document.getElementById("carNumber");
+        if (!addrEl || !selEl || !hintEl) return;
+        var addr = addrEl.value.trim(), seq = ++repAutoSeq;
+        if (addr.length < 4) { hintEl.style.display = "none"; var h2 = document.getElementById("repAutoHint2"); if (h2) h2.style.display = "none"; repAutoLast = null; return; }
+        var hint = null;
+        if (refFormPlace && refFormPlace.lat) hint = await refRegionHint(refFormPlace.lat, refFormPlace.lng);
+        var m = null;
+        try { m = await zmSuggest(addr, hint); } catch (e) { console.warn("[자동배정]", e); }
+        if (seq !== repAutoSeq) return;
+        repAutoLast = m;
+        if (force) repManual = false;
+        var canSet = !!(m && m.zone && m.consultant);
+        var applied = false;
+        if (canSet && !repManual) {
+          var has = Array.prototype.some.call(selEl.options, function(o) { return o.value === m.consultant; });
+          if (has) { selEl.value = m.consultant; if (carEl) carEl.value = m.vehicle || REP_CAR_FALLBACK[m.consultant] || ""; repAutoApplied = true; applied = true; }
+        } else if (!repManual && repAutoApplied) { selEl.value = ""; if (carEl) carEl.value = ""; repAutoApplied = false; }
+        var html = repHintHtml(m, applied);
+        if (repManual && canSet) html = '<span class="rah-manual">직접 지정됨</span> <small>자동배정 제안: ' + m.vehicle + " " + m.consultant + '</small> <a href="#" class="repAutoReapply">자동배정 적용</a>';
+        var hint2 = document.getElementById("repAutoHint2");
+        [hintEl, hint2].forEach(function(h) { if (h) { h.innerHTML = html; h.style.display = "block"; } });
+        document.querySelectorAll(".repAutoReapply").forEach(function(ra) { ra.addEventListener("click", function(e) { e.preventDefault(); repAutoRun(true); }); });
+      }
+      function repAutoSchedule(delay) { clearTimeout(repAutoTimer); repAutoTimer = setTimeout(function() { repAutoRun(false); }, delay == null ? 700 : delay); }
+      // 관리자 수정 화면: 주소 기준 자동배정 제안(표시만)
+      async function editRepSuggest() {
+        var a = document.getElementById("editAddress"), h = document.getElementById("editRepHint"), sel = document.getElementById("editAssignedRep");
+        if (!a || !h || !sel) return;
+        var m = null; if (a.value.trim().length >= 4) { try { m = await zmSuggest(a.value.trim(), null); } catch (e) {} }
+        if (!m || !m.zone || !m.consultant) { h.innerHTML = m ? repHintHtml(m, false) : ""; return; }
+        h.innerHTML = repHintHtml(m, false) + ' <a href="#" id="editRepApply">적용</a>';
+        var ap = document.getElementById("editRepApply");
+        if (ap) ap.addEventListener("click", function(e) { e.preventDefault(); if (Array.prototype.some.call(sel.options, function(o) { return o.value === m.consultant; })) sel.value = m.consultant; });
+      }
+
       // ---- 앱 설치 (PWA) ----
       var deferredInstall = null;
       function isStandalone() { return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true; }
@@ -3077,6 +3344,12 @@
         if (/iphone|ipad|ipod/i.test(navigator.userAgent)) alert("아이폰 설치 방법\n\n1) 사파리로 접속\n2) 하단 공유 버튼(□↑) 누르기\n3) '홈 화면에 추가' 선택");
         else alert("설치 방법\n\n크롬 우측 상단 ⋮ 메뉴 → '앱 설치' 또는 '홈 화면에 추가'를 눌러 주세요.");
       };
+      (function() {
+        function sync() { var w = document.getElementById("loginInstallWrap"); if (w) w.style.display = isStandalone() ? "none" : "block"; }
+        document.addEventListener("click", function(e) { var b = e.target.closest && e.target.closest("#btnLoginInstall"); if (b) window.__appInstall(); });
+        window.addEventListener("appinstalled", sync);
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", sync); else sync();
+      })();
       if ("serviceWorker" in navigator && window.isSecureContext) { window.addEventListener("load", function() { try { navigator.serviceWorker.register("sw.js").catch(function() {}); } catch (e) {} }); }
 
       // ---- 푸시 알림 (Web Push) ----
@@ -4611,6 +4884,50 @@
         if (statusBox) statusBox.style.display = "none";
       }
 
+      // ---- 상세화면: 담당 컨설턴트 변경 (관리자 / 현재 담당 컨설턴트) ----
+      var REP_LIST = ["정문재", "이수열", "최영국", "임영민", "박광춘"];
+      function repChangeSetup(item) {
+        var span = document.getElementById("mAssignedRep");
+        if (!span) return;
+        var box = span.parentNode;
+        var old = document.getElementById("repChangeBox"); if (old) old.remove();
+        var cur = String(item.assigned_rep || "").trim();
+        var me = String(currentUserName || "").trim();
+        if (!(isAdminRole(currentRole) || (cur && me && cur === me))) return;
+        var wrap = document.createElement("span"); wrap.id = "repChangeBox"; wrap.style.cssText = "display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;";
+        var btn = document.createElement("button"); btn.type = "button"; btn.textContent = "변경";
+        btn.style.cssText = "padding:2px 8px;font-size:0.75rem;background:#fff;color:#1a73e8;border:1px solid #1a73e8;border-radius:6px;cursor:pointer;font-weight:700;";
+        wrap.appendChild(btn); box.appendChild(wrap);
+        btn.addEventListener("click", function() {
+          wrap.innerHTML = "";
+          var sel = document.createElement("select"); sel.style.cssText = "padding:4px 6px;font-size:0.85rem;border:1px solid #cbd5e1;border-radius:6px;";
+          var names = REP_LIST.slice(); if (cur && names.indexOf(cur) < 0) names.push(cur);
+          names.forEach(function(n) { var o = document.createElement("option"); o.value = n; o.textContent = n; if (n === cur) o.selected = true; sel.appendChild(o); });
+          var ok = document.createElement("button"); ok.type = "button"; ok.textContent = "저장";
+          ok.style.cssText = "padding:3px 10px;font-size:0.8rem;background:#1a73e8;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:700;";
+          var cx = document.createElement("button"); cx.type = "button"; cx.textContent = "취소";
+          cx.style.cssText = "padding:3px 10px;font-size:0.8rem;background:#f1f3f4;color:#333;border:none;border-radius:6px;cursor:pointer;";
+          wrap.appendChild(sel); wrap.appendChild(ok); wrap.appendChild(cx);
+          cx.addEventListener("click", function() { repChangeSetup(item); });
+          ok.addEventListener("click", async function() {
+            var nr = sel.value;
+            if (!nr || nr === cur) { repChangeSetup(item); return; }
+            if (!supabase) return;
+            if (!confirm("담당 컨설턴트를 '" + (cur || "미지정") + "' → '" + nr + "'(으)로 변경할까요?")) return;
+            ok.disabled = true;
+            var car = (typeof CAR_NUMBER_MAP !== "undefined" && CAR_NUMBER_MAP[nr]) || REP_CAR_FALLBACK[nr] || "";
+            var res = await supabase.from("leads").update({ assigned_rep: nr, car_number: car }).eq("lead_id", item.lead_id);
+            if (res.error) { alert("변경 실패: " + res.error.message); ok.disabled = false; return; }
+            try { await supabase.from("ta_places").update({ consultant: nr }).eq("lead_id", item.lead_id); } catch (e) {}
+            item.assigned_rep = nr; item.car_number = car;
+            span.innerText = nr;
+            alert("✅ 담당 컨설턴트가 " + nr + "(으)로 변경되었습니다.");
+            closeDetailModal();
+            loadDashboardLeads();
+          });
+        });
+      }
+
       function openDetailModal(idx, directItem) {
         var item = directItem || currentLeadsData[idx];
         if (!item) return;
@@ -4695,6 +5012,7 @@
           statusBox.style.display = stEditable ? "" : "none";
         }
 
+        repChangeSetup(item);
         clearBoardFile();
         loadLeadBoardPosts(item.lead_id);
         var bInput = document.getElementById("boardContentInput");
@@ -5187,7 +5505,11 @@
         var refAddrInput = document.getElementById("address");
         if (refAddrInput) refAddrInput.addEventListener("input", function() {
           if (refFormPlace && this.value.trim() !== (refFormPlace.address || "")) refResetPlace();
+          repAutoSchedule(800);
         });
+        if (refAddrInput) refAddrInput.addEventListener("blur", function() { repAutoSchedule(50); });
+        var editAddrInput = document.getElementById("editAddress");
+        if (editAddrInput) editAddrInput.addEventListener("blur", editRepSuggest);
         var refBind = function(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener("click", fn); };
         refBind("refPkCancel", function() { closeRefPicker(); });
         refBind("refPkOk", refPkOk);
@@ -5727,6 +6049,17 @@
             document.getElementById("editContactPerson").value = activeLeadItem.contact_person || "";
             document.getElementById("editContactPhone").value = activeLeadItem.contact_phone || "";
             document.getElementById("editAddress").value = activeLeadItem.address || "";
+            var erg = document.getElementById("editRepGroup"), ers = document.getElementById("editAssignedRep");
+            if (erg && ers) {
+              var showRep = isAdminRole(currentRole);
+              erg.style.display = showRep ? "block" : "none";
+              if (showRep) {
+                var cur = (activeLeadItem.assigned_rep || "").trim();
+                if (cur && !Array.prototype.some.call(ers.options, function(o) { return o.value === cur; })) { var op = document.createElement("option"); op.value = cur; op.textContent = cur; ers.appendChild(op); }
+                ers.value = cur;
+                document.getElementById("editRepHint").innerHTML = "";
+              }
+            }
             document.getElementById("editBusinessType").value = activeLeadItem.business_type || "";
             document.getElementById("editCurrentCompany").value = activeLeadItem.current_company || "";
             document.getElementById("editProduct").value = activeLeadItem.product || "";
@@ -5783,12 +6116,24 @@
               field_description: document.getElementById("editFieldDesc").value.trim(),
               photo_urls: finalPhotoUrls
             };
+            var newRep = null;
+            if (isMaster) {
+              var ers2 = document.getElementById("editAssignedRep");
+              var nr = ers2 ? ers2.value.trim() : "";
+              if (nr && nr !== String(activeLeadItem.assigned_rep || "").trim()) {
+                newRep = nr; updatedData.assigned_rep = nr;
+                updatedData.car_number = (typeof CAR_NUMBER_MAP !== "undefined" && CAR_NUMBER_MAP[nr]) || REP_CAR_FALLBACK[nr] || "";
+              }
+            }
 
             var res = await supabase.from("leads").update(updatedData).eq("lead_id", activeLeadItem.lead_id);
+            if (!res.error && newRep) {
+              try { await supabase.from("ta_places").update({ consultant: newRep }).eq("lead_id", activeLeadItem.lead_id); } catch (pe) {}
+            }
             this.disabled = false; this.innerText = "수정 완료 저장";
 
             if (!res.error) {
-              alert("✅ 안건 상세 정보가 성공적으로 수정되었습니다.");
+              alert("✅ 안건 상세 정보가 성공적으로 수정되었습니다." + (newRep ? "\n담당 컨설턴트: " + newRep : ""));
 
               editNewPhotos = [];
               closeDetailModal();
@@ -5861,6 +6206,8 @@
         if (repSelectEl && carNumEl) {
           repSelectEl.addEventListener("change", function() {
             carNumEl.value = CAR_NUMBER_MAP[this.value] || "";
+            repManual = !!this.value; repAutoApplied = false;
+            if (this.value) repAutoRun(false); else { repManual = false; repAutoRun(false); }
           });
         }
 
@@ -5943,6 +6290,8 @@
               document.getElementById("fieldDescription").value = "";
               document.getElementById("assignedRep").value = "";
               document.getElementById("carNumber").value = "";
+              repManual = false; repAutoApplied = false; repAutoLast = null;
+              ["repAutoHint", "repAutoHint2"].forEach(function(id) { var rah = document.getElementById(id); if (rah) { rah.style.display = "none"; rah.innerHTML = ""; } });
               document.querySelectorAll("input[name=\"prod\"]").forEach(function(cb) {
                 cb.checked = false;
                 if (cb.closest(".prod-item")) cb.closest(".prod-item").classList.remove("checked");
