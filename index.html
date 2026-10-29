@@ -3352,6 +3352,37 @@
       })();
       if ("serviceWorker" in navigator && window.isSecureContext) { window.addEventListener("load", function() { try { navigator.serviceWorker.register("sw.js").catch(function() {}); } catch (e) {} }); }
 
+      // ---- 앱 업데이트 안내 (version.json 의 build 값이 현재 앱과 다르면 하단 배너 표시) ----
+      var APP_BUILD = "20261030a";
+      var updChecked = 0;
+      function showUpdateBanner() {
+        if (document.getElementById("appUpdateBar")) return;
+        var b = document.createElement("div"); b.id = "appUpdateBar";
+        b.style.cssText = "position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 74px);z-index:2147482900;background:#0f2547;color:#fff;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 20px rgba(0,0,0,.3);max-width:480px;margin:0 auto;font-size:0.9rem;";
+        b.innerHTML = '<span style="flex:1;">🔄 새 버전이 있습니다. 업데이트해 주세요.</span><button type="button" id="appUpdateGo" style="background:#1a73e8;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;">업데이트</button><button type="button" id="appUpdateLater" style="background:none;color:#cbd5e1;border:none;font-size:1.1rem;cursor:pointer;">×</button>';
+        document.body.appendChild(b);
+        document.getElementById("appUpdateLater").addEventListener("click", function() { b.remove(); });
+        document.getElementById("appUpdateGo").addEventListener("click", async function() {
+          this.disabled = true; this.textContent = "업데이트 중...";
+          try { if (window.caches) { var ks = await caches.keys(); await Promise.all(ks.map(function(k) { return caches.delete(k); })); } } catch (e) {}
+          try { if (navigator.serviceWorker) { var rs = await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(function(r) { return r.update(); })); } } catch (e) {}
+          location.reload();
+        });
+      }
+      async function checkAppUpdate(force) {
+        try {
+          if (!window.isSecureContext || location.protocol === "file:") return;
+          if (!force && Date.now() - updChecked < 5 * 60 * 1000) return;
+          updChecked = Date.now();
+          var r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
+          if (!r.ok) return;
+          var v = await r.json();
+          if (v && v.build && String(v.build) !== APP_BUILD) showUpdateBanner();
+        } catch (e) {}
+      }
+      window.addEventListener("load", function() { setTimeout(function() { checkAppUpdate(true); }, 2500); });
+      document.addEventListener("visibilitychange", function() { if (document.visibilityState === "visible") checkAppUpdate(false); });
+
       // ---- 푸시 알림 (Web Push) ----
       var PUSH_VAPID_PUBLIC = "BPswZCC-twLU8AoMiSHAyHp8l3K2LMtDCyCr-3rua3I9UCqUFyrDehn3g5Hb4kr7ojNCuBJ8B0cA4S-yD6EvRgI";
       function pushSupported() { return ("serviceWorker" in navigator) && ("PushManager" in window) && ("Notification" in window) && window.isSecureContext; }
