@@ -1,5 +1,5 @@
 // 소개영업 서비스워커: 앱 설치(PWA) + 푸시 알림
-var CACHE = 'referral-shell-v1';
+var CACHE = 'referral-shell-v2';
 var SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', function (e) { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(SHELL.map(function (u) { return c.add(u).catch(function () {}); })); })); });
 self.addEventListener('activate', function (e) {
@@ -20,12 +20,20 @@ self.addEventListener('push', function (event) {
   var d = {};
   try { d = event.data ? event.data.json() : {}; } catch (e) { d = { body: event.data ? event.data.text() : '' }; }
   var title = d.title || '소개영업';
-  event.waitUntil(self.registration.showNotification(title, {
+  var lid = (d.tag || '').replace(/^lead-(new-)?/, '');
+  event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
+    var vis = list.filter(function (c) { return c.visibilityState === 'visible'; });
+    if (vis.length) {   // 앱이 열려 있으면 상단 알림창으로 표시
+      vis.forEach(function (c) { c.postMessage({ type: 'push-foreground', title: title, body: d.body || '', lead_id: lid }); });
+      return;
+    }
+    return self.registration.showNotification(title, {
     body: d.body || '안건 진행상황이 갱신되었습니다.',
     tag: d.tag || 'referral-update',
     renotify: true,
     icon: d.icon || undefined,
     data: { url: d.url || self.registration.scope }
+    });
   }));
 });
 

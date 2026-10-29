@@ -3400,11 +3400,35 @@
       }
       window.__pushToggle = async function() { if (await pushIsOn()) { await pushDisable(); } else { await pushEnable(); } return await pushIsOn(); };
       window.__pushIsOn = pushIsOn;
-      function notifyReferrer(lead) {
+      function notifyReferrer(lead, ev) {
         try {
-          if (!supabase || !lead || !lead.agent_name || String(lead.agent_name).trim() === String(currentUserName || "").trim()) return;
-          supabase.functions.invoke("notify-referrer", { body: { lead_id: lead.lead_id, actor: currentUserName } }).then(function(r) { if (r && r.error) console.warn("[푸시] 발송 실패", r.error); }).catch(function() {});
+          if (!supabase || !lead || !lead.lead_id) return;
+          supabase.functions.invoke("notify-referrer", { body: { lead_id: lead.lead_id, actor: currentUserName, event: ev || "stage" } }).then(function(r) { if (r && r.error) console.warn("[푸시] 발송 실패", r.error); }).catch(function() {});
         } catch (e) {}
+      }
+
+      // ---- 앱이 열려 있을 때: 상단 검은 반투명 알림창 ----
+      var toastTimer = null;
+      function showTopToast(title, body, leadId) {
+        var t = document.getElementById("pushTopToast");
+        if (!t) {
+          t = document.createElement("div"); t.id = "pushTopToast";
+          t.style.cssText = "position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translate(-50%,-140%);width:calc(100% - 24px);max-width:460px;box-sizing:border-box;background:rgba(0,0,0,0.82);color:#fff;border-radius:14px;padding:12px 16px;z-index:2147483000;box-shadow:0 6px 20px rgba(0,0,0,0.35);transition:transform .35s ease;cursor:pointer;font-family:inherit;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);";
+          t.addEventListener("click", function() { hideTopToast(); var id = t.getAttribute("data-lead"); if (id && window.__refOpenLead) { try { window.__refOpenLead(id); } catch (e) {} } });
+          document.body.appendChild(t);
+        }
+        t.setAttribute("data-lead", leadId || "");
+        t.innerHTML = '<div style="font-size:0.78rem;opacity:.75;margin-bottom:3px;">🔔 ' + refEsc(title || "소개영업") + '</div><div style="font-size:0.95rem;font-weight:600;line-height:1.4;">' + refEsc(body || "") + '</div>';
+        void t.offsetWidth; t.style.transform = "translate(-50%,0)";
+        clearTimeout(toastTimer); toastTimer = setTimeout(hideTopToast, 6000);
+      }
+      function hideTopToast() { var t = document.getElementById("pushTopToast"); if (t) t.style.transform = "translate(-50%,-140%)"; }
+      window.__showTopToast = showTopToast;
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.addEventListener("message", function(e) {
+          var d = e.data || {};
+          if (d.type === "push-foreground") showTopToast(d.title, d.body, d.lead_id);
+        });
       }
 
       // ---- 앱 내 카메라 (getUserMedia). 불가/거부 시 기본 카메라(파일 선택)로 대체 ----
@@ -6265,6 +6289,7 @@
               }]);
 
               if (res.error) throw res.error;
+              notifyReferrer({ lead_id: leadId }, "new");
 
               // 위치 좌표 저장 (TA 관리 포털 지도에서 동일 안건 위치로 사용) — 실패해도 접수에는 영향 없음
               if (refFormPlace && refFormPlace.lat) {
