@@ -1532,7 +1532,7 @@
             <input type="text" id="editCustomerName" name="edit_customer_name_no_auto" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="form-group" id="editRepGroup" style="display:none;">
-            <label class="form-label">담당 컨설턴트 <span class="opt">(관리자)</span></label>
+            <label class="form-label">담당 컨설턴트 <span class="opt">(관리자/등록자)</span></label>
             <select id="editAssignedRep" class="rep-select">
               <option value="">컨설턴트 선택</option>
               <option value="정문재">정문재</option>
@@ -4884,7 +4884,7 @@
         if (statusBox) statusBox.style.display = "none";
       }
 
-      // ---- 상세화면: 담당 컨설턴트 변경 (관리자 / 현재 담당 컨설턴트) ----
+      // ---- 상세화면: 담당 컨설턴트 변경 (관리자 / 안건 등록자) ----
       var REP_LIST = ["정문재", "이수열", "최영국", "임영민", "박광춘"];
       function repChangeSetup(item) {
         var span = document.getElementById("mAssignedRep");
@@ -4893,7 +4893,8 @@
         var old = document.getElementById("repChangeBox"); if (old) old.remove();
         var cur = String(item.assigned_rep || "").trim();
         var me = String(currentUserName || "").trim();
-        if (!(isAdminRole(currentRole) || (cur && me && cur === me))) return;
+        var author = String(item.agent_name || "").trim();
+        if (!(isAdminRole(currentRole) || (author && me && author === me))) return;
         var wrap = document.createElement("span"); wrap.id = "repChangeBox"; wrap.style.cssText = "display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;";
         var btn = document.createElement("button"); btn.type = "button"; btn.textContent = "변경";
         btn.style.cssText = "padding:2px 8px;font-size:0.75rem;background:#fff;color:#1a73e8;border:1px solid #1a73e8;border-radius:6px;cursor:pointer;font-weight:700;";
@@ -6051,7 +6052,7 @@
             document.getElementById("editAddress").value = activeLeadItem.address || "";
             var erg = document.getElementById("editRepGroup"), ers = document.getElementById("editAssignedRep");
             if (erg && ers) {
-              var showRep = isAdminRole(currentRole);
+              var showRep = isAdminRole(currentRole) || (String(activeLeadItem.agent_name || "").trim() !== "" && String(activeLeadItem.agent_name).trim() === String(currentUserName || "").trim());
               erg.style.display = showRep ? "block" : "none";
               if (showRep) {
                 var cur = (activeLeadItem.assigned_rep || "").trim();
@@ -6117,7 +6118,7 @@
               photo_urls: finalPhotoUrls
             };
             var newRep = null;
-            if (isMaster) {
+            if (isMaster || isAuthor) {
               var ers2 = document.getElementById("editAssignedRep");
               var nr = ers2 ? ers2.value.trim() : "";
               if (nr && nr !== String(activeLeadItem.assigned_rep || "").trim()) {
