@@ -1,5 +1,5 @@
 // 소개영업 서비스워커: 앱 설치(PWA) + 푸시 알림
-var CACHE = 'referral-shell-v2';
+var CACHE = 'referral-shell-v3';
 var SHELL = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 self.addEventListener('install', function (e) { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(SHELL.map(function (u) { return c.add(u).catch(function () {}); })); })); });
 self.addEventListener('activate', function (e) {
